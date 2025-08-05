@@ -1,0 +1,54 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    // 优化构建
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+      },
+    },
+    // 代码分割优化
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['lucide-react'],
+        },
+        // 优化文件名
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+      },
+    },
+    // 启用源码映射（生产环境可选）
+    sourcemap: false,
+    // 设置块大小警告阈值
+    chunkSizeWarningLimit: 1000,
+  },
+  // 开发服务器优化
+  server: {
+    host: '0.0.0.0', // 允许局域网访问
+    port: 5173, // 指定端口
+    hmr: {
+      overlay: false,
+    },
+  },
+  // 预构建优化
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'lucide-react'],
+    exclude: [],
+  },
+  // CSS优化
+  css: {
+    devSourcemap: false,
+  },
+  // 资源处理优化
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg'],
+}) 

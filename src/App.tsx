@@ -413,7 +413,7 @@ const App: React.FC = () => {
       <footer className="bg-gray-900 text-white mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* 主要内容区域 */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
             {/* 猎豹服务 */}
             <div>
               <h3 className="text-lg font-bold mb-4 text-white">猎豹服务</h3>

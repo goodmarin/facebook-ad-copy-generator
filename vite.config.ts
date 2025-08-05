@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: '/facebook-ad-copy-generator/',
   build: {
     // 优化构建
     minify: 'terser',

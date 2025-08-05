@@ -472,7 +472,7 @@ const App: React.FC = () => {
             </div>
 
             {/* 官方公众号 */}
-            <div className="flex flex-col items-center">
+            <div>
               <h3 className="text-lg font-bold mb-4 text-white">官方公众号</h3>
               {/* 二维码 */}
               <div className="w-32 h-32 mb-3">
@@ -511,7 +511,7 @@ const App: React.FC = () => {
               </div>
               
               {/* 文字信息 */}
-              <div className="text-center">
+              <div className="text-left">
               </div>
             </div>
 

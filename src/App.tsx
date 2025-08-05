@@ -413,9 +413,9 @@ const App: React.FC = () => {
       <footer className="bg-gray-900 text-white mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* 主要内容区域 */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* 猎豹服务 */}
-            <div>
+            <div className="flex flex-col">
               <h3 className="text-lg font-bold mb-4 text-white">猎豹服务</h3>
               <ul className="space-y-2">
                 <li>
@@ -462,7 +462,7 @@ const App: React.FC = () => {
             </div>
 
             {/* 联系我们 */}
-            <div>
+            <div className="flex flex-col">
               <h3 className="text-lg font-bold mb-4 text-white">联系我们</h3>
               <ul className="space-y-2 text-gray-300">
                 <li>咨询热线：400-603-7779</li>
@@ -472,7 +472,7 @@ const App: React.FC = () => {
             </div>
 
             {/* 官方公众号 */}
-            <div>
+            <div className="flex flex-col">
               <h3 className="text-lg font-bold mb-4 text-white">官方公众号</h3>
               {/* 二维码 */}
               <div className="w-32 h-32 mb-3">
@@ -516,7 +516,7 @@ const App: React.FC = () => {
             </div>
 
             {/* 关于我们 */}
-            <div>
+            <div className="flex flex-col">
               <h3 className="text-lg font-bold mb-4 text-white">关于我们</h3>
               <p className="text-gray-300 text-sm leading-relaxed">
                 专业的Facebook广告文案生成工具，基于React + Tailwind CSS + DeepSeek构建，

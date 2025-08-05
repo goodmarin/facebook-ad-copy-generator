@@ -474,7 +474,7 @@ const App: React.FC = () => {
             {/* 官方公众号 */}
             <div className="flex flex-col">
               <h3 className="text-lg font-bold mb-4 text-white">官方公众号</h3>
-              {/* 二维码 */}
+              {/* 二维码 - 左对齐 */}
               <div className="w-32 h-32 mb-3">
                 <img 
                   src="https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813" 
@@ -508,10 +508,6 @@ const App: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* 文字信息 */}
-              <div className="text-left">
               </div>
             </div>
 

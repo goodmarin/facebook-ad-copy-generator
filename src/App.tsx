@@ -1,11 +1,13 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, Suspense } from 'react';
 import { InputForm } from './components/InputForm';
-import { OutputDisplay } from './components/OutputDisplay';
 import { MetaLogo } from './components/MetaLogo';
 import { CountdownTimer } from './components/CountdownTimer';
 import { useOpenAI } from './hooks/useOpenAI';
 import { ProductInfo } from './types';
 import { checkForbiddenCategory } from './utils/sensitiveWords';
+
+// 懒加载组件
+const LazyOutputDisplay = React.lazy(() => import('./components/OutputDisplay').then(module => ({ default: module.OutputDisplay })));
 
 const App: React.FC = () => {
   const [productInfo, setProductInfo] = useState<ProductInfo>({
@@ -137,7 +139,7 @@ const App: React.FC = () => {
 
       {/* 主要内容区域 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* 左侧产品信息 */}
           <div className="lg:col-span-1">
             <div className="card bg-white/90 backdrop-blur-sm border-0 shadow-2xl rounded-3xl h-full">
@@ -169,13 +171,15 @@ const App: React.FC = () => {
                 <h2 className="text-xl font-bold text-gray-900">生成结果</h2>
               </div>
               <div className="px-6 pb-8 min-h-0 overflow-hidden">
-                <OutputDisplay
-                  copies={generatedCopies}
-                  region={productInfo.region}
-                  isLoading={isLoading}
-                  error={error}
-                  isForbiddenProduct={isForbiddenProduct}
-                />
+                <Suspense fallback={<div className="flex items-center justify-center h-32">加载中...</div>}>
+                  <LazyOutputDisplay
+                    copies={generatedCopies}
+                    region={productInfo.region}
+                    isLoading={isLoading}
+                    error={error}
+                    isForbiddenProduct={isForbiddenProduct}
+                  />
+                </Suspense>
               </div>
             </div>
 

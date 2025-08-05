@@ -22,17 +22,24 @@ export default defineConfig({
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+        // 更好的代码分割
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['lucide-react'],
+        },
       },
     },
     // 启用源码映射（生产环境可选）
     sourcemap: false,
     // 设置块大小警告阈值
     chunkSizeWarningLimit: 1000,
+    // 启用CSS代码分割
+    cssCodeSplit: true,
   },
   // 开发服务器优化
   server: {
-    host: '0.0.0.0', // 允许局域网访问
-    port: 5173, // 指定端口
+    host: '0.0.0.0',
+    port: 5173,
     hmr: {
       overlay: false,
     },
@@ -48,4 +55,8 @@ export default defineConfig({
   },
   // 资源处理优化
   assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg'],
+  // 预加载优化
+  preview: {
+    port: 4173,
+  },
 }) 

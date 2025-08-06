@@ -475,29 +475,18 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* 关于我们 */}
-            <div className="flex-1 min-w-0 max-w-xs">
-              <div className="flex flex-col">
-                <h3 className="text-lg font-bold mb-4 text-white">关于我们</h3>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  专业的Facebook广告文案生成工具，基于React + Tailwind CSS + DeepSeek构建，
-                  为广告主提供高质量的文案创作服务。与猎豹移动深度合作，助力企业出海营销。
-                </p>
-              </div>
-            </div>
-
             {/* 官方公众号 */}
             <div className="flex-1 min-w-0 max-w-xs">
               <div className="flex flex-col">
                 <h3 className="text-lg font-bold mb-4 text-white">官方公众号</h3>
                 {/* 二维码 - 左对齐 */}
                 <div className="w-32 h-32 mb-3">
-                                  <img 
-                  src="https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813&v=2" 
-                  alt="猎豹国际广告官方公众号二维码" 
-                  className="w-full h-full object-cover rounded-lg"
-                  loading="lazy"
-                  decoding="async"
+                  <img 
+                    src="https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813&v=3" 
+                    alt="猎豹国际广告官方公众号二维码" 
+                    className="w-full h-full object-cover rounded-lg"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       // 如果图片加载失败，显示备用样式
                       const target = e.target as HTMLImageElement;
@@ -525,6 +514,17 @@ const App: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* 关于我们 */}
+            <div className="flex-1 min-w-0 max-w-xs">
+              <div className="flex flex-col">
+                <h3 className="text-lg font-bold mb-4 text-white">关于我们</h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  专业的Facebook广告文案生成工具，基于React + Tailwind CSS + DeepSeek构建，
+                  为广告主提供高质量的文案创作服务。与猎豹移动深度合作，助力企业出海营销。
+                </p>
               </div>
             </div>
             {/* 猎豹服务 */}

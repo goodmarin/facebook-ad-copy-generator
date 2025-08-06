@@ -237,7 +237,7 @@ const App: React.FC = () => {
                     </h4>
                     <div className="space-y-2">
                       <a 
-                        href="https://cheetahgo.cmcm.com/" 
+                        href="https://cheetahgo.cmcm.com/zhibo/ebusiness" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
@@ -245,7 +245,7 @@ const App: React.FC = () => {
                         电商出海
                       </a>
                       <a 
-                        href="https://cheetahgo.cmcm.com/" 
+                        href="https://cheetahgo.cmcm.com/zhibo/game" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
@@ -253,7 +253,7 @@ const App: React.FC = () => {
                         游戏出海
                       </a>
                       <a 
-                        href="https://cheetahgo.cmcm.com/" 
+                        href="https://cheetahgo.cmcm.com/zhibo/policy" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
@@ -261,7 +261,7 @@ const App: React.FC = () => {
                         政策解读
                       </a>
                       <a 
-                        href="https://cheetahgo.cmcm.com/" 
+                        href="https://cheetahgo.cmcm.com/zhibo/guide" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
@@ -269,7 +269,7 @@ const App: React.FC = () => {
                         新手指导
                       </a>
                       <a 
-                        href="https://cheetahgo.cmcm.com/" 
+                        href="https://cheetahgo.cmcm.com/zhibo/update" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"

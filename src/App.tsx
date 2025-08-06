@@ -423,6 +423,22 @@ const App: React.FC = () => {
               width: '100%'
             }}
           >
+            {/* 联系我们 */}
+            <div 
+              style={{ 
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%'
+              }}
+            >
+              <h3 className="text-lg font-bold mb-4 text-white">联系我们</h3>
+              <ul className="space-y-2 text-gray-300 flex-1">
+                <li>咨询热线：400-603-7779</li>
+                <li>咨询邮箱：adoverseas@cmcm.com</li>
+                <li className="text-sm leading-relaxed">总部地址：北京市朝阳区三间房南里7号万东科技文创园11号楼</li>
+              </ul>
+            </div>
+
             {/* 猎豹服务 */}
             <div 
               style={{ 
@@ -473,22 +489,6 @@ const App: React.FC = () => {
                     9号艺术工作室
                   </a>
                 </li>
-              </ul>
-            </div>
-
-            {/* 联系我们 */}
-            <div 
-              style={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%'
-              }}
-            >
-              <h3 className="text-lg font-bold mb-4 text-white">联系我们</h3>
-              <ul className="space-y-2 text-gray-300 flex-1">
-                <li>咨询热线：400-603-7779</li>
-                <li>咨询邮箱：adoverseas@cmcm.com</li>
-                <li className="text-sm leading-relaxed">总部地址：北京市朝阳区三间房南里7号万东科技文创园11号楼</li>
               </ul>
             </div>
 

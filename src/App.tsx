@@ -414,11 +414,12 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* 主要内容区域 */}
           <div 
+            className="footer-grid"
             style={{ 
-              display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: '32px',
-              alignItems: 'end'
+              display: 'grid !important',
+              gridTemplateColumns: 'repeat(4, 1fr) !important',
+              gap: '32px !important',
+              alignItems: 'end !important'
             }}
           >
             {/* 猎豹服务 */}

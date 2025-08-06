@@ -311,4 +311,12 @@ button, input, textarea, select {
   .meta-input {
     @apply bg-gray-800/90 border-gray-600 text-white;
   }
+}
+
+/* Footer Grid 强制样式 */
+.footer-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 32px !important;
+  align-items: end !important;
 } 

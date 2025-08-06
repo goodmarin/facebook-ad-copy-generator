@@ -493,7 +493,7 @@ const App: React.FC = () => {
                 {/* 二维码 - 左对齐 */}
                 <div className="w-32 h-32 mb-3">
                   <img 
-                    src="https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813&v=4" 
+                    src="https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813&v=5&ts=1754461800" 
                     alt="猎豹国际广告官方公众号二维码" 
                     className="w-full h-full object-cover rounded-lg"
                     loading="lazy"

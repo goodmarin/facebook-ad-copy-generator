@@ -413,9 +413,9 @@ const App: React.FC = () => {
       <footer className="bg-gray-900 text-white mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* 主要内容区域 */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="w-full max-w-xs">
-              {/* 猎豹服务 */}
+          <div className="flex flex-wrap justify-between gap-8">
+            {/* 猎豹服务 */}
+            <div className="flex-1 min-w-0 max-w-xs">
               <div className="flex flex-col">
                 <h3 className="text-lg font-bold mb-4 text-white">猎豹服务</h3>
                 <ul className="space-y-2">
@@ -463,8 +463,8 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-full max-w-xs">
-              {/* 联系我们 */}
+            {/* 联系我们 */}
+            <div className="flex-1 min-w-0 max-w-xs">
               <div className="flex flex-col">
                 <h3 className="text-lg font-bold mb-4 text-white">联系我们</h3>
                 <ul className="space-y-2 text-gray-300">
@@ -475,8 +475,8 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-full max-w-xs">
-              {/* 官方公众号 */}
+            {/* 官方公众号 */}
+            <div className="flex-1 min-w-0 max-w-xs">
               <div className="flex flex-col">
                 <h3 className="text-lg font-bold mb-4 text-white">官方公众号</h3>
                 {/* 二维码 - 左对齐 */}
@@ -517,8 +517,8 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-full max-w-xs">
-              {/* 关于我们 */}
+            {/* 关于我们 */}
+            <div className="flex-1 min-w-0 max-w-xs">
               <div className="flex flex-col">
                 <h3 className="text-lg font-bold mb-4 text-white">关于我们</h3>
                 <p className="text-gray-300 text-sm leading-relaxed">

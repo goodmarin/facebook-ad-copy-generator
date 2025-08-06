@@ -467,7 +467,7 @@ const App: React.FC = () => {
               <ul className="space-y-2 text-gray-300">
                 <li>咨询热线：400-603-7779</li>
                 <li>咨询邮箱：adoverseas@cmcm.com</li>
-                <li className="text-sm leading-relaxed">总部地址：北京市朝阳区三间房南里7号万东科技文创园11号楼猎豹移动大厦</li>
+                <li className="text-sm leading-relaxed">总部地址：北京市朝阳区三间房南里7号万东科技文创园11号楼</li>
               </ul>
             </div>
 

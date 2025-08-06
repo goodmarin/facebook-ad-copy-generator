@@ -503,8 +503,8 @@ const App: React.FC = () => {
             >
               <h3 className="text-lg font-bold mb-4 text-white">官方公众号</h3>
               <div className="flex-1 flex flex-col">
-                {/* 二维码 - 左对齐 */}
-                <div className="w-32 h-32 mb-3">
+                {/* 二维码 - 缩小尺寸 */}
+                <div className="w-24 h-24 mb-3">
                   <img 
                     src="https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813&v=5&ts=1754461800" 
                     alt="猎豹国际广告官方公众号二维码" 
@@ -520,7 +520,7 @@ const App: React.FC = () => {
                   />
                   {/* 备用二维码样式 - 当图片加载失败时显示 */}
                   <div className="w-full h-full bg-black rounded-lg flex items-center justify-center relative hidden">
-                    <div className="grid grid-cols-7 gap-0.5 w-24 h-24">
+                    <div className="grid grid-cols-7 gap-0.5 w-20 h-20">
                       {/* 简化的二维码图案 */}
                       <div className="bg-white w-1 h-1"></div>
                       <div className="bg-black w-1 h-1"></div>
@@ -532,7 +532,7 @@ const App: React.FC = () => {
                       {/* 更多图案... */}
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="bg-orange-500 rounded-lg p-1.5 w-8 h-8 flex items-center justify-center">
+                      <div className="bg-orange-500 rounded-lg p-1 w-6 h-6 flex items-center justify-center">
                         <span className="text-white text-xs font-bold">CMT</span>
                       </div>
                     </div>
@@ -558,6 +558,13 @@ const App: React.FC = () => {
                 </p>
               </div>
             </div>
+          </div>
+          
+          {/* 版权信息 - 参考CheetahGo设计 */}
+          <div className="mt-8 pt-8 border-t border-gray-700 text-center">
+            <p className="text-gray-400 text-sm">
+              猎豹移动 © 2024 • 京公网安备11010502025911号，京ICP备12038800号-7
+            </p>
           </div>
         </div>
       </footer>

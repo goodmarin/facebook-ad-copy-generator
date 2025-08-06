@@ -416,15 +416,15 @@ const App: React.FC = () => {
           <div 
             className="footer-grid"
             style={{ 
-              display: 'grid !important',
-              gridTemplateColumns: 'repeat(4, 1fr) !important',
-              gap: '32px !important',
-              alignItems: 'end !important'
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '32px',
+              alignItems: 'end',
+              width: '100%'
             }}
           >
             {/* 猎豹服务 */}
             <div 
-              className="flex flex-col h-full" 
               style={{ 
                 display: 'flex',
                 flexDirection: 'column',
@@ -478,7 +478,6 @@ const App: React.FC = () => {
 
             {/* 联系我们 */}
             <div 
-              className="flex flex-col h-full" 
               style={{ 
                 display: 'flex',
                 flexDirection: 'column',
@@ -495,7 +494,6 @@ const App: React.FC = () => {
 
             {/* 官方公众号 */}
             <div 
-              className="flex flex-col h-full" 
               style={{ 
                 display: 'flex',
                 flexDirection: 'column',
@@ -544,7 +542,6 @@ const App: React.FC = () => {
 
             {/* 关于我们 */}
             <div 
-              className="flex flex-col h-full" 
               style={{ 
                 display: 'flex',
                 flexDirection: 'column',

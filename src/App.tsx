@@ -488,8 +488,8 @@ const App: React.FC = () => {
             >
               <h3 className="text-lg font-bold mb-4 text-white">联系我们</h3>
               <ul className="space-y-2 text-gray-300 flex-1">
-                <li>咨询热线：400-603-7779</li>
-                <li>咨询邮箱：adoverseas@cmcm.com</li>
+                <li className="text-sm">咨询热线：400-603-7779</li>
+                <li className="text-sm">咨询邮箱：adoverseas@cmcm.com</li>
                 <li className="text-sm leading-relaxed">总部地址：北京市朝阳区三间房南里7号万东科技文创园11号楼</li>
               </ul>
             </div>
@@ -505,7 +505,7 @@ const App: React.FC = () => {
               <h3 className="text-lg font-bold mb-4 text-white">官方公众号</h3>
               <div className="flex-1 flex flex-col">
                 {/* 二维码 - 进一步缩小尺寸 */}
-                <div className="w-12 h-12 mb-3">
+                <div className="w-10 h-10 mb-3">
                   <img 
                     src="https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813&v=5&ts=1754461800" 
                     alt="猎豹国际广告官方公众号二维码" 

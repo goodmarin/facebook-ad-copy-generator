@@ -414,13 +414,15 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* 主要内容区域 */}
           <div 
-            className="footer-grid"
             style={{ 
               display: 'grid',
               gridTemplateColumns: 'repeat(4, 1fr)',
               gap: '32px',
               alignItems: 'end',
-              width: '100%'
+              width: '100%',
+              maxWidth: '100%',
+              margin: '0',
+              padding: '0'
             }}
           >
             {/* 联系我们 */}

@@ -413,7 +413,120 @@ const App: React.FC = () => {
       <footer className="bg-gray-900 text-white mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* 主要内容区域 */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 justify-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="w-full max-w-xs">
+              {/* 猎豹服务 */}
+              <div className="flex flex-col">
+                <h3 className="text-lg font-bold mb-4 text-white">猎豹服务</h3>
+                <ul className="space-y-2">
+                  <li>
+                    <a 
+                      href="https://cheetahgo.cmcm.com/classes/facebook/0a4ec1f962875a3c05a4bb915589d5d8" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-gray-300 hover:text-white transition-colors duration-200"
+                    >
+                      Facebook广告
+                    </a>
+                  </li>
+                  <li>
+                    <a 
+                      href="https://cheetahgo.cmcm.com/classes/tiktok/f6e08a6462875fbf0440ff297acb257d" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-gray-300 hover:text-white transition-colors duration-200"
+                    >
+                      TikTok广告
+                    </a>
+                  </li>
+                  <li>
+                    <a 
+                      href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-gray-300 hover:text-white transition-colors duration-200"
+                    >
+                      客户自助平台
+                    </a>
+                  </li>
+                  <li>
+                    <a 
+                      href="https://overseas.cmcm.com/no9" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-gray-300 hover:text-white transition-colors duration-200"
+                    >
+                      9号艺术工作室
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="w-full max-w-xs">
+              {/* 联系我们 */}
+              <div className="flex flex-col">
+                <h3 className="text-lg font-bold mb-4 text-white">联系我们</h3>
+                <ul className="space-y-2 text-gray-300">
+                  <li>咨询热线：400-603-7779</li>
+                  <li>咨询邮箱：adoverseas@cmcm.com</li>
+                  <li className="text-sm leading-relaxed">总部地址：北京市朝阳区三间房南里7号</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="w-full max-w-xs">
+              {/* 官方公众号 */}
+              <div className="flex flex-col">
+                <h3 className="text-lg font-bold mb-4 text-white">官方公众号</h3>
+                {/* 二维码 - 左对齐 */}
+                <div className="w-32 h-32 mb-3">
+                  <img 
+                    src="https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813" 
+                    alt="猎豹国际广告官方公众号二维码" 
+                    className="w-full h-full object-cover rounded-lg"
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => {
+                      // 如果图片加载失败，显示备用样式
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      target.nextElementSibling?.classList.remove('hidden');
+                    }}
+                  />
+                  {/* 备用二维码样式 - 当图片加载失败时显示 */}
+                  <div className="w-full h-full bg-black rounded-lg flex items-center justify-center relative hidden">
+                    <div className="grid grid-cols-7 gap-0.5 w-24 h-24">
+                      {/* 简化的二维码图案 */}
+                      <div className="bg-white w-1 h-1"></div>
+                      <div className="bg-black w-1 h-1"></div>
+                      <div className="bg-white w-1 h-1"></div>
+                      <div className="bg-black w-1 h-1"></div>
+                      <div className="bg-white w-1 h-1"></div>
+                      <div className="bg-black w-1 h-1"></div>
+                      <div className="bg-white w-1 h-1"></div>
+                      {/* 更多图案... */}
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="bg-orange-500 rounded-lg p-1.5 w-8 h-8 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">CMT</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full max-w-xs">
+              {/* 关于我们 */}
+              <div className="flex flex-col">
+                <h3 className="text-lg font-bold mb-4 text-white">关于我们</h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  专业的Facebook广告文案生成工具，基于React + Tailwind CSS + DeepSeek构建，
+                  为广告主提供高质量的文案创作服务。与猎豹移动深度合作，助力企业出海营销。
+                </p>
+              </div>
+            </div>
             {/* 猎豹服务 */}
             <div className="flex flex-col">
               <h3 className="text-lg font-bold mb-4 text-white">猎豹服务</h3>
@@ -467,7 +580,7 @@ const App: React.FC = () => {
               <ul className="space-y-2 text-gray-300">
                 <li>咨询热线：400-603-7779</li>
                 <li>咨询邮箱：adoverseas@cmcm.com</li>
-                <li className="text-sm leading-relaxed">总部地址：北京市朝阳区三间房南里7号万东科技文创园</li>
+                <li className="text-sm leading-relaxed">总部地址：北京市朝阳区三间房南里7号</li>
               </ul>
             </div>
 
@@ -520,8 +633,6 @@ const App: React.FC = () => {
               </p>
             </div>
           </div>
-          
-
         </div>
       </footer>
     </div>

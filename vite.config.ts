@@ -3,8 +3,8 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/facebook-ad-copy-generator/', // 关键：适配GitHub Pages子路径
   plugins: [react()],
-  base: '/',
   build: {
     // 优化构建
     minify: 'terser',

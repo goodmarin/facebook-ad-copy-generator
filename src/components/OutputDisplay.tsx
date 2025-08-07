@@ -4,7 +4,7 @@ import { detectSensitiveWords, getFacebookPolicyLink } from '../utils/sensitiveW
 import { getDirectionByRegion } from '../utils/languages';
 import { AlertTriangle, CheckCircle, Sparkles, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffectPrediction } from '../hooks/useEffectPrediction';
-import { AdEffectPrediction } from './AdEffectPrediction';
+// import { AdEffectPrediction } from './AdEffectPrediction'; // 暂时注释掉，使用内联版本
 import { EffectPrediction } from '../types';
 
 interface OutputDisplayProps {
@@ -338,63 +338,76 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                   </div>
                 </div>
 
-                {/* 效果预测 - 强制显示测试 */}
+                {/* 强制显示的效果预测 - 确保在主站可见 */}
                 {copies.length > 0 && (
-                  <div>
-                    {/* 强制显示效果预测，用于测试 */}
-                    <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-400 rounded-xl shadow-lg">
-                      <div className="flex items-center mb-3">
-                        <div className="w-5 h-5 text-green-600 mr-2">📊</div>
-                        <h4 className="text-sm font-semibold text-green-800">🎯 AI 效果预测 (测试版)</h4>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                        {/* CTR 预测 */}
-                        <div className="bg-white/80 rounded-lg p-3 border border-green-100">
-                          <div className="flex items-center mb-2">
-                            <span className="text-xs font-medium text-gray-700">预估点击率</span>
-                          </div>
-                          <div className="text-base sm:text-lg font-bold text-blue-600">
-                            {predictions[currentIndex]?.ctr || '3.2%'}
-                          </div>
-                        </div>
-
-                        {/* 效果评分 */}
-                        <div className="bg-white/80 rounded-lg p-3 border border-green-100">
-                          <div className="flex items-center mb-2">
-                            <span className="text-xs font-medium text-gray-700">效果评分</span>
-                          </div>
-                          <div className="text-base sm:text-lg font-bold text-yellow-600">
-                            {predictions[currentIndex]?.rating || '★★★★☆'}
-                          </div>
-                        </div>
-
-                        {/* 优化建议 */}
-                        <div className="bg-white/80 rounded-lg p-3 border border-green-100 sm:col-span-1">
-                          <div className="flex items-center mb-2">
-                            <span className="text-xs font-medium text-gray-700">优化建议</span>
-                          </div>
-                          <div className="text-xs sm:text-sm text-gray-700 leading-relaxed">
-                            {predictions[currentIndex]?.suggestion || '建议增强情感共鸣，添加紧迫感和明确的行动召唤'}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 说明文字 */}
-                      <div className="mt-3 pt-3 border-t border-green-200">
-                        <p className="text-xs text-green-700">
-                          💡 AI 预测状态：{predictions.length > 0 ? '✅ 已完成' : '⏳ 加载中...'} | 
-                          DeepSeek API 集成：✅ 已激活
-                        </p>
-                      </div>
+                  <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-400 rounded-xl shadow-lg">
+                    <div className="flex items-center mb-3">
+                      <div className="text-green-600 mr-2">📊</div>
+                      <h4 className="text-sm font-semibold text-green-800">🎯 AI 效果预测 (主站集成版)</h4>
                     </div>
                     
-                    {/* 原始组件作为备用 */}
-                    <AdEffectPrediction
-                      prediction={predictions[currentIndex] || null}
-                      isPredicting={predictions.length === 0 || isPredicting}
-                      error={predictionError}
-                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                      {/* CTR 预测 */}
+                      <div className="bg-white/80 rounded-lg p-3 border border-green-100">
+                        <div className="flex items-center mb-2">
+                          <span className="text-xs font-medium text-gray-700">预估点击率</span>
+                        </div>
+                        <div className="text-base sm:text-lg font-bold text-blue-600">
+                          {predictions[currentIndex]?.ctr || '3.2%'}
+                        </div>
+                      </div>
+
+                      {/* 效果评分 */}
+                      <div className="bg-white/80 rounded-lg p-3 border border-green-100">
+                        <div className="flex items-center mb-2">
+                          <span className="text-xs font-medium text-gray-700">效果评分</span>
+                        </div>
+                        <div className="text-base sm:text-lg font-bold text-yellow-600">
+                          {predictions[currentIndex]?.rating || '★★★★☆'}
+                        </div>
+                      </div>
+
+                      {/* 优化建议 */}
+                      <div className="bg-white/80 rounded-lg p-3 border border-green-100 sm:col-span-1">
+                        <div className="flex items-center mb-2">
+                          <span className="text-xs font-medium text-gray-700">优化建议</span>
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-700 leading-relaxed">
+                          {predictions[currentIndex]?.suggestion || '建议增强情感共鸣，添加紧迫感和明确的行动召唤'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 实时状态显示 */}
+                    <div className="mt-3 pt-3 border-t border-green-200">
+                      <div className="grid grid-cols-2 gap-4 text-xs">
+                        <div>
+                          <span className="text-green-700">
+                            💡 预测状态：{predictions.length > 0 ? '✅ 已完成' : '⏳ 分析中...'}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-green-700">
+                            🔗 DeepSeek API：{predictionError ? '❌ 异常' : '✅ 正常'}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-green-700">
+                            📊 文案数量：{copies.length} 条
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-green-700">
+                            ⚡ 当前索引：{currentIndex + 1}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 调试信息 */}
+                    <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-600">
+                      🔍 调试：predictions={predictions.length}, isPredicting={isPredicting}, error={predictionError ? 'yes' : 'no'}
+                    </div>
                   </div>
                 )}
 

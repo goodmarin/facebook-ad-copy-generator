@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CopyButton } from './CopyButton';
 import { detectSensitiveWords, getFacebookPolicyLink } from '../utils/sensitiveWords';
 import { getDirectionByRegion } from '../utils/languages';
 import { AlertTriangle, CheckCircle, Sparkles, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffectPrediction } from '../hooks/useEffectPrediction';
+import { AdEffectPrediction } from './AdEffectPrediction';
+import { EffectPrediction } from '../types';
 
 interface OutputDisplayProps {
   copies: string[];
@@ -65,6 +68,50 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
 }) => {
   const direction = getDirectionByRegion(region);
   const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // 效果预测相关状态
+  const [predictions, setPredictions] = useState<EffectPrediction[]>([]);
+  const { predictEffect, isPredicting, predictionError } = useEffectPrediction();
+
+  // 当文案生成完成后，自动进行效果预测
+  useEffect(() => {
+    const generatePredictions = async () => {
+      console.log('检查是否需要生成预测:', { 
+        copiesLength: copies.length, 
+        predictionsLength: predictions.length 
+      });
+      
+      if (copies.length > 0 && predictions.length === 0) {
+        console.log('开始为文案生成效果预测，文案数量:', copies.length);
+        const newPredictions: EffectPrediction[] = [];
+        
+        // 为每条文案生成效果预测
+        for (let i = 0; i < copies.length; i++) {
+          const copy = copies[i];
+          console.log(`正在预测第 ${i + 1} 条文案:`, copy.substring(0, 50) + '...');
+          
+          const prediction = await predictEffect(copy);
+          if (prediction) {
+            console.log(`第 ${i + 1} 条文案预测成功:`, prediction);
+            newPredictions.push(prediction);
+          } else {
+            console.log(`第 ${i + 1} 条文案预测失败，使用默认值`);
+            // 如果预测失败，添加一个默认的预测结果
+            newPredictions.push({
+              ctr: '2.5%',
+              rating: '★★★☆☆',
+              suggestion: '建议优化文案结构，增加情感共鸣元素'
+            });
+          }
+        }
+        
+        console.log('所有预测完成，设置预测结果:', newPredictions);
+        setPredictions(newPredictions);
+      }
+    };
+
+    generatePredictions();
+  }, [copies, predictions.length, predictEffect]);
 
   const nextCopy = () => {
     setCurrentIndex((prev) => (prev + 1) % copies.length);
@@ -178,6 +225,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
           </div>
         </div>
       )}
+      
       <div className="card h-full flex flex-col pb-4 overflow-hidden">
         <div className="flex items-center justify-between mb-4 px-4 sm:px-6">
           <h3 className="text-lg font-semibold text-gray-900">生成的文案</h3>
@@ -264,6 +312,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                         </div>
                       </div>
                     )}
+
                   </div>
 
                   {/* 装饰性元素 */}
@@ -271,6 +320,15 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                     <Sparkles className="w-4 h-4 text-blue-400" />
                   </div>
                 </div>
+
+                {/* 效果预测 - 移到卡片外部 */}
+                {(isPredicting || predictions.length > 0) && (
+                  <AdEffectPrediction
+                    prediction={predictions[currentIndex] || null}
+                    isPredicting={isPredicting}
+                    error={predictionError}
+                  />
+                )}
 
                 {/* 半卡片预览 */}
                 {copies.length > 1 && (

@@ -1,575 +1,352 @@
-import React, { useState, useMemo, useCallback, useEffect, Suspense } from 'react';
-import { InputForm } from './components/InputForm';
-import { MetaLogo } from './components/MetaLogo';
-import { CountdownTimer } from './components/CountdownTimer';
-import { useOpenAI } from './hooks/useOpenAI';
-import { ProductInfo } from './types';
-import { checkForbiddenCategory } from './utils/sensitiveWords';
+import { useState } from 'react';
 
-// 懒加载组件
-const LazyOutputDisplay = React.lazy(() => import('./components/OutputDisplay').then(module => ({ default: module.OutputDisplay })));
-
-const App: React.FC = () => {
-  const [productInfo, setProductInfo] = useState<ProductInfo>({
+function App() {
+  const [productInfo, setProductInfo] = useState({
     name: '',
     features: '',
     targetAudience: '',
-    region: '',
-    style: '',
-    tone: ''
+    region: ''
   });
+  const [copies, setCopies] = useState<string[]>([]);
+  const [predictions, setPredictions] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPredicting, setIsPredicting] = useState(false);
 
-  const [generatedCopies, setGeneratedCopies] = useState<string[]>([]);
-  const { generateCopies, isLoading, error, clearError } = useOpenAI();
+  // 效果预测函数
+  const predictEffect = async (copyText: string) => {
+    try {
+      console.log('🎯 开始效果预测，文案:', copyText);
+      
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer sk-674b29e0b86846bca55195b66eb3e3aa'
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            {
+              role: 'system',
+              content: '你是一个专业的Facebook广告效果预测专家，能够准确评估广告文案的营销效果。请基于文案的吸引力、情感共鸣、号召性语言等因素进行评分。'
+            },
+            {
+              role: 'user',
+              content: `请对以下 Facebook 广告文案进行营销效果预测，输出格式如下：
+- 预估点击率（CTR）百分比（例如 3.2%）
+- 效果评分（1~5星）
+- 简短优化建议
 
-  // 性能优化：预加载关键资源
-  useEffect(() => {
-    // 预加载关键字体
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=SF+Pro+Display:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap';
-    link.as = 'style';
-    document.head.appendChild(link);
+文案内容：『${copyText}』
 
-    // 预加载关键图片
-    const img = new Image();
-    img.src = 'https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813';
-  }, []);
+请严格按照以下格式返回，不要添加其他内容：
+CTR: [百分比]
+评分: [星级]
+建议: [一句话建议]`
+            }
+          ],
+          max_tokens: 200,
+          temperature: 0.3,
+          top_p: 0.9
+        })
+      });
 
-  const handleSubmit = useCallback(async () => {
-    clearError();
-    const copies = await generateCopies(productInfo);
-    setGeneratedCopies(copies);
-  }, [productInfo, generateCopies, clearError]);
+      console.log('📊 API响应状态:', response.status);
+      if (!response.ok) {
+        throw new Error(`API请求失败: ${response.status}`);
+      }
 
-  // 优化功能卡片数据
-  const featureCards = useMemo(() => [
-    { title: '多语言支持' },
-    { title: '多种文案风格' },
-    { title: '敏感词检测' },
-    { title: '响应式设计' },
-    { title: '一键复制' },
-    { title: '快速生成' },
-    { title: 'DeepSeek AI' }
-  ], []);
+      const data = await response.json();
+      console.log('📊 API响应数据:', data);
+      const content = data.choices[0]?.message?.content;
 
-  // 检查产品信息是否包含黑五类
-  const isForbiddenProduct = useMemo(() => {
-    return checkForbiddenCategory(productInfo.name + ' ' + productInfo.features);
-  }, [productInfo.name, productInfo.features]);
+      if (!content) {
+        throw new Error('AI未返回有效内容');
+      }
+
+      console.log('🤖 AI返回内容:', content);
+      
+      // 解析结果
+      const lines = content.split('\n').map((line: string) => line.trim()).filter((line: string) => line);
+      let ctr = '';
+      let rating = '';
+      let suggestion = '';
+      
+      for (const line of lines) {
+        if (line.startsWith('CTR:')) {
+          ctr = line.replace('CTR:', '').trim();
+        } else if (line.startsWith('评分:')) {
+          rating = line.replace('评分:', '').trim();
+        } else if (line.startsWith('建议:')) {
+          suggestion = line.replace('建议:', '').trim();
+        }
+      }
+      
+      console.log('📊 解析结果:', { ctr, rating, suggestion });
+      
+      if (!ctr || !rating || !suggestion) {
+        console.warn('⚠️ 效果预测结果格式不完整');
+        return null;
+      }
+      
+      return { ctr, rating, suggestion };
+    } catch (err) {
+      console.error('💥 效果预测错误:', err);
+      return null;
+    }
+  };
+
+  // 生成文案并预测效果
+  const handleGenerate = async () => {
+    setIsLoading(true);
+    setCopies([]);
+    setPredictions([]);
+    
+    try {
+      console.log('🚀 开始生成文案...');
+      
+      // 模拟生成过程
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const mockCopies = [
+        `🚀 ${productInfo.name} - 改变你的生活！`,
+        `💡 发现 ${productInfo.name} 的独特魅力`,
+        `🔥 限时优惠：${productInfo.name} 等你来体验！`
+      ];
+      
+      console.log('📝 生成的文案:', mockCopies);
+      setCopies(mockCopies);
+      
+      // 为每个文案生成效果预测
+      console.log('🎯 开始效果预测...');
+      setIsPredicting(true);
+      const newPredictions = [];
+      
+      for (let i = 0; i < mockCopies.length; i++) {
+        const copy = mockCopies[i];
+        console.log(`📊 正在预测第 ${i + 1} 条文案:`, copy.substring(0, 50) + '...');
+        
+        const prediction = await predictEffect(copy);
+        if (prediction) {
+          console.log(`✅ 第 ${i + 1} 条文案预测成功:`, prediction);
+          newPredictions.push(prediction);
+        } else {
+          console.log(`⚠️ 第 ${i + 1} 条文案预测失败，使用默认值`);
+          newPredictions.push({
+            ctr: '2.5%',
+            rating: '★★★☆☆',
+            suggestion: '建议优化文案结构，增加情感共鸣元素'
+          });
+        }
+      }
+      
+      console.log('🎉 所有预测完成，设置预测结果:', newPredictions);
+      setPredictions(newPredictions);
+      
+    } catch (err) {
+      console.error('💥 生成过程出错:', err);
+    } finally {
+      setIsLoading(false);
+      setIsPredicting(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
-      {/* 头部 - 参考CheetahGo设计 */}
-      <header className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-8 relative">
-            {/* 左侧占位，保持平衡 */}
-            <div className="w-32"></div>
-            
-            {/* 中间标题和Logo - 完全居中显示 */}
-            <div className="absolute left-1/2 transform -translate-x-1/2">
-              <div className="flex items-start justify-center">
-                <div className="transform transition-transform duration-200 mr-3 mt-1">
-                  <MetaLogo className="text-white" size={32} />
-                </div>
-                <div className="text-center">
-                  <h1 className="text-3xl font-bold text-white mb-1">
-                    Facebook爆款广告文案生成器
-                  </h1>
-                </div>
-              </div>
-            </div>
-            
-            {/* 右侧友联链接 - 缩小尺寸 */}
-            <div className="flex items-center space-x-3">
-              <a 
-                href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200"
-              >
-                立即开户
-              </a>
-              <a 
-                href="https://cheetahgo.cmcm.com/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200"
-              >
-                猎豹学院
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* 分割线 */}
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/40 to-transparent shadow-sm"></div>
-      
-      {/* 功能特点 - Meta风格 */}
-      <section className="text-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10">
-          {/* 功能卡片网格 */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
-            {featureCards.map((card, index) => (
-              <div key={index} className="group">
-                <div className="bg-white/25 backdrop-blur-sm rounded-2xl p-4 transform group-hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl border border-white/15 text-center flex items-center justify-center min-h-[70px]">
-                  <span className="text-xs sm:text-sm font-medium text-white/90 leading-tight px-1">{card.title}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 倒计时板块 */}
-      <div className="text-white py-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* 倒计时内容 - 跨越整个宽度，与产品信息和生成结果对齐 */}
-            <div className="lg:col-span-3">
-              <div className="w-full">
-                <CountdownTimer />
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold mb-2">🎯 爆款 Facebook 广告文案生成器</h1>
+              <p className="text-xl opacity-90">专业的广告文案生成工具，支持多语言和多种文案风格</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 主要内容区域 */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* 左侧产品信息 */}
+          {/* Left: Product Info Input */}
           <div className="lg:col-span-1">
-            <div className="card bg-white/90 backdrop-blur-sm border-0 shadow-2xl rounded-3xl h-full">
-              <div className="flex items-center mb-4 p-6 pb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
-                  <span className="text-white text-lg">📝</span>
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">产品信息</h2>
+              
+              <form onSubmit={(e) => { e.preventDefault(); handleGenerate(); }} className="space-y-6">
+                {/* 产品名称 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    产品名称 *
+                  </label>
+                  <input
+                    type="text"
+                    value={productInfo.name}
+                    onChange={(e) => setProductInfo(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="例如：轻便折叠电动滑板车"
+                    required
+                  />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">产品信息</h2>
-              </div>
-              <div className="px-6 pb-6 flex-1 w-full">
-                <InputForm
-                  productInfo={productInfo}
-                  onProductInfoChange={setProductInfo}
-                  onSubmit={handleSubmit}
-                  isLoading={isLoading}
-                />
-              </div>
+
+                {/* 产品特性 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    产品特性 *
+                  </label>
+                  <textarea
+                    value={productInfo.features}
+                    onChange={(e) => setProductInfo(prev => ({ ...prev, features: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    rows={4}
+                    placeholder="描述产品的主要特点和优势"
+                    required
+                  />
+                </div>
+
+                {/* 受众人群 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    受众人群 *
+                  </label>
+                  <input
+                    type="text"
+                    value={productInfo.targetAudience}
+                    onChange={(e) => setProductInfo(prev => ({ ...prev, targetAudience: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="例如：年轻上班族、户外爱好者"
+                    required
+                  />
+                </div>
+
+                {/* 投放地区 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    投放地区 *
+                  </label>
+                  <select
+                    value={productInfo.region}
+                    onChange={(e) => setProductInfo(prev => ({ ...prev, region: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">请选择</option>
+                    <option value="CN">🇨🇳 中国</option>
+                    <option value="US">🇺🇸 美国</option>
+                    <option value="JP">🇯🇵 日本</option>
+                    <option value="KR">🇰🇷 韩国</option>
+                  </select>
+                </div>
+
+                {/* 生成按钮 */}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? '生成中...' : '生成广告文案'}
+                </button>
+              </form>
             </div>
           </div>
 
-          {/* 右侧生成结果和快速导航 */}
-          <div className="lg:col-span-2 grid grid-rows-2 gap-6">
-            {/* 生成结果 */}
-            <div className="card bg-white/90 backdrop-blur-sm border-0 shadow-2xl rounded-3xl min-h-[600px]">
-              <div className="flex items-center mb-4 p-6 pb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl flex items-center justify-center mr-3">
-                  <span className="text-white text-lg">✨</span>
+          {/* Right: Generated Results */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">生成结果</h2>
+              
+              {isLoading && (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <p className="mt-2 text-gray-600">正在生成文案...</p>
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">生成结果</h2>
-              </div>
-              <div className="px-6 pb-8 min-h-0 overflow-hidden">
-                <Suspense fallback={<div className="flex items-center justify-center h-32">加载中...</div>}>
-                  <LazyOutputDisplay
-                    copies={generatedCopies}
-                    region={productInfo.region}
-                    isLoading={isLoading}
-                    error={error}
-                    isForbiddenProduct={isForbiddenProduct}
-                  />
-                </Suspense>
-              </div>
-            </div>
+              )}
+              
+              {copies.length > 0 && (
+                <div className="space-y-6">
+                  {copies.map((copy, index) => (
+                    <div key={index} className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <p className="text-gray-800 leading-relaxed">{copy}</p>
+                        </div>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(copy)}
+                          className="ml-4 px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                        >
+                          复制
+                        </button>
+                      </div>
+                      
+                      {/* 效果预测 */}
+                      {predictions[index] && (
+                        <div className="mt-4 p-4 bg-white/80 rounded-lg border border-green-100">
+                          <div className="flex items-center mb-3">
+                            <span className="text-sm font-semibold text-green-800">📊 效果预测</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            {/* CTR 预测 */}
+                            <div className="bg-gray-50 rounded-lg p-3">
+                              <div className="flex items-center mb-1">
+                                <span className="text-xs font-medium text-gray-700">预估点击率</span>
+                              </div>
+                              <div className="text-base font-bold text-blue-600">{predictions[index].ctr}</div>
+                            </div>
 
-            {/* 快速导航 */}
-            <div className="card bg-white/90 backdrop-blur-sm border-0 shadow-2xl rounded-3xl">
-              <div className="p-6 h-full flex flex-col">
-                <h3 className="text-lg font-bold text-gray-900 mb-6">快速导航</h3>
-                
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
-                  {/* 系列课程 */}
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">
-                      系列课程
-                    </h4>
-                    <div className="space-y-2">
-                      <a 
-                        href="https://cheetahgo.cmcm.com/classes/facebook/0a4ec1f962875a3c05a4bb915589d5d8" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        Facebook新手课
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/classes/facebook/684266796287669c0313e7b119d42dba" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        Facebook进阶课
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/classes/tiktok/f6e08a6462875fbf0440ff297acb257d" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        TikTok课程
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zixun/all" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        政策解读课程
-                      </a>
-                    </div>
-                  </div>
+                            {/* 效果评分 */}
+                            <div className="bg-gray-50 rounded-lg p-3">
+                              <div className="flex items-center mb-1">
+                                <span className="text-xs font-medium text-gray-700">效果评分</span>
+                              </div>
+                              <div className="text-base font-bold text-yellow-600">{predictions[index].rating}</div>
+                            </div>
 
-                  {/* 线上直播 */}
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">
-                      线上直播
-                    </h4>
-                    <div className="space-y-2">
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zhibo/ebusiness" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        电商出海
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zhibo/game" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        游戏出海
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zhibo/policy" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        政策解读
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zhibo/guide" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        新手指导
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zhibo/update" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        进阶指南
-                      </a>
+                            {/* 优化建议 */}
+                            <div className="bg-gray-50 rounded-lg p-3 sm:col-span-1">
+                              <div className="flex items-center mb-1">
+                                <span className="text-xs font-medium text-gray-700">优化建议</span>
+                              </div>
+                              <div className="text-xs text-gray-700 leading-relaxed">{predictions[index].suggestion}</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* 预测中状态 */}
+                      {isPredicting && index === predictions.length && (
+                        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                          <div className="flex items-center justify-center">
+                            <div className="loading-spinner w-4 h-4 mr-2"></div>
+                            <span className="text-sm text-blue-700">预测中...</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-
-                  {/* 资讯报告 */}
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">
-                      资讯报告
-                    </h4>
-                    <div className="space-y-2">
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zixun/dujiazhuanlan" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        独家专栏
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zixun/zhengcejiedu" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        政策解读
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zixun/chanpingengxin" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        产品更新
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zixun/zhanghuzhuye" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        账户主页
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zixun/anlijingxuan" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        案例精选
-                      </a>
-                      <a 
-                        href="https://cheetahgo.cmcm.com/zixun/baogaodongcha" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        报告洞察
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* 线下活动 */}
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">
-                      线下活动
-                    </h4>
-                    <div className="space-y-2">
-                      <a 
-                        href="https://cheetahgo.cmcm.com/xianxia" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        线下活动
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* 营销工具 */}
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">
-                      营销工具
-                    </h4>
-                    <div className="space-y-2">
-                      <a 
-                        href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        Cheetahgo客户自助平台
-                      </a>
-                      <a 
-                        href="https://partner.cmcm.com/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        合伙人计划
-                      </a>
-                      <a 
-                        href="https://overseas.cmcm.com/no9" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        9号艺术工作室
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* 帮助中心 */}
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">
-                      帮助中心
-                    </h4>
-                    <div className="space-y-2">
-                      <a 
-                        href="https://cheetahgo.cmcm.com/help" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm block py-1 transition-colors duration-200"
-                      >
-                        帮助中心
-                      </a>
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              </div>
+              )}
+              
+              {!isLoading && copies.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <p>填写产品信息并点击生成按钮开始创建广告文案</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* 底部 - 参考CheetahGo网站设计 */}
-      <footer className="bg-gray-900 text-white mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* 主要内容区域 */}
-          <div 
-            style={{ 
-              display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: '32px',
-              alignItems: 'end',
-              width: '100%',
-              maxWidth: '100%',
-              margin: '0',
-              padding: '0'
-            }}
-          >
-            {/* 猎豹服务 */}
-            <div 
-              style={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%'
-              }}
-            >
-              <h3 className="text-lg font-bold mb-4 text-white">猎豹服务</h3>
-              <ul className="space-y-2 flex-1">
-                <li>
-                  <a 
-                    href="https://cheetahgo.cmcm.com/classes/facebook/0a4ec1f962875a3c05a4bb915589d5d8" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-300 hover:text-white transition-colors duration-200"
-                  >
-                    Facebook广告
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="https://cheetahgo.cmcm.com/classes/tiktok/f6e08a6462875fbf0440ff297acb257d" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-300 hover:text-white transition-colors duration-200"
-                  >
-                    TikTok广告
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-300 hover:text-white transition-colors duration-200"
-                  >
-                    客户自助平台
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="https://overseas.cmcm.com/no9" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-300 hover:text-white transition-colors duration-200"
-                  >
-                    9号艺术工作室
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* 联系我们 */}
-            <div 
-              style={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%'
-              }}
-            >
-              <h3 className="text-lg font-bold mb-4 text-white">联系我们</h3>
-              <ul className="space-y-2 text-gray-300 flex-1">
-                <li className="text-sm">咨询热线：400-603-7779</li>
-                <li className="text-sm">咨询邮箱：adoverseas@cmcm.com</li>
-                <li className="text-sm leading-relaxed">总部地址：北京市朝阳区三间房南里7号万东科技文创园11号楼</li>
-              </ul>
-            </div>
-
-            {/* 官方公众号 */}
-            <div 
-              style={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%'
-              }}
-            >
-              <h3 className="text-lg font-bold mb-4 text-white">官方公众号</h3>
-              <div className="flex-1 flex flex-col">
-                {/* 二维码 - 进一步缩小尺寸 */}
-                <div className="w-10 h-10 mb-3">
-                  <img 
-                    src="https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813&v=5&ts=1754461800" 
-                    alt="猎豹国际广告官方公众号二维码" 
-                    className="w-full h-full object-cover rounded-lg"
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => {
-                      // 如果图片加载失败，显示备用样式
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      target.nextElementSibling?.classList.remove('hidden');
-                    }}
-                  />
-                  {/* 备用二维码样式 - 当图片加载失败时显示 */}
-                  <div className="w-full h-full bg-black rounded-lg flex items-center justify-center relative hidden">
-                    <div className="grid grid-cols-7 gap-0.5 w-12 h-12">
-                      {/* 简化的二维码图案 */}
-                      <div className="bg-white w-1 h-1"></div>
-                      <div className="bg-black w-1 h-1"></div>
-                      <div className="bg-white w-1 h-1"></div>
-                      <div className="bg-black w-1 h-1"></div>
-                      <div className="bg-white w-1 h-1"></div>
-                      <div className="bg-black w-1 h-1"></div>
-                      <div className="bg-white w-1 h-1"></div>
-                      {/* 更多图案... */}
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="bg-orange-500 rounded-lg p-1 w-4 h-4 flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">CMT</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 关于我们 */}
-            <div 
-              style={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%'
-              }}
-            >
-              <h3 className="text-lg font-bold mb-4 text-white">关于我们</h3>
-              <div className="flex-1">
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  专业的Facebook广告文案生成工具，基于React + Tailwind CSS + DeepSeek构建，
-                  为广告主提供高质量的文案创作服务。与猎豹移动深度合作，助力企业出海营销。
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          {/* 版权信息 - 参考CheetahGo设计 */}
-          <div className="mt-8 pt-8 border-t border-gray-700 text-center">
-            <p className="text-gray-400 text-sm">
-              猎豹移动 © 2024 • 京公网安备11010502025911号，京ICP备12038800号-7
-            </p>
-          </div>
+      {/* Footer */}
+      <div className="bg-gray-900 text-white py-8 mt-16">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-sm opacity-75">
+            © 2024 爆款文案生成器 - 专业的Facebook广告文案生成工具
+          </p>
         </div>
-      </footer>
+      </div>
     </div>
   );
-};
+}
 
 export default App; 

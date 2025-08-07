@@ -60,4 +60,20 @@ export interface SensitiveWordResult {
   hasSensitiveWords: boolean;
   detectedWords: string[];
   suggestions: string[];
+}
+
+// 效果预测结果接口
+export interface EffectPrediction {
+  ctr: string;        // 预估点击率，如 "3.2%"
+  rating: string;     // 效果评分，如 "★★★☆☆"
+  suggestion: string; // 优化建议
+}
+
+// 效果预测API响应接口
+export interface EffectPredictionResponse {
+  choices: Array<{
+    message: {
+      content: string;
+    };
+  }>;
 } 

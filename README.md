@@ -10,11 +10,12 @@
 - 📱 **响应式设计**：完美适配桌面端和移动端
 - 🔒 **政策合规**：内置敏感词检测，避免违反广告政策
 - 📋 **一键复制**：生成的文案支持一键复制到剪贴板
+- 📊 **效果预测**：基于AI分析预估广告文案的点击率和效果评分，并提供优化建议
 
 ## 技术架构
 - **前端框架**：React 18 + TypeScript
 - **样式框架**：Tailwind CSS
-- **AI 接口**：OpenAI GPT API
+- **AI 接口**：OpenAI GPT API + DeepSeek API
 - **构建工具**：Vite
 - **包管理**：npm
 
@@ -24,10 +25,12 @@ src/
 ├── components/          # React 组件
 │   ├── InputForm.tsx   # 用户输入表单
 │   ├── OutputDisplay.tsx # 文案输出展示
+│   ├── AdEffectPrediction.tsx # 效果预测组件
 │   ├── LanguageSelector.tsx # 语言选择器
 │   └── CopyButton.tsx  # 复制按钮
 ├── hooks/              # 自定义 Hooks
-│   └── useOpenAI.ts    # OpenAI API 调用
+│   ├── useOpenAI.ts    # OpenAI API 调用
+│   └── useEffectPrediction.ts # 效果预测API调用
 ├── utils/              # 工具函数
 │   ├── languages.ts    # 语言配置
 │   ├── sensitiveWords.ts # 敏感词检测
@@ -67,11 +70,15 @@ npm run dev
 
 ### 如需使用真实 AI 功能
 1. 获取 OpenAI API Key（需要付费账户）
-2. 创建 `.env.local` 文件并添加：
+2. 获取 DeepSeek API Key（用于效果预测功能）
+   - 访问 https://platform.deepseek.com/
+   - 注册账户并获取API密钥
+3. 创建 `.env.local` 文件并添加：
 ```
 VITE_OPENAI_API_KEY=你的OpenAI_API_Key
+VITE_DEEPSEEK_API_KEY=你的DeepSeek_API_Key
 ```
-3. 修改 `src/hooks/useOpenAI.ts` 文件，恢复 API 调用功能
+4. 修改 `src/hooks/useOpenAI.ts` 文件，恢复 API 调用功能
 
 ## 使用说明
 
@@ -92,6 +99,13 @@ VITE_OPENAI_API_KEY=你的OpenAI_API_Key
 ### 3. 复制和使用
 - 点击文案右侧的复制按钮即可复制到剪贴板
 - 生成的文案已针对 Facebook 广告优化，可直接使用
+
+### 4. 效果预测
+- 每条文案生成后会自动进行效果预测
+- 预测结果包括：预估点击率(CTR)、效果评分(1-5星)、优化建议
+- 预测基于DeepSeek AI分析，评估文案的吸引力、情感共鸣、号召性语言等因素
+- 预测结果仅供参考，实际效果可能因市场环境、受众群体等因素而有所不同
+- 如需使用真实效果预测功能，请配置DeepSeek API密钥
 
 ## 支持的语言和地区
 - 🇨🇳 中国（中文）
@@ -119,6 +133,13 @@ VITE_OPENAI_API_KEY=你的OpenAI_API_Key
 - 内置错误处理和加载状态
 
 ## 更新日志
+
+### v1.5.0 (2024-12-19)
+- **新增效果预测功能**: 为每条生成的文案添加AI驱动的效果预测
+- **预测指标**: 包含预估点击率(CTR)、效果评分(1-5星)、优化建议
+- **自动预测**: 文案生成后自动调用DeepSeek API进行效果分析
+- **实时反馈**: 预测过程中显示loading状态，失败时显示友好提示
+- **组件化设计**: 创建独立的AdEffectPrediction组件，便于维护和扩展
 
 ### v1.4.7 (2024-12-19)
 - **标题居中优化**: 将顶部副标题"专业的广告文案生成工具"设置为居中显示

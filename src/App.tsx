@@ -15,6 +15,20 @@ function App() {
 
   // 生成文案
   const handleGenerate = async () => {
+    console.log('🎯 表单提交，产品信息:', productInfo);
+    
+    // 检查必填字段
+    if (!productInfo.name || !productInfo.features || !productInfo.targetAudience || !productInfo.region) {
+      console.error('❌ 必填字段未填写完整:', {
+        name: productInfo.name,
+        features: productInfo.features,
+        targetAudience: productInfo.targetAudience,
+        region: productInfo.region
+      });
+      alert('请填写所有必填字段！');
+      return;
+    }
+    
     setIsLoading(true);
     setCopies([]);
     

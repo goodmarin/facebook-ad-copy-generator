@@ -76,26 +76,29 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
   // 当文案生成完成后，自动进行效果预测
   useEffect(() => {
     const generatePredictions = async () => {
-      console.log('检查是否需要生成预测:', { 
+      console.log('🔍 检查是否需要生成预测:', { 
         copiesLength: copies.length, 
-        predictionsLength: predictions.length 
+        predictionsLength: predictions.length,
+        isPredicting,
+        predictionError
       });
       
-      if (copies.length > 0 && predictions.length === 0) {
-        console.log('开始为文案生成效果预测，文案数量:', copies.length);
+      // 强制触发预测，不管predictions.length
+      if (copies.length > 0) {
+        console.log('🚀 开始为文案生成效果预测，文案数量:', copies.length);
         const newPredictions: EffectPrediction[] = [];
         
         // 为每条文案生成效果预测
         for (let i = 0; i < copies.length; i++) {
           const copy = copies[i];
-          console.log(`正在预测第 ${i + 1} 条文案:`, copy.substring(0, 50) + '...');
+          console.log(`📊 正在预测第 ${i + 1} 条文案:`, copy.substring(0, 50) + '...');
           
           const prediction = await predictEffect(copy);
           if (prediction) {
-            console.log(`第 ${i + 1} 条文案预测成功:`, prediction);
+            console.log(`✅ 第 ${i + 1} 条文案预测成功:`, prediction);
             newPredictions.push(prediction);
           } else {
-            console.log(`第 ${i + 1} 条文案预测失败，使用默认值`);
+            console.log(`⚠️ 第 ${i + 1} 条文案预测失败，使用默认值`);
             // 如果预测失败，添加一个默认的预测结果
             newPredictions.push({
               ctr: '2.5%',
@@ -105,13 +108,13 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
           }
         }
         
-        console.log('所有预测完成，设置预测结果:', newPredictions);
+        console.log('🎉 所有预测完成，设置预测结果:', newPredictions);
         setPredictions(newPredictions);
       }
     };
 
     generatePredictions();
-  }, [copies, predictions.length, predictEffect]);
+  }, [copies, predictEffect]);
 
   const nextCopy = () => {
     setCurrentIndex((prev) => (prev + 1) % copies.length);

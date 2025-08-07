@@ -79,6 +79,10 @@ button, input, textarea, select {
     @apply animate-pulse bg-gray-200 rounded;
   }
 
+  .loading-spinner {
+    @apply border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin;
+  }
+
   /* 关键动画优化 */
   .fade-in {
     animation: fadeIn 0.3s ease-out;

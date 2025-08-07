@@ -1,4 +1,4 @@
-import React from 'react';
+import { JSX } from 'react';
 import { EffectPrediction } from '../types';
 import { TrendingUp, Star, Lightbulb, AlertTriangle } from 'lucide-react';
 
@@ -8,22 +8,12 @@ interface AdEffectPredictionProps {
   error: string | null;
 }
 
-export const AdEffectPrediction: React.FC<AdEffectPredictionProps> = ({
+export const AdEffectPrediction = ({
   prediction,
   isPredicting,
   error
-}) => {
-  if (isPredicting) {
-    return (
-      <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl">
-        <div className="flex items-center justify-center">
-          <div className="loading-spinner w-5 h-5 mr-3"></div>
-          <span className="text-sm text-blue-700 font-medium">预测中...</span>
-        </div>
-      </div>
-    );
-  }
-
+}: AdEffectPredictionProps): JSX.Element | null => {
+  // 如果有错误，显示错误信息
   if (error) {
     return (
       <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
@@ -35,8 +25,20 @@ export const AdEffectPrediction: React.FC<AdEffectPredictionProps> = ({
     );
   }
 
-  if (!prediction) {
-    return null;
+  // 如果正在预测或没有预测结果，显示加载状态
+  if (isPredicting || !prediction) {
+    return (
+      <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl">
+        <div className="flex items-center mb-3">
+          <TrendingUp className="w-5 h-5 text-blue-600 mr-2" />
+          <h4 className="text-sm font-semibold text-blue-800">📊 效果预测</h4>
+        </div>
+        <div className="flex items-center justify-center py-2">
+          <div className="loading-spinner w-5 h-5 mr-3"></div>
+          <span className="text-sm text-blue-700 font-medium">正在使用 DeepSeek AI 分析广告效果...</span>
+        </div>
+      </div>
+    );
   }
 
   return (

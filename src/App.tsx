@@ -6,7 +6,7 @@ function App() {
     name: '',
     features: '',
     targetAudience: '',
-    region: ''
+    regions: [] as string[] // 改为数组
   });
   const [copies, setCopies] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,17 +22,19 @@ function App() {
     return regionConfig[region] || regionConfig['CN'];
   };
 
-  // 生成文案函数
+  // 生成文案函数 - 支持多地区
   const generateCopies = async (productInfo: any) => {
-    const config = getLanguageAndStyle(productInfo.region);
+    const allCopies: string[] = [];
     
-    // 这里可以集成真实的 OpenAI API
-    // 现在使用模拟数据，但结构已经为真实 API 做好准备
-    const prompt = `为以下产品生成3条Facebook广告文案：
+    // 为每个选择的地区生成文案
+    for (const region of productInfo.regions) {
+      const config = getLanguageAndStyle(region);
+      
+      const prompt = `为以下产品生成3条Facebook广告文案：
 产品名称：${productInfo.name}
 产品特性：${productInfo.features}
 目标受众：${productInfo.targetAudience}
-投放地区：${productInfo.region}
+投放地区：${region}
 
 要求：
 - 使用${config.language}
@@ -42,16 +44,23 @@ function App() {
 - 突出产品核心价值
 - 包含明确的行动召唤`;
 
-    console.log('📝 生成文案提示词:', prompt);
+      console.log(`📝 为地区 ${region} 生成文案提示词:`, prompt);
 
-    // 模拟 AI 生成的高质量文案
-    const generatedCopies = [
-      `🚀 ${productInfo.name} - 改变你的生活方式！${productInfo.features}，专为${productInfo.targetAudience}设计。立即体验科技与生活的完美融合！`,
-      `💎 发现${productInfo.name}的独特魅力！${productInfo.features}让你在${productInfo.targetAudience}中脱颖而出。限时特价，错过就没有了！`,
-      `🔥 热销爆款！${productInfo.name}凭借${productInfo.features}成为${productInfo.targetAudience}的首选。现在购买享受专属优惠，快来抢购吧！`
-    ];
+      // 模拟 AI 生成的高质量文案
+      const regionCopies = [
+        `🚀 ${productInfo.name} - 改变你的生活方式！${productInfo.features}，专为${productInfo.targetAudience}设计。立即体验科技与生活的完美融合！`,
+        `💎 发现${productInfo.name}的独特魅力！${productInfo.features}让你在${productInfo.targetAudience}中脱颖而出。限时特价，错过就没有了！`,
+        `🔥 热销爆款！${productInfo.name}凭借${productInfo.features}成为${productInfo.targetAudience}的首选。现在购买享受专属优惠，快来抢购吧！`
+      ];
 
-    return generatedCopies;
+      // 为每条文案添加地区标识
+      const regionLabel = region === 'CN' ? '🇨🇳' : region === 'US' ? '🇺🇸' : region === 'JP' ? '🇯🇵' : '🇰🇷';
+      const labeledCopies = regionCopies.map(copy => `${regionLabel} ${copy}`);
+      
+      allCopies.push(...labeledCopies);
+    }
+
+    return allCopies;
   };
 
   // 主要的生成处理函数
@@ -59,14 +68,14 @@ function App() {
     console.log('🎯 表单提交，产品信息:', productInfo);
     
     // 检查必填字段
-    if (!productInfo.name || !productInfo.features || !productInfo.targetAudience || !productInfo.region) {
+    if (!productInfo.name || !productInfo.features || !productInfo.targetAudience || productInfo.regions.length === 0) {
       console.error('❌ 必填字段未填写完整:', {
         name: productInfo.name,
         features: productInfo.features,
         targetAudience: productInfo.targetAudience,
-        region: productInfo.region
+        regions: productInfo.regions
       });
-      alert('请填写所有必填字段！');
+      alert('请填写所有必填字段并至少选择一个投放地区！');
       return;
     }
     
@@ -91,6 +100,16 @@ function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // 处理地区选择
+  const handleRegionChange = (region: string, checked: boolean) => {
+    setProductInfo(prev => ({
+      ...prev,
+      regions: checked 
+        ? [...prev.regions, region]
+        : prev.regions.filter(r => r !== region)
+    }));
   };
 
   return (
@@ -164,23 +183,35 @@ function App() {
                   />
                 </div>
 
-                {/* 投放地区 */}
+                {/* 投放地区 - 改为多选 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    投放地区 *
+                    投放地区 * (可多选)
                   </label>
-                  <select
-                    value={productInfo.region}
-                    onChange={(e) => setProductInfo(prev => ({ ...prev, region: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                    required
-                  >
-                    <option value="">请选择投放地区</option>
-                    <option value="CN">🇨🇳 中国大陆</option>
-                    <option value="US">🇺🇸 美国</option>
-                    <option value="JP">🇯🇵 日本</option>
-                    <option value="KR">🇰🇷 韩国</option>
-                  </select>
+                  <div className="space-y-2">
+                    {[
+                      { value: 'CN', label: '🇨🇳 中国大陆', desc: '中文市场' },
+                      { value: 'US', label: '🇺🇸 美国', desc: '英语市场' },
+                      { value: 'JP', label: '🇯🇵 日本', desc: '日语市场' },
+                      { value: 'KR', label: '🇰🇷 韩国', desc: '韩语市场' }
+                    ].map((region) => (
+                      <label key={region.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={productInfo.regions.includes(region.value)}
+                          onChange={(e) => handleRegionChange(region.value, e.target.checked)}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <div className="ml-3">
+                          <div className="text-sm font-medium text-gray-900">{region.label}</div>
+                          <div className="text-xs text-gray-500">{region.desc}</div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                  {productInfo.regions.length === 0 && (
+                    <p className="text-xs text-red-600 mt-1">请至少选择一个投放地区</p>
+                  )}
                 </div>
 
                 {/* 生成按钮 */}
@@ -208,8 +239,8 @@ function App() {
                 <h3 className="text-sm font-semibold text-blue-800 mb-2">🎯 智能功能</h3>
                 <ul className="text-xs text-blue-700 space-y-1">
                   <li>✅ AI 智能生成多条文案</li>
+                  <li>✅ 支持多地区多语言</li>
                   <li>✅ 自动效果预测分析</li>
-                  <li>✅ 多语言多地区适配</li>
                   <li>✅ 实时优化建议</li>
                 </ul>
               </div>
@@ -220,7 +251,7 @@ function App() {
           <div className="lg:col-span-2">
             <OutputDisplay
               copies={copies}
-              region={productInfo.region}
+              regions={productInfo.regions}
               isLoading={isLoading}
               error={null}
             />
@@ -240,8 +271,8 @@ function App() {
               <h4 className="text-lg font-semibold mb-4">核心功能</h4>
               <ul className="text-gray-400 space-y-2">
                 <li>• AI 智能文案生成</li>
+                <li>• 多地区多语言支持</li>
                 <li>• 效果预测分析</li>
-                <li>• 多语言支持</li>
                 <li>• 实时优化建议</li>
               </ul>
             </div>

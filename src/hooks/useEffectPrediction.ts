@@ -19,8 +19,8 @@ export const useEffectPrediction = (): UseEffectPredictionResult => {
     console.log('开始效果预测，文案:', copyText);
 
     try {
-      // 使用你提供的 DeepSeek API 密钥
-      const apiKey = 'sk-674b29e0b86846bca55195b66eb3e3aa';
+      // 使用环境变量中的 API key，如果没有则使用默认值
+      const apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY || 'sk-674b29e0b86846bca55195b66eb3e3aa';
       
       // 构建效果预测的prompt
       const prompt = `请对以下 Facebook 广告文案进行营销效果预测，输出格式如下：

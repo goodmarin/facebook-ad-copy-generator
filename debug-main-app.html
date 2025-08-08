@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调试主应用</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        .status.success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .status.info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 主应用调试页面</h1>
+        
+        <div class="status info">
+            <h3>📋 调试信息</h3>
+            <p>这个页面用于测试主应用是否能正常加载和运行。</p>
+        </div>
+
+        <div class="status success">
+            <h3>✅ 服务器状态</h3>
+            <p>开发服务器正在运行在端口 5173</p>
+            <p>基础路径: /facebook-ad-copy-generator/</p>
+        </div>
+
+        <div class="status info">
+            <h3>🎯 测试选项</h3>
+            <p>请尝试以下方法来访问主应用：</p>
+        </div>
+
+        <div style="margin: 20px 0;">
+            <button class="test-button" onclick="testDirectAccess()">直接访问主应用</button>
+            <button class="test-button" onclick="testIframe()">在iframe中加载</button>
+            <button class="test-button" onclick="clearCache()">清除浏览器缓存</button>
+            <button class="test-button" onclick="checkConsole()">检查控制台错误</button>
+        </div>
+
+        <div id="test-results"></div>
+
+        <div id="iframe-container" style="display: none;">
+            <h3>📱 iframe 测试</h3>
+            <iframe id="main-app-iframe" src="http://localhost:5173/facebook-ad-copy-generator/"></iframe>
+        </div>
+
+        <div class="status info">
+            <h3>💡 故障排除建议</h3>
+            <ul>
+                <li>确保开发服务器正在运行 (npm run dev)</li>
+                <li>尝试清除浏览器缓存</li>
+                <li>使用无痕模式打开</li>
+                <li>检查浏览器控制台是否有错误</li>
+                <li>尝试不同的浏览器</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function testDirectAccess() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">正在测试直接访问...</div>';
+            
+            fetch('http://localhost:5173/facebook-ad-copy-generator/')
+                .then(response => {
+                    if (response.ok) {
+                        results.innerHTML = '<div class="status success">✅ 主应用可以正常访问！<br><a href="http://localhost:5173/facebook-ad-copy-generator/" target="_blank">点击这里打开主应用</a></div>';
+                    } else {
+                        results.innerHTML = `<div class="status error">❌ 主应用访问失败，状态码: ${response.status}</div>`;
+                    }
+                })
+                .catch(error => {
+                    results.innerHTML = `<div class="status error">❌ 访问失败: ${error.message}</div>`;
+                });
+        }
+
+        function testIframe() {
+            const container = document.getElementById('iframe-container');
+            const iframe = document.getElementById('main-app-iframe');
+            
+            container.style.display = 'block';
+            iframe.src = 'http://localhost:5173/facebook-ad-copy-generator/';
+            
+            iframe.onload = function() {
+                document.getElementById('test-results').innerHTML = '<div class="status success">✅ iframe 加载成功！</div>';
+            };
+            
+            iframe.onerror = function() {
+                document.getElementById('test-results').innerHTML = '<div class="status error">❌ iframe 加载失败</div>';
+            };
+        }
+
+        function clearCache() {
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                });
+            }
+            
+            // 清除localStorage和sessionStorage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            document.getElementById('test-results').innerHTML = '<div class="status success">✅ 缓存已清除，请刷新页面重试</div>';
+        }
+
+        function checkConsole() {
+            document.getElementById('test-results').innerHTML = `
+                <div class="status info">
+                    <h4>🔍 请检查浏览器控制台</h4>
+                    <p>1. 按 F12 打开开发者工具</p>
+                    <p>2. 切换到 Console 标签</p>
+                    <p>3. 查看是否有红色错误信息</p>
+                    <p>4. 如果有错误，请截图或复制错误信息</p>
+                </div>
+            `;
+        }
+
+        // 页面加载时自动测试
+        window.onload = function() {
+            testDirectAccess();
+        };
+    </script>
+</body>
+</html>

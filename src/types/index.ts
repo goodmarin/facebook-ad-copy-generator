@@ -3,7 +3,7 @@ export interface ProductInfo {
   name: string;
   features: string;
   targetAudience: string;
-  region: string;
+  regions: string[]; // 改为数组支持多地区
   style: string;
   tone: string;
 }

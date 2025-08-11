@@ -1,19 +1,25 @@
-import { useState } from 'react';
-import { OutputDisplay } from './components/OutputDisplay';
+import { useState, useEffect } from 'react';
 import { Logo } from './components/Logo';
 import { Navigation } from './components/Navigation';
-import { NewsCarousel } from './components/NewsCarousel';
+import { OutputDisplay } from './components/OutputDisplay';
+import { CountdownTimer } from './components/CountdownTimer';
+import { TimeDisplay } from './components/TimeDisplay';
+import { checkProductInfo, PolicyCheckResult } from './utils/policyChecker';
 
 function App() {
   const [productInfo, setProductInfo] = useState({
     name: '',
     features: '',
     targetAudience: '',
-    regions: [] as string[] // 改为数组
+    regions: [] as string[],
+    style: 'confident', // 文案风格
+    promotion: 'discount' // 促销方式
   });
   const [copies, setCopies] = useState<Array<{text: string, region: string, regionName: string}>>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showAllRegions, setShowAllRegions] = useState(false);
+  const [showRegionDropdown, setShowRegionDropdown] = useState(false);
+  const [regionSearchTerm, setRegionSearchTerm] = useState('');
+  const [policyCheckResult, setPolicyCheckResult] = useState<PolicyCheckResult | null>(null);
 
   // 根据地区获取语言和文案风格
   const getLanguageAndStyle = (region: string) => {
@@ -87,18 +93,32 @@ function App() {
     try {
       const apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY || 'sk-674b29e0b86846bca55195b66eb3e3aa';
       
+      // 先翻译产品信息
+      const translatedProduct = translateProductInfo(productInfo, region);
+      
       const prompt = `请为以下产品生成3条Facebook广告文案，要求：
 
 1. 使用${language}语言
 2. 文案风格：${style}
 3. 文化特点：${culture}
-4. 每条文案都要有吸引力，包含情感共鸣和明确的行动召唤
-5. 文案长度控制在100-150字之间
-6. 要针对${productInfo.targetAudience}这个目标受众
+4. 促销方式：${getPromotionText(productInfo.promotion)}
+5. 每条文案都要有吸引力，包含情感共鸣和明确的行动召唤
+6. 文案长度控制在100-150字之间
+7. 要针对${translatedProduct.audience}这个目标受众
 
-产品信息：
-- 产品名称：${productInfo.name}
-- 产品特性：${productInfo.features}
+CRITICAL REQUIREMENTS:
+- 产品名称"${translatedProduct.name}"已经翻译成${language}
+- 产品特性"${translatedProduct.features}"已经翻译成${language}
+- 目标受众"${translatedProduct.audience}"已经翻译成${language}
+- 整个文案必须完全使用${language}，绝对禁止包含任何中文字符
+- 绝对不要使用原始的中文产品信息
+- 如果遇到无法翻译的中文词汇，请用${language}的对应词汇替换
+- 确保所有文案都是纯${language}，没有任何中文混合
+
+产品信息（已翻译成${language}）：
+- 产品名称：${translatedProduct.name}
+- 产品特性：${translatedProduct.features}
+- 目标受众：${translatedProduct.audience}
 
 请严格按照以下格式返回，每条文案用换行分隔：
 文案1：[内容]
@@ -116,7 +136,18 @@ function App() {
           messages: [
             {
               role: 'system',
-              content: '你是一个专业的Facebook广告文案创作专家，擅长为不同地区和文化背景创作本土化的广告文案。'
+              content: `你是一个专业的Facebook广告文案创作专家，擅长为不同地区和文化背景创作本土化的广告文案。
+
+CRITICAL RULES:
+1. 所有文案必须完全使用${language}语言
+2. 绝对禁止包含任何中文字符、中文标点符号
+3. 产品信息已经翻译完成，请直接使用翻译后的信息
+4. 如果遇到无法翻译的中文词汇，请用${language}的对应词汇替换
+5. 确保所有文案都是纯${language}，没有任何中文混合
+6. 文案风格要符合${culture}文化特点
+7. 每条文案都要有吸引力，包含情感共鸣和明确的行动召唤
+
+请严格按照要求生成文案。`
             },
             {
               role: 'user',
@@ -151,13 +182,24 @@ function App() {
         })
         .filter((copy: string) => copy.length > 10); // 过滤掉太短的内容
 
-      // 如果AI生成失败，使用备用模板
-      if (copies.length === 0) {
-        console.warn(`AI生成失败，使用备用模板 for ${region}`);
+      // 后处理：确保文案中没有中文
+      const processedCopies = copies.map((copy: string) => {
+        // 移除所有中文字符
+        let processedCopy = copy.replace(/[\u4e00-\u9fff]/g, '');
+        // 移除中文标点符号
+        processedCopy = processedCopy.replace(/[，。！？；：""''（）【】]/g, '');
+        // 清理多余的空格
+        processedCopy = processedCopy.replace(/\s+/g, ' ').trim();
+        return processedCopy;
+      }).filter((copy: string) => copy.length > 10); // 再次过滤太短的内容
+
+      // 如果AI生成失败或处理后没有有效文案，使用备用模板
+      if (processedCopies.length === 0) {
+        console.warn(`AI生成失败或处理后无有效文案，使用备用模板 for ${region}`);
         return generateFallbackCopies(productInfo, region, config);
       }
 
-      return copies.slice(0, 3); // 确保只返回3条文案
+      return processedCopies.slice(0, 3); // 确保只返回3条文案
 
     } catch (error) {
       console.error(`生成文案失败 for ${region}:`, error);
@@ -170,15 +212,346 @@ function App() {
   const generateFallbackCopies = (productInfo: any, region: string, config: any) => {
     const { language, style, culture } = config;
     const templates = getLocalizedTemplates(region, language);
-    
+
+    const translatedProduct = translateProductInfo(productInfo, region);
+
     return templates.map(template => {
       return template
-        .replace('{product}', productInfo.name)
-        .replace('{features}', productInfo.features)
-        .replace('{audience}', productInfo.targetAudience)
+        .replace('{product}', translatedProduct.name)
+        .replace('{features}', translatedProduct.features)
+        .replace('{audience}', translatedProduct.audience)
         .replace('{style}', style)
         .replace('{culture}', culture);
     });
+  };
+
+  // 翻译产品信息 - 彻底修复版本
+  const translateProductInfo = (productInfo: any, region: string) => {
+    const translations: { [key: string]: { [key: string]: string } } = {
+      // 金融投资类
+      '股票': {
+        'US': 'Investment Products',
+        'JP': '投資商品',
+        'KR': '투자 상품',
+        'GB': 'Investment Products',
+        'DE': 'Anlageprodukte',
+        'FR': 'Produits d\'Investissement',
+        'IT': 'Prodotti di Investimento',
+        'ES': 'Productos de Inversión',
+        'SG': 'Investment Products',
+        'MY': 'Produk Pelaburan',
+        'TH': 'ผลิตภัณฑ์การลงทุน',
+        'VN': 'Sản Phẩm Đầu Tư'
+      },
+      '一夜暴富': {
+        'US': 'Wealth Building',
+        'JP': '資産構築',
+        'KR': '부자 되기',
+        'GB': 'Wealth Building',
+        'DE': 'Vermögensaufbau',
+        'FR': 'Construction de Richesse',
+        'IT': 'Costruzione di Ricchezza',
+        'ES': 'Construcción de Riqueza',
+        'SG': 'Wealth Building',
+        'MY': 'Pembinaan Kekayaan',
+        'TH': 'การสร้างความมั่งคั่ง',
+        'VN': 'Xây Dựng Tài Sản'
+      },
+      '高回报': {
+        'US': 'Good Returns',
+        'JP': '良いリターン',
+        'KR': '좋은 수익',
+        'GB': 'Good Returns',
+        'DE': 'Gute Renditen',
+        'FR': 'Bons Rendements',
+        'IT': 'Buoni Rendimenti',
+        'ES': 'Buenos Rendimientos',
+        'SG': 'Good Returns',
+        'MY': 'Pulangan Baik',
+        'TH': 'ผลตอบแทนที่ดี',
+        'VN': 'Lợi Nhuận Tốt'
+      },
+      '低投资': {
+        'US': 'Affordable Investment',
+        'JP': '手頃な投資',
+        'KR': '저렴한 투자',
+        'GB': 'Affordable Investment',
+        'DE': 'Erschwingliche Investition',
+        'FR': 'Investissement Abordable',
+        'IT': 'Investimento Accessibile',
+        'ES': 'Inversión Asequible',
+        'SG': 'Affordable Investment',
+        'MY': 'Pelaburan Berpatutan',
+        'TH': 'การลงทุนที่เหมาะสม',
+        'VN': 'Đầu Tư Phù Hợp'
+      },
+      '投资': {
+        'US': 'Financial Products',
+        'JP': '金融商品',
+        'KR': '금융 상품',
+        'GB': 'Financial Products',
+        'DE': 'Finanzprodukte',
+        'FR': 'Produits Financiers',
+        'IT': 'Prodotti Finanziari',
+        'ES': 'Productos Financieros',
+        'SG': 'Financial Products',
+        'MY': 'Produk Kewangan',
+        'TH': 'ผลิตภัณฑ์ทางการเงิน',
+        'VN': 'Sản Phẩm Tài Chính'
+      },
+      '理财': {
+        'US': 'Financial Planning',
+        'JP': '資産運用',
+        'KR': '자산 관리',
+        'GB': 'Financial Planning',
+        'DE': 'Finanzplanung',
+        'FR': 'Planification Financière',
+        'IT': 'Pianificazione Finanziaria',
+        'ES': 'Planificación Financiera',
+        'SG': 'Financial Planning',
+        'MY': 'Perancangan Kewangan',
+        'TH': 'การวางแผนทางการเงิน',
+        'VN': 'Lập Kế Hoạch Tài Chính'
+      },
+      '希望一夜暴富的人': {
+        'US': 'People Seeking Wealth Building',
+        'JP': '資産構築を求める人々',
+        'KR': '부자 되기를 원하는 사람들',
+        'GB': 'People Seeking Wealth Building',
+        'DE': 'Menschen, die Vermögensaufbau suchen',
+        'FR': 'Personnes Cherchant la Construction de Richesse',
+        'IT': 'Persone che Cercano la Costruzione di Ricchezza',
+        'ES': 'Personas que Buscan la Construcción de Riqueza',
+        'SG': 'People Seeking Wealth Building',
+        'MY': 'Orang yang Mencari Pembinaan Kekayaan',
+        'TH': 'ผู้ที่แสวงหาการสร้างความมั่งคั่ง',
+        'VN': 'Những Người Tìm Kiếm Xây Dựng Tài Sản'
+      },
+      // 运动健身器材
+      '运动健身器材': {
+        'US': 'Sports Fitness Equipment',
+        'JP': 'スポーツフィットネス機器',
+        'KR': '스포츠 피트니스 장비',
+        'GB': 'Sports Fitness Equipment',
+        'DE': 'Sport- und Fitnessgeräte',
+        'FR': 'Équipement de Fitness Sportif',
+        'IT': 'Attrezzature Sportive e Fitness',
+        'ES': 'Equipamiento Deportivo y Fitness',
+        'SG': 'Sports Fitness Equipment',
+        'MY': 'Peralatan Kecergasan Sukan',
+        'TH': 'อุปกรณ์กีฬาและฟิตเนส',
+        'VN': 'Thiết Bị Thể Thao và Fitness'
+      },
+      '便携设计': {
+        'US': 'Portable Design',
+        'JP': 'ポータブルデザイン',
+        'KR': '휴대용 디자인',
+        'GB': 'Portable Design',
+        'DE': 'Tragbares Design',
+        'FR': 'Design Portable',
+        'IT': 'Design Portatile',
+        'ES': 'Diseño Portátil',
+        'SG': 'Portable Design',
+        'MY': 'Reka Bentuk Mudah Alih',
+        'TH': 'การออกแบบแบบพกพา',
+        'VN': 'Thiết Kế Di Động'
+      },
+      '多功能': {
+        'US': 'Multi-functional',
+        'JP': '多機能',
+        'KR': '다기능',
+        'GB': 'Multi-functional',
+        'DE': 'Multifunktional',
+        'FR': 'Multifonctionnel',
+        'IT': 'Multifunzionale',
+        'ES': 'Multifuncional',
+        'SG': 'Multi-functional',
+        'MY': 'Pelbagai Fungsi',
+        'TH': 'หลายฟังก์ชัน',
+        'VN': 'Đa Chức Năng'
+      },
+      '耐用材质': {
+        'US': 'Durable Material',
+        'JP': '耐久性素材',
+        'KR': '내구성 재료',
+        'GB': 'Durable Material',
+        'DE': 'Langlebiges Material',
+        'FR': 'Matériau Durable',
+        'IT': 'Materiale Durevole',
+        'ES': 'Material Duradero',
+        'SG': 'Durable Material',
+        'MY': 'Bahan Tahan Lama',
+        'TH': 'วัสดุทนทาน',
+        'VN': 'Vật Liệu Bền Bỉ'
+      },
+      '适合家庭使用': {
+        'US': 'Suitable for Home Use',
+        'JP': '家庭使用に適している',
+        'KR': '가정용으로 적합',
+        'GB': 'Suitable for Home Use',
+        'DE': 'Geeignet für den Heimgebrauch',
+        'FR': 'Adapté à l\'Usage Domestique',
+        'IT': 'Adatto all\'Uso Domestico',
+        'ES': 'Adecuado para Uso Doméstico',
+        'SG': 'Suitable for Home Use',
+        'MY': 'Sesuai untuk Penggunaan Rumah',
+        'TH': 'เหมาะสำหรับใช้ในบ้าน',
+        'VN': 'Phù Hợp cho Sử Dụng Gia Đình'
+      },
+      '健身爱好者': {
+        'US': 'Fitness Enthusiasts',
+        'JP': 'フィットネス愛好家',
+        'KR': '피트니스 애호가',
+        'GB': 'Fitness Enthusiasts',
+        'DE': 'Fitness-Enthusiasten',
+        'FR': 'Passionnés de Fitness',
+        'IT': 'Appassionati di Fitness',
+        'ES': 'Entusiastas del Fitness',
+        'SG': 'Fitness Enthusiasts',
+        'MY': 'Peminat Kecergasan',
+        'TH': 'ผู้ที่ชื่นชอบการออกกำลังกาย',
+        'VN': 'Người Yêu Thích Fitness'
+      },
+      '居家运动人群': {
+        'US': 'Home Exercise Crowd',
+        'JP': '在宅運動をする人々',
+        'KR': '홈 운동 인구',
+        'GB': 'Home Exercise Crowd',
+        'DE': 'Heimtrainingsgruppe',
+        'FR': 'Groupe d\'Exercice à Domicile',
+        'IT': 'Gruppo di Esercizio a Casa',
+        'ES': 'Grupo de Ejercicio en Casa',
+        'SG': 'Home Exercise Crowd',
+        'MY': 'Kumpulan Senaman di Rumah',
+        'TH': 'กลุ่มคนออกกำลังกายที่บ้าน',
+        'VN': 'Nhóm Tập Thể Dục Tại Nhà'
+      },
+      '智能无线耳机': {
+        'US': 'Smart Wireless Headphones',
+        'JP': 'スマートワイヤレスヘッドフォン',
+        'KR': '스마트 무선 헤드폰',
+        'GB': 'Smart Wireless Headphones',
+        'DE': 'Smart Wireless Kopfhörer',
+        'FR': 'Écouteurs Sans Fil Intelligents',
+        'IT': 'Cuffie Wireless Intelligenti',
+        'ES': 'Auriculares Inalámbricos Inteligentes',
+        'SG': 'Smart Wireless Headphones',
+        'MY': 'Fon Telinga Tanpa Wayar Pintar',
+        'TH': 'หูฟังไร้สายอัจฉริยะ',
+        'VN': 'Tai Nghe Không Dây Thông Minh'
+      },
+      '主动降噪': {
+        'US': 'Active Noise Cancellation',
+        'JP': 'アクティブノイズキャンセリング',
+        'KR': '액티브 노이즈 캔슬링',
+        'GB': 'Active Noise Cancellation',
+        'DE': 'Aktive Geräuschunterdrückung',
+        'FR': 'Réduction Active du Bruit',
+        'IT': 'Cancellazione Attiva del Rumore',
+        'ES': 'Cancelación Activa de Ruido',
+        'SG': 'Active Noise Cancellation',
+        'MY': 'Pembatalan Bunyi Aktif',
+        'TH': 'การลดเสียงรบกวนแบบแอคทีฟ',
+        'VN': 'Chống Ồn Chủ Động'
+      },
+      '长续航': {
+        'US': 'Long Battery Life',
+        'JP': '長時間バッテリー',
+        'KR': '긴 배터리 수명',
+        'GB': 'Long Battery Life',
+        'DE': 'Lange Akkulaufzeit',
+        'FR': 'Longue Autonomie',
+        'IT': 'Lunga Durata della Batteria',
+        'ES': 'Larga Duración de Batería',
+        'SG': 'Long Battery Life',
+        'MY': 'Hayat Bateri Panjang',
+        'TH': 'อายุแบตเตอรี่ยาวนาน',
+        'VN': 'Pin Trâu Bền Bỉ'
+      },
+      '快速充电': {
+        'US': 'Fast Charging',
+        'JP': '急速充電',
+        'KR': '빠른 충전',
+        'GB': 'Fast Charging',
+        'DE': 'Schnellladung',
+        'FR': 'Chargement Rapide',
+        'IT': 'Ricaricamento Rapido',
+        'ES': 'Carga Rápida',
+        'SG': 'Fast Charging',
+        'MY': 'Pengecasan Pantas',
+        'TH': 'การชาร์จเร็ว',
+        'VN': 'Sạc Nhanh'
+      },
+      '舒适佩戴': {
+        'US': 'Comfortable Fit',
+        'JP': '快適な装着感',
+        'KR': '편안한 착용감',
+        'GB': 'Comfortable Fit',
+        'DE': 'Komfortabler Sitz',
+        'FR': 'Ajustement Confortable',
+        'IT': 'Adattamento Comodo',
+        'ES': 'Ajuste Cómodo',
+        'SG': 'Comfortable Fit',
+        'MY': 'Sesuai Selesa',
+        'TH': 'การสวมใส่ที่สบาย',
+        'VN': 'Đeo Thoải Mái'
+      },
+      '年轻上班族': {
+        'US': 'Young Professionals',
+        'JP': '若い会社員',
+        'KR': '젊은 직장인',
+        'GB': 'Young Professionals',
+        'DE': 'Junge Berufstätige',
+        'FR': 'Jeunes Professionnels',
+        'IT': 'Giovani Professionisti',
+        'ES': 'Jóvenes Profesionales',
+        'SG': 'Young Professionals',
+        'MY': 'Profesional Muda',
+        'TH': 'คนทำงานรุ่นใหม่',
+        'VN': 'Người Đi Làm Trẻ'
+      },
+      '音乐爱好者': {
+        'US': 'Music Lovers',
+        'JP': '音楽愛好家',
+        'KR': '음악 애호가',
+        'GB': 'Music Lovers',
+        'DE': 'Musikliebhaber',
+        'FR': 'Passionnés de Musique',
+        'IT': 'Amanti della Musica',
+        'ES': 'Amantes de la Música',
+        'SG': 'Music Lovers',
+        'MY': 'Peminat Muzik',
+        'TH': 'ผู้ที่ชื่นชอบดนตรี',
+        'VN': 'Người Yêu Âm Nhạc'
+      }
+    };
+
+    const translateText = (text: string) => {
+      if (!text) return '';
+      
+      // 分割文本，支持多种分隔符
+      const words = text.split(/[,，、\s]+/).filter(word => word.trim());
+      
+      const translatedWords = words.map(word => {
+        const trimmedWord = word.trim();
+        const wordTranslations = translations[trimmedWord];
+        
+        if (wordTranslations) {
+          return wordTranslations[region] || wordTranslations['US'] || trimmedWord;
+        }
+        
+        // 如果没有找到翻译，返回原词
+        return trimmedWord;
+      });
+      
+      return translatedWords.join(' ');
+    };
+
+    return {
+      name: translateText(productInfo.name),
+      features: translateText(productInfo.features),
+      audience: translateText(productInfo.targetAudience)
+    };
   };
 
   // 获取本土化文案模板
@@ -297,7 +670,7 @@ function App() {
       'MX': [
         '🚀 ¡Transforma tu vida con {product}! {features} diseñado para {audience}. ¡Experimenta la fusión perfecta de tecnología y estilo de vida!',
         '💎 ¡Descubre el encanto único de {product}! {features} te ayudan a destacar entre {audience}. ¡Oferta limitada, no te lo pierdas!',
-        '🔥 ¡Venta caliente! {product} con {features} se convierte en la primera opción para {audience}. ¡Obtén descuentos exclusivos ahora!'
+        '�� ¡Venta caliente! {product} con {features} se convierte en la primera opción para {audience}. ¡Obtén descuentos exclusivos ahora!'
       ],
       'BR': [
         '🚀 Transforme sua vida com {product}! {features} projetado para {audience}. Experimente a fusão perfeita de tecnologia e estilo de vida!',
@@ -312,6 +685,57 @@ function App() {
     };
 
     return templates[region] || templates['US']; // 默认使用英语模板
+  };
+
+  // 获取已选择地区的文本显示
+  const getSelectedRegionsText = () => {
+    if (productInfo.regions.length === 0) {
+      return '请选择投放地区';
+    }
+    if (productInfo.regions.length === 1) {
+      const region = productInfo.regions[0];
+      const regionData = regionGroups.flatMap(group => group.regions).find(r => r.value === region);
+      return regionData ? regionData.label.split(' ')[1] : '未知地区'; // 只显示国家名称，不显示国旗
+    }
+    
+    // 多个地区的情况
+    const selectedRegions = productInfo.regions.map(region => {
+      const regionData = regionGroups.flatMap(group => group.regions).find(r => r.value === region);
+      return regionData ? regionData.label.split(' ')[1] : '未知地区'; // 只显示国家名称，不显示国旗
+    });
+    
+    if (productInfo.regions.length <= 3) {
+      return selectedRegions.join('、');
+    } else {
+      return `${selectedRegions.slice(0, 3).join('、')}等${productInfo.regions.length}个地区`;
+    }
+  };
+
+  // 处理地区选择
+  const handleRegionToggle = (region: string) => {
+    setProductInfo(prev => ({
+      ...prev,
+      regions: prev.regions.includes(region)
+        ? prev.regions.filter(r => r !== region)
+        : [...prev.regions, region]
+    }));
+  };
+
+  // 搜索过滤逻辑
+  const getFilteredRegionGroups = () => {
+    if (!regionSearchTerm.trim()) {
+      return regionGroups;
+    }
+
+    const searchTerm = regionSearchTerm.toLowerCase();
+    return regionGroups.map(group => ({
+      ...group,
+      regions: group.regions.filter(region => 
+        region.label.toLowerCase().includes(searchTerm) ||
+        region.desc.toLowerCase().includes(searchTerm) ||
+        region.value.toLowerCase().includes(searchTerm)
+      )
+    })).filter(group => group.regions.length > 0);
   };
 
   // 主要的生成处理函数
@@ -330,6 +754,11 @@ function App() {
       return;
     }
 
+    // 进行风险检测
+    const policyResult = checkProductInfo(productInfo);
+    setPolicyCheckResult(policyResult);
+    console.log('🔍 风险检测结果:', policyResult);
+
     setIsLoading(true);
     console.log('🚀 开始生成文案...');
 
@@ -345,13 +774,28 @@ function App() {
     }
   };
 
-  const handleRegionChange = (region: string, checked: boolean) => {
-    setProductInfo(prev => ({
-      ...prev,
-      regions: checked 
-        ? [...prev.regions, region]
-        : prev.regions.filter(r => r !== region)
-    }));
+  // 获取促销文本
+  const getPromotionText = (promotion: string) => {
+    switch (promotion) {
+      case 'discount':
+        return '折扣优惠';
+      case 'limited':
+        return '限时抢购';
+      case 'premium':
+        return '高端品质';
+      case 'bundle':
+        return '套装组合';
+      case 'new':
+        return '新品上市';
+      case 'sale':
+        return '清仓特卖';
+      case 'gift':
+        return '赠品促销';
+      case 'none':
+        return '无促销';
+      default:
+        return '折扣优惠';
+    }
   };
 
   // 地区分组配置
@@ -364,16 +808,20 @@ function App() {
         { value: 'JP', label: '🇯🇵 日本', desc: '日语市场' },
         { value: 'KR', label: '🇰🇷 韩国', desc: '韩语市场' },
         { value: 'SG', label: '🇸🇬 新加坡', desc: '英语市场' },
-        { value: 'MY', label: '🇲🇾 马来西亚', desc: '马来语市场' }
+        { value: 'MY', label: '🇲🇾 马来西亚', desc: '马来语市场' },
+        { value: 'TH', label: '🇹🇭 泰国', desc: '泰语市场' },
+        { value: 'VN', label: '🇻🇳 越南', desc: '越南语市场' }
       ]
     },
     {
       name: '东南亚',
       regions: [
-        { value: 'TH', label: '🇹🇭 泰国', desc: '泰语市场' },
-        { value: 'VN', label: '🇻🇳 越南', desc: '越南语市场' },
         { value: 'ID', label: '🇮🇩 印度尼西亚', desc: '印尼语市场' },
-        { value: 'PH', label: '🇵🇭 菲律宾', desc: '英语市场' }
+        { value: 'PH', label: '🇵🇭 菲律宾', desc: '英语市场' },
+        { value: 'MM', label: '🇲🇲 缅甸', desc: '缅甸语市场' },
+        { value: 'KH', label: '🇰🇭 柬埔寨', desc: '柬埔寨语市场' },
+        { value: 'LA', label: '🇱🇦 老挝', desc: '老挝语市场' },
+        { value: 'BN', label: '🇧🇳 文莱', desc: '马来语市场' }
       ]
     },
     {
@@ -385,7 +833,58 @@ function App() {
         { value: 'FR', label: '🇫🇷 法国', desc: '法语市场' },
         { value: 'IT', label: '🇮🇹 意大利', desc: '意大利语市场' },
         { value: 'ES', label: '🇪🇸 西班牙', desc: '西班牙语市场' },
-        { value: 'NL', label: '🇳🇱 荷兰', desc: '荷兰语市场' }
+        { value: 'NL', label: '🇳🇱 荷兰', desc: '荷兰语市场' },
+        { value: 'BE', label: '🇧🇪 比利时', desc: '法语/荷兰语市场' },
+        { value: 'CH', label: '🇨🇭 瑞士', desc: '德语/法语/意大利语市场' },
+        { value: 'AT', label: '🇦🇹 奥地利', desc: '德语市场' },
+        { value: 'SE', label: '🇸🇪 瑞典', desc: '瑞典语市场' },
+        { value: 'NO', label: '🇳🇴 挪威', desc: '挪威语市场' },
+        { value: 'DK', label: '🇩🇰 丹麦', desc: '丹麦语市场' },
+        { value: 'FI', label: '🇫🇮 芬兰', desc: '芬兰语市场' },
+        { value: 'PL', label: '🇵🇱 波兰', desc: '波兰语市场' },
+        { value: 'CZ', label: '🇨🇿 捷克', desc: '捷克语市场' },
+        { value: 'HU', label: '🇭🇺 匈牙利', desc: '匈牙利语市场' },
+        { value: 'RO', label: '🇷🇴 罗马尼亚', desc: '罗马尼亚语市场' },
+        { value: 'BG', label: '🇧🇬 保加利亚', desc: '保加利亚语市场' },
+        { value: 'HR', label: '🇭🇷 克罗地亚', desc: '克罗地亚语市场' },
+        { value: 'SI', label: '🇸🇮 斯洛文尼亚', desc: '斯洛文尼亚语市场' },
+        { value: 'SK', label: '🇸🇰 斯洛伐克', desc: '斯洛伐克语市场' },
+        { value: 'LT', label: '🇱🇹 立陶宛', desc: '立陶宛语市场' },
+        { value: 'LV', label: '🇱🇻 拉脱维亚', desc: '拉脱维亚语市场' },
+        { value: 'EE', label: '🇪🇪 爱沙尼亚', desc: '爱沙尼亚语市场' },
+        { value: 'IE', label: '🇮🇪 爱尔兰', desc: '英语市场' },
+        { value: 'PT', label: '🇵🇹 葡萄牙', desc: '葡萄牙语市场' },
+        { value: 'GR', label: '🇬🇷 希腊', desc: '希腊语市场' }
+      ]
+    },
+    {
+      name: '美洲地区',
+      regions: [
+        { value: 'MX', label: '🇲🇽 墨西哥', desc: '西班牙语市场' },
+        { value: 'BR', label: '🇧🇷 巴西', desc: '葡萄牙语市场' },
+        { value: 'AR', label: '🇦🇷 阿根廷', desc: '西班牙语市场' },
+        { value: 'CL', label: '🇨🇱 智利', desc: '西班牙语市场' },
+        { value: 'CO', label: '🇨🇴 哥伦比亚', desc: '西班牙语市场' },
+        { value: 'PE', label: '🇵🇪 秘鲁', desc: '西班牙语市场' },
+        { value: 'VE', label: '🇻🇪 委内瑞拉', desc: '西班牙语市场' },
+        { value: 'EC', label: '🇪🇨 厄瓜多尔', desc: '西班牙语市场' },
+        { value: 'BO', label: '🇧🇴 玻利维亚', desc: '西班牙语市场' },
+        { value: 'PY', label: '🇵🇾 巴拉圭', desc: '西班牙语市场' },
+        { value: 'UY', label: '🇺🇾 乌拉圭', desc: '西班牙语市场' },
+        { value: 'CR', label: '🇨🇷 哥斯达黎加', desc: '西班牙语市场' },
+        { value: 'PA', label: '🇵🇦 巴拿马', desc: '西班牙语市场' },
+        { value: 'GT', label: '🇬🇹 危地马拉', desc: '西班牙语市场' },
+        { value: 'SV', label: '🇸🇻 萨尔瓦多', desc: '西班牙语市场' },
+        { value: 'HN', label: '🇭🇳 洪都拉斯', desc: '西班牙语市场' },
+        { value: 'NI', label: '🇳🇮 尼加拉瓜', desc: '西班牙语市场' },
+        { value: 'DO', label: '🇩🇴 多米尼加', desc: '西班牙语市场' },
+        { value: 'CU', label: '🇨🇺 古巴', desc: '西班牙语市场' },
+        { value: 'JM', label: '🇯🇲 牙买加', desc: '英语市场' },
+        { value: 'TT', label: '🇹🇹 特立尼达和多巴哥', desc: '英语市场' },
+        { value: 'BB', label: '🇧🇧 巴巴多斯', desc: '英语市场' },
+        { value: 'GY', label: '🇬🇾 圭亚那', desc: '英语市场' },
+        { value: 'SR', label: '🇸🇷 苏里南', desc: '荷兰语市场' },
+        { value: 'GF', label: '🇬🇫 法属圭亚那', desc: '法语市场' }
       ]
     },
     {
@@ -394,14 +893,63 @@ function App() {
         { value: 'IN', label: '🇮🇳 印度', desc: '英语市场' },
         { value: 'TW', label: '🇨🇳 台湾', desc: '繁体中文市场' },
         { value: 'HK', label: '🇭🇰 香港', desc: '繁体中文市场' },
-        { value: 'MX', label: '🇲🇽 墨西哥', desc: '西班牙语市场' },
         { value: 'AU', label: '🇦🇺 澳大利亚', desc: '英语市场' },
         { value: 'NZ', label: '🇳🇿 新西兰', desc: '英语市场' },
-        { value: 'BR', label: '🇧🇷 巴西', desc: '葡萄牙语市场' },
-        { value: 'AR', label: '🇦🇷 阿根廷', desc: '西班牙语市场' }
+        { value: 'ZA', label: '🇿🇦 南非', desc: '英语市场' },
+        { value: 'EG', label: '🇪🇬 埃及', desc: '阿拉伯语市场' },
+        { value: 'SA', label: '🇸🇦 沙特阿拉伯', desc: '阿拉伯语市场' },
+        { value: 'AE', label: '🇦🇪 阿联酋', desc: '阿拉伯语市场' },
+        { value: 'QA', label: '🇶🇦 卡塔尔', desc: '阿拉伯语市场' },
+        { value: 'KW', label: '🇰🇼 科威特', desc: '阿拉伯语市场' },
+        { value: 'BH', label: '🇧🇭 巴林', desc: '阿拉伯语市场' },
+        { value: 'OM', label: '🇴🇲 阿曼', desc: '阿拉伯语市场' },
+        { value: 'JO', label: '🇯🇴 约旦', desc: '阿拉伯语市场' },
+        { value: 'LB', label: '🇱🇧 黎巴嫩', desc: '阿拉伯语市场' },
+        { value: 'IL', label: '🇮🇱 以色列', desc: '希伯来语市场' },
+        { value: 'TR', label: '🇹🇷 土耳其', desc: '土耳其语市场' },
+        { value: 'IR', label: '🇮🇷 伊朗', desc: '波斯语市场' },
+        { value: 'PK', label: '🇵🇰 巴基斯坦', desc: '乌尔都语市场' },
+        { value: 'BD', label: '🇧🇩 孟加拉国', desc: '孟加拉语市场' },
+        { value: 'LK', label: '🇱🇰 斯里兰卡', desc: '僧伽罗语市场' },
+        { value: 'NP', label: '🇳🇵 尼泊尔', desc: '尼泊尔语市场' },
+        { value: 'MV', label: '🇲🇻 马尔代夫', desc: '迪维希语市场' },
+        { value: 'BT', label: '🇧🇹 不丹', desc: '宗卡语市场' },
+        { value: 'MN', label: '🇲🇳 蒙古', desc: '蒙古语市场' },
+        { value: 'KZ', label: '🇰🇿 哈萨克斯坦', desc: '哈萨克语市场' },
+        { value: 'UZ', label: '🇺🇿 乌兹别克斯坦', desc: '乌兹别克语市场' },
+        { value: 'KG', label: '🇰🇬 吉尔吉斯斯坦', desc: '吉尔吉斯语市场' },
+        { value: 'TJ', label: '🇹🇯 塔吉克斯坦', desc: '塔吉克语市场' },
+        { value: 'TM', label: '🇹🇲 土库曼斯坦', desc: '土库曼语市场' },
+        { value: 'AF', label: '🇦🇫 阿富汗', desc: '普什图语市场' },
+        { value: 'GE', label: '🇬🇪 格鲁吉亚', desc: '格鲁吉亚语市场' },
+        { value: 'AM', label: '🇦🇲 亚美尼亚', desc: '亚美尼亚语市场' },
+        { value: 'AZ', label: '🇦🇿 阿塞拜疆', desc: '阿塞拜疆语市场' },
+        { value: 'UA', label: '🇺🇦 乌克兰', desc: '乌克兰语市场' },
+        { value: 'BY', label: '🇧🇾 白俄罗斯', desc: '白俄罗斯语市场' },
+        { value: 'MD', label: '🇲🇩 摩尔多瓦', desc: '罗马尼亚语市场' },
+        { value: 'RS', label: '🇷🇸 塞尔维亚', desc: '塞尔维亚语市场' },
+        { value: 'ME', label: '🇲🇪 黑山', desc: '黑山语市场' },
+        { value: 'BA', label: '🇧🇦 波斯尼亚和黑塞哥维那', desc: '波斯尼亚语市场' },
+        { value: 'MK', label: '🇲🇰 北马其顿', desc: '马其顿语市场' },
+        { value: 'AL', label: '🇦🇱 阿尔巴尼亚', desc: '阿尔巴尼亚语市场' },
+        { value: 'XK', label: '🇽🇰 科索沃', desc: '阿尔巴尼亚语市场' }
       ]
     }
   ];
+
+  // 点击外部关闭下拉菜单
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const dropdown = document.getElementById('region-dropdown');
+      if (dropdown && !dropdown.contains(event.target as Node)) {
+        setShowRegionDropdown(false);
+        setRegionSearchTerm(''); // 清空搜索词
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showRegionDropdown]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
@@ -417,39 +965,16 @@ function App() {
             {/* 中间导航菜单 */}
             <Navigation className="hidden lg:flex" />
             
-            {/* 右侧按钮 */}
-            <div className="flex items-center space-x-2">
-              <a 
-                href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-              >
-                立即开户
-              </a>
-              <a 
-                href="https://cheetahgo.cmcm.com/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-              >
-                猎豹学院
-              </a>
-            </div>
+            {/* 删除重复的右侧按钮，Navigation组件已经包含了这些按钮 */}
           </div>
         </div>
       </div>
-      
 
+      {/* 倒计时信息栏 */}
+      <CountdownTimer />
 
-      {/* 跨境快讯 */}
-      <div className="bg-white border-b border-gray-100 py-4">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <NewsCarousel />
-          </div>
-        </div>
-      </div>
+      {/* 全球时间显示 */}
+      <TimeDisplay />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8" id="generator">
@@ -505,77 +1030,153 @@ function App() {
                   />
                 </div>
 
-                {/* 投放地区 - 优化为分组显示 */}
-                <div>
+                {/* 投放地区 - 下拉选择 */}
+                <div className="relative">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     投放地区 * (可多选)
                   </label>
-                  <div className="space-y-4">
-                    {/* 热门地区 - 始终显示 */}
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-800 mb-2">🔥 热门地区</h4>
-                      <div className="grid grid-cols-2 gap-2">
-                        {regionGroups[0].regions.map((region) => (
-                          <label key={region.value} className="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={productInfo.regions.includes(region.value)}
-                              onChange={(e) => handleRegionChange(region.value, e.target.checked)}
-                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                            />
-                            <div className="ml-2">
-                              <div className="text-sm font-medium text-gray-900">{region.label}</div>
+                  <button
+                    type="button"
+                    onClick={() => setShowRegionDropdown(!showRegionDropdown)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-left bg-white hover:bg-gray-50"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={productInfo.regions.length === 0 ? 'text-gray-500' : 'text-gray-900'}>
+                        {getSelectedRegionsText()}
+                      </span>
+                      <svg 
+                        className={`w-4 h-4 text-gray-400 transition-transform ${showRegionDropdown ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {/* 下拉菜单 */}
+                  {showRegionDropdown && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-80 overflow-y-auto" id="region-dropdown">
+                      {/* 搜索输入框 - 固定悬浮 */}
+                      <div className="sticky top-0 bg-white border-b border-gray-200 p-3 z-20">
+                        <input
+                          type="text"
+                          placeholder="搜索地区..."
+                          value={regionSearchTerm}
+                          onChange={(e) => setRegionSearchTerm(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                        />
+                      </div>
+
+                      <div className="p-3 pt-0">
+                        {/* 热门地区 */}
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold text-gray-800 mb-2">🔥 热门地区</h4>
+                          <div className="space-y-2">
+                            {getFilteredRegionGroups()[0]?.regions.map((region) => (
+                              <label key={region.value} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors">
+                                <input
+                                  type="checkbox"
+                                  checked={productInfo.regions.includes(region.value)}
+                                  onChange={() => handleRegionToggle(region.value)}
+                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <div className="ml-3">
+                                  <div className="text-sm font-medium text-gray-900">{region.label}</div>
+                                  <div className="text-xs text-gray-500">{region.desc}</div>
+                                </div>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 其他地区 */}
+                        {getFilteredRegionGroups().slice(1).map((group) => (
+                          <div key={group.name} className="mb-4">
+                            <h4 className="text-sm font-semibold text-gray-800 mb-2">{group.name}</h4>
+                            <div className="space-y-2">
+                              {group.regions.map((region) => (
+                                <label key={region.value} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors">
+                                  <input
+                                    type="checkbox"
+                                    checked={productInfo.regions.includes(region.value)}
+                                    onChange={() => handleRegionToggle(region.value)}
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                  />
+                                  <div className="ml-3">
+                                    <div className="text-sm font-medium text-gray-900">{region.label}</div>
+                                    <div className="text-xs text-gray-500">{region.desc}</div>
+                                  </div>
+                                </label>
+                              ))}
                             </div>
-                          </label>
+                          </div>
                         ))}
                       </div>
                     </div>
+                  )}
 
-                    {/* 其他地区 - 可展开/收起 */}
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => setShowAllRegions(!showAllRegions)}
-                        className="flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        {showAllRegions ? '收起其他地区' : '展开所有地区'}
-                        <svg className={`ml-1 w-4 h-4 transition-transform ${showAllRegions ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                      
-                      {showAllRegions && (
-                        <div className="mt-3 space-y-3">
-                          {regionGroups.slice(1).map((group) => (
-                            <div key={group.name}>
-                              <h4 className="text-sm font-semibold text-gray-800 mb-2">{group.name}</h4>
-                              <div className="grid grid-cols-2 gap-2">
-                                {group.regions.map((region) => (
-                                  <label key={region.value} className="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-                                    <input
-                                      type="checkbox"
-                                      checked={productInfo.regions.includes(region.value)}
-                                      onChange={(e) => handleRegionChange(region.value, e.target.checked)}
-                                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                    />
-                                    <div className="ml-2">
-                                      <div className="text-sm font-medium text-gray-900">{region.label}</div>
-                                    </div>
-                                  </label>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  {/* 错误提示 */}
                   {productInfo.regions.length === 0 && (
                     <p className="text-xs text-red-600 mt-1">请至少选择一个投放地区</p>
                   )}
-                  {productInfo.regions.length > 0 && (
-                    <p className="text-xs text-green-600 mt-1">已选择 {productInfo.regions.length} 个地区</p>
-                  )}
+                </div>
+
+                {/* 文案风格 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    文案风格
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={productInfo.style}
+                      onChange={(e) => setProductInfo(prev => ({ ...prev, style: e.target.value }))}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white appearance-none pr-10"
+                    >
+                      <option value="confident">自信专业</option>
+                      <option value="friendly">亲切友好</option>
+                      <option value="energetic">活力四射</option>
+                      <option value="elegant">优雅精致</option>
+                      <option value="modern">现代时尚</option>
+                      <option value="casual">轻松随意</option>
+                      <option value="luxury">奢华高端</option>
+                      <option value="humorous">幽默风趣</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 促销方式 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    促销方式
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={productInfo.promotion}
+                      onChange={(e) => setProductInfo(prev => ({ ...prev, promotion: e.target.value }))}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white appearance-none pr-10"
+                    >
+                      <option value="discount">折扣优惠</option>
+                      <option value="limited">限时抢购</option>
+                      <option value="premium">高端品质</option>
+                      <option value="bundle">套装组合</option>
+                      <option value="new">新品上市</option>
+                      <option value="sale">清仓特卖</option>
+                      <option value="gift">赠品促销</option>
+                      <option value="none">无促销</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
                 {/* 生成按钮 */}
@@ -599,35 +1200,147 @@ function App() {
               </form>
 
               {/* 功能说明 */}
-              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                <h3 className="text-sm font-semibold text-blue-800 mb-2">🎯 智能功能</h3>
-                <ul className="text-xs text-blue-700 space-y-1">
-                  <li>✅ AI 智能生成多条文案</li>
-                  <li>✅ 支持多地区多语言</li>
-                  <li>✅ 自动效果预测分析</li>
-                  <li>✅ 实时优化建议</li>
-                </ul>
-              </div>
+              <div className="mt-6 space-y-4">
+                  {/* 快速模板 */}
+                  <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                    <h3 className="text-sm font-semibold text-green-800 mb-2">⚡ 快速模板</h3>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => setProductInfo({
+                          name: '智能无线耳机',
+                          features: '主动降噪, 长续航, 快速充电, 舒适佩戴',
+                          targetAudience: '年轻上班族, 音乐爱好者',
+                          regions: [],
+                          style: 'confident',
+                          promotion: 'discount'
+                        })}
+                        className="w-full text-left p-2 bg-white rounded border border-green-200 hover:bg-green-50 transition-colors text-xs"
+                      >
+                        🎧 智能耳机模板
+                      </button>
+                      <button
+                        onClick={() => setProductInfo({
+                          name: '运动健身器材',
+                          features: '便携设计, 多功能, 耐用材质, 适合家庭使用',
+                          targetAudience: '健身爱好者, 居家运动人群',
+                          regions: [],
+                          style: 'energetic',
+                          promotion: 'limited'
+                        })}
+                        className="w-full text-left p-2 bg-white rounded border border-green-200 hover:bg-green-50 transition-colors text-xs"
+                      >
+                        💪 健身器材模板
+                      </button>
+                      <button
+                        onClick={() => setProductInfo({
+                          name: '护肤美容产品',
+                          features: '天然成分, 温和配方, 快速见效, 适合敏感肌',
+                          targetAudience: '爱美女性, 护肤达人',
+                          regions: [],
+                          style: 'elegant',
+                          promotion: 'premium'
+                        })}
+                        className="w-full text-left p-2 bg-white rounded border border-green-200 hover:bg-green-50 transition-colors text-xs"
+                      >
+                        ✨ 护肤产品模板
+                      </button>
+                      <button
+                        onClick={() => setProductInfo({
+                          name: '数码配件',
+                          features: '高品质, 兼容性强, 时尚设计, 实用功能',
+                          targetAudience: '数码爱好者, 3C用户',
+                          regions: [],
+                          style: 'modern',
+                          promotion: 'bundle'
+                        })}
+                        className="w-full text-left p-2 bg-white rounded border border-green-200 hover:bg-green-50 transition-colors text-xs"
+                      >
+                        📱 数码配件模板
+                      </button>
+                    </div>
+                  </div>
+                </div>
             </div>
           </div>
 
           {/* Right: Generated Results */}
           <div className="lg:col-span-2">
-            <OutputDisplay
-              copies={copies}
-              regions={productInfo.regions}
-              isLoading={isLoading}
-              error={null}
-            />
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
+              <OutputDisplay
+                copies={copies}
+                regions={productInfo.regions}
+                isLoading={isLoading}
+                error={null}
+                policyCheckResult={policyCheckResult}
+              />
+            </div>
           </div>
         </div>
       </div>
 
-
-
-
-
-
+      {/* Footer - 保留页脚信息，但不包括倒计时 */}
+      <div className="bg-gray-900 text-white py-12" id="footer">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* 猎豹服务 */}
+            <div>
+              <h3 className="text-xl font-bold mb-4">猎豹服务</h3>
+              <ul className="text-gray-400 space-y-2">
+                <li><a href="https://cheetahgo.cmcm.com/classes/facebook/0a4ec1f962875a3c05a4bb915589d5d8" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Facebook广告</a></li>
+                <li><a href="https://cheetahgo.cmcm.com/classes/tiktok/f6e08a6462875fbf0440ff297acb257d" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• TikTok广告</a></li>
+                <li><a href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 客户自助平台</a></li>
+                <li><a href="https://overseas.cmcm.com/no9" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 9号艺术工作室</a></li>
+              </ul>
+            </div>
+            
+            {/* 联系我们 */}
+            <div>
+              <h3 className="text-xl font-bold mb-4">联系我们</h3>
+              <ul className="text-gray-400 space-y-2">
+                <li>咨询热线: 400-603-7779</li>
+                <li>咨询邮箱: adoverseas@cmcm.com</li>
+                <li>总部地址: 北京市朝阳区三间房南里7号万东科技文创园11号楼</li>
+              </ul>
+            </div>
+            
+            {/* 官方公众号 */}
+            <div>
+              <h3 className="text-xl font-bold mb-4">官方公众号</h3>
+              <div className="w-32 h-32 mb-3">
+                <img 
+                  src="https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813" 
+                  alt="猎豹国际广告官方公众号二维码" 
+                  className="w-full h-full object-cover rounded-lg" 
+                  loading="lazy" 
+                  decoding="async"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const fallback = target.nextElementSibling as HTMLElement;
+                    if (fallback) {
+                      fallback.classList.remove('hidden');
+                    }
+                  }}
+                />
+                <div className="hidden w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-orange-500 rounded mx-auto mb-1"></div>
+                    <div className="text-xs text-gray-600">CMCM</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* 关于我们 */}
+            <div>
+              <h3 className="text-xl font-bold mb-4">关于我们</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                专业的Facebook广告文案生成工具,基于React + Tailwind CSS + DeepSeek构建,为广告主提供高质量的文案创作服务。与猎豹移动深度合作,助力企业出海营销。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

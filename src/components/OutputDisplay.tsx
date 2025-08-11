@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { CopyButton } from './CopyButton';
 import { detectSensitiveWords, getFacebookPolicyLink } from '../utils/sensitiveWords';
 import { getDirectionByRegion } from '../utils/languages';
-import { AlertTriangle, CheckCircle, Sparkles, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Sparkles, ExternalLink, ChevronLeft, ChevronRight, Shield } from 'lucide-react';
 import { useEffectPrediction } from '../hooks/useEffectPrediction';
 // import { AdEffectPrediction } from './AdEffectPrediction'; // 暂时注释掉，使用内联版本
 import { EffectPrediction } from '../types';
+import { PolicyCheckResult } from '../utils/policyChecker';
 
 interface OutputDisplayProps {
   copies: Array<{text: string, region: string, regionName: string}>;
@@ -13,6 +14,7 @@ interface OutputDisplayProps {
   isLoading: boolean;
   error: string | null;
   isForbiddenProduct?: boolean;
+  policyCheckResult?: PolicyCheckResult | null;
 }
 
 // 清理文案中的Markdown格式
@@ -64,7 +66,8 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
   regions,
   isLoading,
   error,
-  isForbiddenProduct
+  isForbiddenProduct,
+  policyCheckResult
 }) => {
   // 使用第一个地区作为主要方向，或者默认使用CN
   const primaryRegion = regions.length > 0 ? regions[0] : 'CN';
@@ -144,8 +147,24 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
     return (
       <div className="card h-full flex items-center justify-center">
         <div className="text-center">
-          <div className="loading-spinner mx-auto mb-4"></div>
-          <p className="text-gray-600">正在生成文案，请稍候...</p>
+          {/* 重新设计的加载动画 */}
+          <div className="relative mb-6">
+            {/* 外圈旋转动画 */}
+            <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mx-auto"></div>
+            {/* 内圈旋转动画 */}
+            <div className="absolute inset-2 w-12 h-12 border-2 border-purple-200 border-t-purple-500 rounded-full animate-spin mx-auto" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+          </div>
+          
+          {/* 文字和指示器 */}
+          <div className="space-y-3">
+            <p className="text-gray-700 font-medium text-lg">正在生成文案</p>
+            <div className="flex justify-center space-x-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+            </div>
+            <p className="text-gray-500 text-sm">AI正在为您创作精彩的广告文案...</p>
+          </div>
         </div>
       </div>
     );
@@ -227,6 +246,102 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
 
   return (
     <div className="relative">
+      {/* 风险检测结果 */}
+      {policyCheckResult && (
+        <div className="mb-4">
+          <div className={`p-4 border rounded-xl ${
+            policyCheckResult.riskLevel === 'high' 
+              ? 'bg-red-50 border-red-200' 
+              : policyCheckResult.riskLevel === 'medium'
+              ? 'bg-yellow-50 border-yellow-200'
+              : policyCheckResult.riskLevel === 'low'
+              ? 'bg-blue-50 border-blue-200'
+              : 'bg-green-50 border-green-200'
+          }`}>
+            <div className="flex items-start">
+              <Shield className={`w-5 h-5 mr-3 mt-0.5 ${
+                policyCheckResult.riskLevel === 'high' 
+                  ? 'text-red-600' 
+                  : policyCheckResult.riskLevel === 'medium'
+                  ? 'text-yellow-600'
+                  : policyCheckResult.riskLevel === 'low'
+                  ? 'text-blue-600'
+                  : 'text-green-600'
+              }`} />
+              <div className="flex-1">
+                <div className="flex items-center mb-2">
+                  <h4 className={`text-sm font-bold ${
+                    policyCheckResult.riskLevel === 'high' 
+                      ? 'text-red-700' 
+                      : policyCheckResult.riskLevel === 'medium'
+                      ? 'text-yellow-700'
+                      : policyCheckResult.riskLevel === 'low'
+                      ? 'text-blue-700'
+                      : 'text-green-700'
+                  }`}>
+                    🛡️ 风险预估检测结果
+                  </h4>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                    policyCheckResult.riskLevel === 'high' 
+                      ? 'bg-red-200 text-red-800' 
+                      : policyCheckResult.riskLevel === 'medium'
+                      ? 'bg-yellow-200 text-yellow-800'
+                      : policyCheckResult.riskLevel === 'low'
+                      ? 'bg-blue-200 text-blue-800'
+                      : 'bg-green-200 text-green-800'
+                  }`}>
+                    {policyCheckResult.riskLevel === 'high' ? '高风险' : 
+                     policyCheckResult.riskLevel === 'medium' ? '中风险' : 
+                     policyCheckResult.riskLevel === 'low' ? '低风险' : '安全'}
+                  </span>
+                </div>
+                
+                <p className={`text-sm mb-3 ${
+                  policyCheckResult.riskLevel === 'high' 
+                    ? 'text-red-700' 
+                    : policyCheckResult.riskLevel === 'medium'
+                    ? 'text-yellow-700'
+                    : policyCheckResult.riskLevel === 'low'
+                    ? 'text-blue-700'
+                    : 'text-green-700'
+                }`}>
+                  {policyCheckResult.summary}
+                </p>
+
+                {policyCheckResult.violations.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-gray-700">检测到的风险词汇：</p>
+                    <div className="flex flex-wrap gap-2">
+                      {policyCheckResult.violations.map((violation, index) => (
+                        <div key={index} className="bg-white/80 border border-gray-200 rounded-lg p-2">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm font-medium text-red-600">{violation.word}</span>
+                            <span className={`text-xs px-2 py-1 rounded ${
+                              violation.severity === 'high' 
+                                ? 'bg-red-100 text-red-700' 
+                                : violation.severity === 'medium'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : 'bg-blue-100 text-blue-700'
+                            }`}>
+                              {violation.severity === 'high' ? '高风险' : 
+                               violation.severity === 'medium' ? '中风险' : '低风险'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-600 mb-1">{violation.description}</p>
+                          <p className="text-xs text-green-600">
+                            建议替换为：<span className="font-medium">{violation.suggestion}</span>
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 黑五类违规提示 */}
       {isForbiddenProduct && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center">

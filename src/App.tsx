@@ -4,6 +4,7 @@ import { CountdownTimer } from './components/CountdownTimer';
 import { Logo } from './components/Logo';
 import { Navigation } from './components/Navigation';
 import { NewsCarousel } from './components/NewsCarousel';
+import { QuickNavigation } from './components/QuickNavigation';
 
 function App() {
   const [productInfo, setProductInfo] = useState({
@@ -453,6 +454,9 @@ function App() {
 
       {/* 倒计时功能 - 移到页首 */}
       <CountdownTimer />
+
+      {/* 快速导航栏 */}
+      <QuickNavigation />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8" id="generator">

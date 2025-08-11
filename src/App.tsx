@@ -346,39 +346,156 @@ function App() {
         </div>
       </div>
       
-      {/* Quick Navigation - 复制GitHub Pages的快速导航栏 */}
-      <div className="bg-blue-50 py-6">
+      {/* 快速导航 - 移到页首，一级和二级导航 */}
+      <div className="bg-gradient-to-r from-gray-50 to-blue-50 py-8">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
-            <a href="#generator" className="bg-white rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">快速导航</h2>
+          
+          {/* 一级导航 */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-8">
+            {/* 系列课程 */}
+            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+              <div className="text-center mb-4">
+                <div className="text-3xl mb-2">📚</div>
+                <h3 className="text-lg font-semibold text-gray-900">系列课程</h3>
+              </div>
+              <div className="space-y-2">
+                <a href="https://cheetahgo.cmcm.com/classes/facebook/0a4ec1f962875a3c05a4bb915589d5d8" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • Facebook新手课
+                </a>
+                <a href="https://cheetahgo.cmcm.com/classes/facebook/684266796287669c0313e7b119d42dba" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • Facebook进阶课
+                </a>
+                <a href="https://cheetahgo.cmcm.com/classes/tiktok/f6e08a6462875fbf0440ff297acb257d" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • TikTok课程
+                </a>
+                <a href="https://cheetahgo.cmcm.com/zixun/all" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 政策解读课程
+                </a>
+              </div>
+            </div>
+
+            {/* 线上直播 */}
+            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+              <div className="text-center mb-4">
+                <div className="text-3xl mb-2">📺</div>
+                <h3 className="text-lg font-semibold text-gray-900">线上直播</h3>
+              </div>
+              <div className="space-y-2">
+                <a href="https://cheetahgo.cmcm.com/live/ecommerce" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 电商出海
+                </a>
+                <a href="https://cheetahgo.cmcm.com/live/gaming" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 游戏出海
+                </a>
+                <a href="https://cheetahgo.cmcm.com/live/policy" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 政策解读
+                </a>
+                <a href="https://cheetahgo.cmcm.com/live/guide" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 新手指导
+                </a>
+              </div>
+            </div>
+
+            {/* 资讯报告 */}
+            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+              <div className="text-center mb-4">
+                <div className="text-3xl mb-2">📰</div>
+                <h3 className="text-lg font-semibold text-gray-900">资讯报告</h3>
+              </div>
+              <div className="space-y-2">
+                <a href="https://cheetahgo.cmcm.com/zixun/dujiazhuanlan" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 独家专栏
+                </a>
+                <a href="https://cheetahgo.cmcm.com/zixun/zhengcejiedu" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 政策解读
+                </a>
+                <a href="https://cheetahgo.cmcm.com/zixun/chanpingengxin" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 产品更新
+                </a>
+                <a href="https://cheetahgo.cmcm.com/zixun/anlijingxuan" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 案例精选
+                </a>
+              </div>
+            </div>
+
+            {/* 线下活动 */}
+            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+              <div className="text-center mb-4">
+                <div className="text-3xl mb-2">🎪</div>
+                <h3 className="text-lg font-semibold text-gray-900">线下活动</h3>
+              </div>
+              <div className="space-y-2">
+                <a href="https://cheetahgo.cmcm.com/xianxia" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 线下活动
+                </a>
+              </div>
+            </div>
+
+            {/* 营销工具 */}
+            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+              <div className="text-center mb-4">
+                <div className="text-3xl mb-2">🛠️</div>
+                <h3 className="text-lg font-semibold text-gray-900">营销工具</h3>
+              </div>
+              <div className="space-y-2">
+                <a href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • Cheetahgo自助平台
+                </a>
+                <a href="https://partner.cmcm.com/" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 合伙人计划
+                </a>
+                <a href="https://cheetahgo.cmcm.com/studio9" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 9号艺术工作室
+                </a>
+              </div>
+            </div>
+
+            {/* 帮助中心 */}
+            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+              <div className="text-center mb-4">
+                <div className="text-3xl mb-2">❓</div>
+                <h3 className="text-lg font-semibold text-gray-900">帮助中心</h3>
+              </div>
+              <div className="space-y-2">
+                <a href="https://cheetahgo.cmcm.com/help" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors">
+                  • 帮助中心
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* 二级导航 - 功能特色 */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+            <a href="#generator" className="bg-white/80 backdrop-blur-sm rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
               <div className="text-2xl mb-2">🌍</div>
               <div className="text-sm font-medium text-gray-700">多语言支持</div>
             </a>
-            <a href="#generator" className="bg-white rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <a href="#generator" className="bg-white/80 backdrop-blur-sm rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
               <div className="text-2xl mb-2">✍️</div>
               <div className="text-sm font-medium text-gray-700">多种文案风格</div>
             </a>
-            <a href="#generator" className="bg-white rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <a href="#generator" className="bg-white/80 backdrop-blur-sm rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
               <div className="text-2xl mb-2">🛡️</div>
               <div className="text-sm font-medium text-gray-700">敏感词检测</div>
             </a>
-            <a href="#generator" className="bg-white rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <a href="#generator" className="bg-white/80 backdrop-blur-sm rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
               <div className="text-2xl mb-2">📱</div>
               <div className="text-sm font-medium text-gray-700">响应式设计</div>
             </a>
-            <a href="#generator" className="bg-white rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <a href="#generator" className="bg-white/80 backdrop-blur-sm rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
               <div className="text-2xl mb-2">📋</div>
               <div className="text-sm font-medium text-gray-700">一键复制</div>
             </a>
-            <a href="#generator" className="bg-white rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <a href="#generator" className="bg-white/80 backdrop-blur-sm rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
               <div className="text-2xl mb-2">⚡</div>
               <div className="text-sm font-medium text-gray-700">快速生成</div>
             </a>
-            <a href="https://platform.deepseek.com" target="_blank" rel="noopener noreferrer" className="bg-white rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <a href="https://platform.deepseek.com" target="_blank" rel="noopener noreferrer" className="bg-white/80 backdrop-blur-sm rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
               <div className="text-2xl mb-2">🤖</div>
               <div className="text-sm font-medium text-gray-700">DeepSeek AI</div>
             </a>
-            <a href="#generator" className="bg-white rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <a href="#generator" className="bg-white/80 backdrop-blur-sm rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
               <div className="text-2xl mb-2">🎯</div>
               <div className="text-sm font-medium text-gray-700">智能优化</div>
             </a>
@@ -710,58 +827,9 @@ function App() {
             </div>
           </div>
           
-          {/* 快速导航 */}
-          <div className="border-t border-gray-800 mt-8 pt-8">
-            <h4 className="text-lg font-semibold mb-4">快速导航</h4>
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
-              <div>
-                <h5 className="font-semibold text-gray-300 mb-2">系列课程</h5>
-                <ul className="text-gray-400 space-y-1">
-                  <li><a href="https://cheetahgo.cmcm.com/classes/facebook/0a4ec1f962875a3c05a4bb915589d5d8" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Facebook新手课</a></li>
-                  <li><a href="https://cheetahgo.cmcm.com/classes/facebook/684266796287669c0313e7b119d42dba" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Facebook进阶课</a></li>
-                  <li><a href="https://cheetahgo.cmcm.com/classes/tiktok/f6e08a6462875fbf0440ff297acb257d" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• TikTok课程</a></li>
-                  <li><a href="https://cheetahgo.cmcm.com/zixun/all" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 政策解读课程</a></li>
-                </ul>
-              </div>
-              <div>
-                <h5 className="font-semibold text-gray-300 mb-2">线上直播</h5>
-                <ul className="text-gray-400 space-y-1">
-                  <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 电商出海</a></li>
-                  <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 游戏出海</a></li>
-                  <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 政策解读</a></li>
-                  <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 新手指导</a></li>
-                </ul>
-              </div>
-              <div>
-                <h5 className="font-semibold text-gray-300 mb-2">资讯报告</h5>
-                <ul className="text-gray-400 space-y-1">
-                  <li><a href="https://cheetahgo.cmcm.com/zixun/dujiazhuanlan" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 独家专栏</a></li>
-                  <li><a href="https://cheetahgo.cmcm.com/zixun/zhengcejiedu" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 政策解读</a></li>
-                  <li><a href="https://cheetahgo.cmcm.com/zixun/chanpingengxin" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 产品更新</a></li>
-                  <li><a href="https://cheetahgo.cmcm.com/zixun/anlijingxuan" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 案例精选</a></li>
-                </ul>
-              </div>
-              <div>
-                <h5 className="font-semibold text-gray-300 mb-2">线下活动</h5>
-                <ul className="text-gray-400 space-y-1">
-                  <li><a href="https://cheetahgo.cmcm.com/xianxia" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 线下活动</a></li>
-                </ul>
-              </div>
-              <div>
-                <h5 className="font-semibold text-gray-300 mb-2">营销工具</h5>
-                <ul className="text-gray-400 space-y-1">
-                  <li><a href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Cheetahgo客户自助平台</a></li>
-                  <li><a href="https://partner.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 合伙人计划</a></li>
-                  <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 9号艺术工作室</a></li>
-                </ul>
-              </div>
-              <div>
-                <h5 className="font-semibold text-gray-300 mb-2">帮助中心</h5>
-                <ul className="text-gray-400 space-y-1">
-                  <li><a href="https://cheetahgo.cmcm.com/help" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 帮助中心</a></li>
-                </ul>
-              </div>
-            </div>
+          {/* 版权信息 */}
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center">
+            <p className="text-gray-400">© 2024 爆款文案生成器 - 与猎豹移动深度合作，助力企业出海营销</p>
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center">

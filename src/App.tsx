@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { OutputDisplay } from './components/OutputDisplay';
-import { CountdownTimer } from './components/CountdownTimer';
 import { Logo } from './components/Logo';
 import { Navigation } from './components/Navigation';
 import { NewsCarousel } from './components/NewsCarousel';
-import { QuickNavigation } from './components/QuickNavigation';
 
 function App() {
   const [productInfo, setProductInfo] = useState({
@@ -444,13 +442,7 @@ function App() {
       
 
 
-      {/* 倒计时功能 - 移到页首 */}
-      <CountdownTimer />
-
-      {/* 快速导航栏 */}
-      <QuickNavigation />
-
-      {/* 跨境快讯 - 移到快速导航栏之后 */}
+      {/* 跨境快讯 */}
       <div className="bg-white border-b border-gray-100 py-4">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
@@ -635,102 +627,7 @@ function App() {
 
 
 
-      {/* 倒计时信息栏 - 复制GitHub Pages的倒计时功能 */}
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 text-white py-4">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between text-sm">
-            <div className="font-medium">
-              2025年第32周
-            </div>
-            <div className="flex space-x-6">
-              <div className="flex items-center space-x-2">
-                <span>距2026年还有</span>
-                <span className="bg-white bg-opacity-20 px-2 py-1 rounded font-bold">145</span>
-                <span>天</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span>距黑五还有</span>
-                <span className="bg-red-500 px-2 py-1 rounded font-bold">112</span>
-                <span>天</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span>距网络星期一还有</span>
-                <span className="bg-blue-500 px-2 py-1 rounded font-bold">115</span>
-                <span>天</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span>距圣诞节还有</span>
-                <span className="bg-green-500 px-2 py-1 rounded font-bold">139</span>
-                <span>天</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span>距春节还有</span>
-                <span className="bg-red-500 px-2 py-1 rounded font-bold">174</span>
-                <span>天</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span>距情人节还有</span>
-                <span className="bg-red-500 px-2 py-1 rounded font-bold">190</span>
-                <span>天</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Footer - 复制GitHub Pages的完整页脚 */}
-      <div className="bg-gray-900 text-white py-12" id="footer">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* 猎豹服务 */}
-            <div>
-              <h3 className="text-xl font-bold mb-4">猎豹服务</h3>
-              <ul className="text-gray-400 space-y-2">
-                <li><a href="https://cheetahgo.cmcm.com/classes/facebook/0a4ec1f962875a3c05a4bb915589d5d8" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Facebook广告</a></li>
-                <li><a href="https://cheetahgo.cmcm.com/classes/tiktok/f6e08a6462875fbf0440ff297acb257d" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• TikTok广告</a></li>
-                <li><a href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 客户自助平台</a></li>
-                <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 9号艺术工作室</a></li>
-              </ul>
-            </div>
-            
-            {/* 联系我们 */}
-            <div>
-              <h3 className="text-xl font-bold mb-4">联系我们</h3>
-              <ul className="text-gray-400 space-y-2">
-                <li>咨询热线: 400-603-7779</li>
-                <li>咨询邮箱: adoverseas@cmcm.com</li>
-                <li>总部地址: 北京市朝阳区三间房南里7号万东科技文创园11号楼</li>
-              </ul>
-            </div>
-            
-            {/* 官方公众号 */}
-            <div>
-              <h3 className="text-xl font-bold mb-4">官方公众号</h3>
-              <div className="bg-white p-2 rounded-lg inline-block">
-                <div className="w-24 h-24 bg-gray-200 rounded flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-8 h-8 bg-orange-500 rounded mx-auto mb-1"></div>
-                    <div className="text-xs text-gray-600">CMCM</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* 关于我们 */}
-            <div>
-              <h3 className="text-xl font-bold mb-4">关于我们</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                专业的Facebook广告文案生成工具,基于React + Tailwind CSS + DeepSeek构建,为广告主提供高质量的文案创作服务。与猎豹移动深度合作,助力企业出海营销。
-              </p>
-            </div>
-          </div>
-          
-          {/* 版权信息 */}
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-            <p className="text-gray-400">© 2024 爆款文案生成器 - 与猎豹移动深度合作，助力企业出海营销</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

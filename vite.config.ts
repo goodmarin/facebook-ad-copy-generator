@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/facebook-ad-copy-generator/', // 恢复GitHub Pages路径
   plugins: [react()],
+  root: '.', // 明确指定根目录
   build: {
     // 优化构建
     minify: 'terser',

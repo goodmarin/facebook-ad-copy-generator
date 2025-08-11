@@ -1,95 +1,107 @@
 import React, { useState, useEffect } from 'react';
 
-interface CountdownItem {
-  name: string;
-  date: Date;
-  color: string;
+interface CountdownTimerProps {
+  className?: string;
 }
 
-export const CountdownTimer: React.FC = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+export const CountdownTimer: React.FC<CountdownTimerProps> = ({ className = '' }) => {
+  const [countdowns, setCountdowns] = useState({
+    newYear: 0,
+    blackFriday: 0,
+    cyberMonday: 0,
+    christmas: 0,
+    chineseNewYear: 0,
+    valentinesDay: 0
+  });
 
-  // 计算当前是第几周
-  const getWeekNumber = (date: Date) => {
-    const startOfYear = new Date(date.getFullYear(), 0, 1);
-    const days = Math.floor((date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
-    return Math.ceil((days + startOfYear.getDay() + 1) / 7);
-  };
-
-  // 计算距离目标日期的天数
-  const getDaysUntil = (targetDate: Date) => {
-    const timeDiff = targetDate.getTime() - currentDate.getTime();
-    return Math.ceil(timeDiff / (1000 * 3600 * 24));
-  };
-
-  // 重要节日和日期
-  const countdownItems: CountdownItem[] = [
-    {
-      name: '2026年',
-      date: new Date(2026, 0, 1),
-      color: 'text-orange-500'
-    },
-    {
-      name: '黑五',
-      date: new Date(2025, 10, 28), // 11月28日
-      color: 'text-red-500'
-    },
-    {
-      name: '网络星期一',
-      date: new Date(2025, 11, 1), // 12月1日
-      color: 'text-blue-500'
-    },
-    {
-      name: '圣诞节',
-      date: new Date(2025, 11, 25), // 12月25日
-      color: 'text-green-500'
-    },
-    {
-      name: '春节',
-      date: new Date(2026, 0, 29), // 2026年1月29日
-      color: 'text-red-600'
-    },
-    {
-      name: '情人节',
-      date: new Date(2026, 1, 14), // 2026年2月14日
-      color: 'text-pink-500'
-    }
-  ];
-
-  // 更新当前时间
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentDate(new Date());
-    }, 1000 * 60 * 60); // 每小时更新一次
+    const calculateDays = () => {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      
+      // 计算各种节日的日期
+      const newYear = new Date(currentYear + 1, 0, 1);
+      const blackFriday = new Date(currentYear, 10, 29); // 11月最后一个星期五
+      const cyberMonday = new Date(currentYear, 10, 2); // 11月第一个星期一
+      const christmas = new Date(currentYear, 11, 25);
+      const chineseNewYear = new Date(currentYear, 1, 10); // 简化处理
+      const valentinesDay = new Date(currentYear + 1, 1, 14);
 
-    return () => clearInterval(timer);
+      // 如果今年的节日已经过了，计算明年的
+      const adjustDate = (date: Date, targetYear: number) => {
+        if (date < now) {
+          return new Date(targetYear + 1, date.getMonth(), date.getDate());
+        }
+        return date;
+      };
+
+      const daysDiff = (target: Date) => {
+        const diffTime = target.getTime() - now.getTime();
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      };
+
+      setCountdowns({
+        newYear: daysDiff(adjustDate(newYear, currentYear)),
+        blackFriday: daysDiff(adjustDate(blackFriday, currentYear)),
+        cyberMonday: daysDiff(adjustDate(cyberMonday, currentYear)),
+        christmas: daysDiff(adjustDate(christmas, currentYear)),
+        chineseNewYear: daysDiff(adjustDate(chineseNewYear, currentYear)),
+        valentinesDay: daysDiff(adjustDate(valentinesDay, currentYear))
+      });
+    };
+
+    calculateDays();
+    const interval = setInterval(calculateDays, 60000); // 每分钟更新一次
+
+    return () => clearInterval(interval);
   }, []);
 
-  const currentWeek = getWeekNumber(currentDate);
+  const getCurrentWeek = () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const days = Math.floor((now.getTime() - start.getTime()) / (24 * 60 * 60 * 1000));
+    const weekNumber = Math.ceil(days / 7);
+    return `${now.getFullYear()}年第${weekNumber}周`;
+  };
 
   return (
-    <div className="w-full">
-      <div className="bg-white/15 backdrop-blur-sm rounded-xl p-3 w-full">
-        <div className="flex items-center justify-between text-sm flex-wrap gap-2">
-          <div className="flex items-center space-x-2">
-            <span className="text-white/90 font-medium">
-              {currentDate.getFullYear()}年第{currentWeek}周
-            </span>
+    <div className={`bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 text-white py-4 ${className}`}>
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between text-sm">
+          <div className="font-medium">
+            {getCurrentWeek()}
           </div>
-          
-          <div className="flex items-center space-x-4 flex-wrap">
-            {countdownItems.map((item, index) => {
-              const daysUntil = getDaysUntil(item.date);
-              return (
-                <div key={index} className="flex items-center space-x-1">
-                  <span className="text-white/80">距{item.name}还有</span>
-                  <span className={`font-bold text-base ${item.color}`}>
-                    {daysUntil > 0 ? daysUntil : 0}
-                  </span>
-                  <span className="text-white/80">天</span>
-                </div>
-              );
-            })}
+          <div className="flex space-x-6">
+            <div className="flex items-center space-x-2">
+              <span>距2026年还有</span>
+              <span className="bg-white bg-opacity-20 px-2 py-1 rounded font-bold">{countdowns.newYear}</span>
+              <span>天</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span>距黑五还有</span>
+              <span className="bg-red-500 px-2 py-1 rounded font-bold">{countdowns.blackFriday}</span>
+              <span>天</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span>距网络星期一还有</span>
+              <span className="bg-blue-500 px-2 py-1 rounded font-bold">{countdowns.cyberMonday}</span>
+              <span>天</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span>距圣诞节还有</span>
+              <span className="bg-green-500 px-2 py-1 rounded font-bold">{countdowns.christmas}</span>
+              <span>天</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span>距春节还有</span>
+              <span className="bg-red-500 px-2 py-1 rounded font-bold">{countdowns.chineseNewYear}</span>
+              <span>天</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span>距情人节还有</span>
+              <span className="bg-red-500 px-2 py-1 rounded font-bold">{countdowns.valentinesDay}</span>
+              <span>天</span>
+            </div>
           </div>
         </div>
       </div>

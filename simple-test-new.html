@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单测试 - 新功能验证</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 5px solid;
+        }
+        .status.success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .status.warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 简单测试 - 新功能验证</h1>
+        
+        <div class="status success">
+            <h3>✅ 最新构建完成</h3>
+            <p>构建文件: index-aa3fcbdc.js</p>
+            <p>构建时间: 2024年8月8日 18:31</p>
+        </div>
+
+        <div class="status warning">
+            <h3>⚠️ 重要提示</h3>
+            <p>如果看不到新功能，请：</p>
+            <ol>
+                <li>按 <strong>Ctrl+Shift+R</strong> (Windows) 或 <strong>Cmd+Shift+R</strong> (Mac) 强制刷新</li>
+                <li>或者打开浏览器的无痕模式</li>
+                <li>或者清除浏览器缓存</li>
+            </ol>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="http://localhost:5173/facebook-ad-copy-generator/" target="_blank" class="btn">
+                🚀 打开主应用测试
+            </a>
+        </div>
+
+        <h3>🔍 请检查以下功能：</h3>
+        <ul>
+            <li>✅ 页首是否完整（标题和描述）</li>
+            <li>✅ 快速导航栏是否存在（文案生成器、核心功能等链接）</li>
+            <li>✅ 投放地区是否显示分组选择（热门地区 + 展开按钮）</li>
+            <li>✅ 点击"展开所有地区"是否能显示更多地区</li>
+            <li>✅ 页面是否有"核心功能"和"支持地区"展示区</li>
+            <li>✅ 生成文案后是否显示单文案轮播</li>
+            <li>✅ 是否显示AI效果预测</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -326,7 +326,7 @@ function App() {
             </div>
             <div className="flex space-x-4">
               <a 
-                href="https://www.cmcm.com/account" 
+                href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-2 rounded-lg font-medium transition-all cursor-pointer"
@@ -334,7 +334,7 @@ function App() {
                 立即开户
               </a>
               <a 
-                href="https://academy.cmcm.com" 
+                href="https://cheetahgo.cmcm.com/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-2 rounded-lg font-medium transition-all cursor-pointer"
@@ -671,10 +671,10 @@ function App() {
             <div>
               <h3 className="text-xl font-bold mb-4">猎豹服务</h3>
               <ul className="text-gray-400 space-y-2">
-                <li><a href="https://goodmarin.github.io/facebook-ad-copy-generator/facebook-ads" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Facebook广告</a></li>
-                <li><a href="https://goodmarin.github.io/facebook-ad-copy-generator/tiktok-ads" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• TikTok广告</a></li>
-                <li><a href="https://goodmarin.github.io/facebook-ad-copy-generator/cheetahgo" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 客户自助平台</a></li>
-                <li><a href="https://goodmarin.github.io/facebook-ad-copy-generator/studio9" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 9号艺术工作室</a></li>
+                <li><a href="https://cheetahgo.cmcm.com/classes/facebook/0a4ec1f962875a3c05a4bb915589d5d8" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Facebook广告</a></li>
+                <li><a href="https://cheetahgo.cmcm.com/classes/tiktok/f6e08a6462875fbf0440ff297acb257d" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• TikTok广告</a></li>
+                <li><a href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 客户自助平台</a></li>
+                <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 9号艺术工作室</a></li>
               </ul>
             </div>
             
@@ -717,48 +717,48 @@ function App() {
               <div>
                 <h5 className="font-semibold text-gray-300 mb-2">系列课程</h5>
                 <ul className="text-gray-400 space-y-1">
-                  <li><a href="https://academy.cmcm.com/facebook-beginner" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Facebook新手课</a></li>
-                  <li><a href="https://academy.cmcm.com/facebook-advanced" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Facebook进阶课</a></li>
-                  <li><a href="https://academy.cmcm.com/tiktok-course" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• TikTok课程</a></li>
-                  <li><a href="https://academy.cmcm.com/policy-course" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 政策解读课程</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/classes/facebook/0a4ec1f962875a3c05a4bb915589d5d8" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Facebook新手课</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/classes/facebook/684266796287669c0313e7b119d42dba" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Facebook进阶课</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/classes/tiktok/f6e08a6462875fbf0440ff297acb257d" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• TikTok课程</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/zixun/all" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 政策解读课程</a></li>
                 </ul>
               </div>
               <div>
                 <h5 className="font-semibold text-gray-300 mb-2">线上直播</h5>
                 <ul className="text-gray-400 space-y-1">
-                  <li><a href="https://live.cmcm.com/ecommerce" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 电商出海</a></li>
-                  <li><a href="https://live.cmcm.com/gaming" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 游戏出海</a></li>
-                  <li><a href="https://live.cmcm.com/policy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 政策解读</a></li>
-                  <li><a href="https://live.cmcm.com/guide" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 新手指导</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 电商出海</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 游戏出海</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 政策解读</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 新手指导</a></li>
                 </ul>
               </div>
               <div>
                 <h5 className="font-semibold text-gray-300 mb-2">资讯报告</h5>
                 <ul className="text-gray-400 space-y-1">
-                  <li>• 独家专栏</li>
-                  <li>• 政策解读</li>
-                  <li>• 产品更新</li>
-                  <li>• 案例精选</li>
+                  <li><a href="https://cheetahgo.cmcm.com/zixun/dujiazhuanlan" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 独家专栏</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/zixun/zhengcejiedu" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 政策解读</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/zixun/chanpingengxin" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 产品更新</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/zixun/anlijingxuan" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 案例精选</a></li>
                 </ul>
               </div>
               <div>
                 <h5 className="font-semibold text-gray-300 mb-2">线下活动</h5>
                 <ul className="text-gray-400 space-y-1">
-                  <li>• 线下活动</li>
+                  <li><a href="https://cheetahgo.cmcm.com/xianxia" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 线下活动</a></li>
                 </ul>
               </div>
               <div>
                 <h5 className="font-semibold text-gray-300 mb-2">营销工具</h5>
                 <ul className="text-gray-400 space-y-1">
-                  <li>• Cheetahgo客户自助平台</li>
-                  <li>• 合伙人计划</li>
-                  <li>• 9号艺术工作室</li>
+                  <li><a href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Cheetahgo客户自助平台</a></li>
+                  <li><a href="https://partner.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 合伙人计划</a></li>
+                  <li><a href="https://cheetahgo.cmcm.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 9号艺术工作室</a></li>
                 </ul>
               </div>
               <div>
                 <h5 className="font-semibold text-gray-300 mb-2">帮助中心</h5>
                 <ul className="text-gray-400 space-y-1">
-                  <li>• 帮助中心</li>
+                  <li><a href="https://cheetahgo.cmcm.com/help" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 帮助中心</a></li>
                 </ul>
               </div>
             </div>

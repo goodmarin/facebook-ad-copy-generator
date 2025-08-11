@@ -419,32 +419,24 @@ function App() {
             {/* 中间导航菜单 */}
             <Navigation className="hidden lg:flex" />
             
-            {/* 右侧按钮和新闻 */}
-            <div className="flex items-center space-x-4">
-              {/* 跨境快讯 */}
-              <div className="hidden xl:block w-80">
-                <NewsCarousel />
-              </div>
-              
-              {/* 按钮组 */}
-              <div className="flex items-center space-x-2">
-                <a 
-                  href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                >
-                  立即开户
-                </a>
-                <a 
-                  href="https://cheetahgo.cmcm.com/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                >
-                  猎豹学院
-                </a>
-              </div>
+            {/* 右侧按钮 */}
+            <div className="flex items-center space-x-2">
+              <a 
+                href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                立即开户
+              </a>
+              <a 
+                href="https://cheetahgo.cmcm.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                猎豹学院
+              </a>
             </div>
           </div>
         </div>
@@ -457,6 +449,15 @@ function App() {
 
       {/* 快速导航栏 */}
       <QuickNavigation />
+
+      {/* 跨境快讯 - 移到快速导航栏之后 */}
+      <div className="bg-white border-b border-gray-100 py-4">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <NewsCarousel />
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8" id="generator">

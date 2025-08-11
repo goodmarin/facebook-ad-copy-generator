@@ -95,7 +95,7 @@ export const QuickNavigation: React.FC<QuickNavigationProps> = ({ className = ''
               onMouseLeave={handleMouseLeave}
             >
               {/* 一级导航项 */}
-              <div className="flex items-center space-x-1 sm:space-x-2 cursor-pointer px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 hover:bg-white hover:shadow-md bg-white bg-opacity-50 backdrop-blur-sm">
+              <div className="flex items-center space-x-1 sm:space-x-2 cursor-pointer px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 hover:bg-white hover:shadow-md">
                 <span className="text-lg sm:text-xl">{item.icon}</span>
                 <span className="font-medium text-gray-700 group-hover:text-blue-600 transition-colors whitespace-nowrap text-sm sm:text-base">
                   {item.url ? (

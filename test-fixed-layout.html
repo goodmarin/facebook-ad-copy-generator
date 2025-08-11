@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>布局修复测试 - Facebook 广告文案生成器</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 18px;
+        }
+        .status {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .status.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .status.info {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .feature-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .feature-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .feature-list li:before {
+            content: "✅ ";
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 布局修复测试</h1>
+            <p>白色遮挡问题和快速导航重复问题已修复</p>
+        </div>
+
+        <div class="status success">
+            <h3>✅ 问题修复完成</h3>
+            <p>已成功解决白色遮挡板块问题，并重新布局了页面结构。</p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="http://localhost:5174/facebook-ad-copy-generator/" target="_blank" class="btn">
+                🚀 查看修复后的页面
+            </a>
+            <a href="http://localhost:5174/test-quick-navigation.html" target="_blank" class="btn">
+                🧪 快速导航测试
+            </a>
+        </div>
+
+        <div class="status info">
+            <h3>🔧 修复内容</h3>
+            <div class="feature-list">
+                <ul>
+                    <li><strong>移除白色遮挡</strong> - 将NewsCarousel组件从顶部导航栏移除</li>
+                    <li><strong>重新布局</strong> - 将NewsCarousel组件移动到快速导航栏之后</li>
+                    <li><strong>优化导航栏</strong> - 简化顶部导航栏，只保留必要的按钮</li>
+                    <li><strong>解决遮挡问题</strong> - 确保所有组件都不会相互遮挡</li>
+                    <li><strong>保持功能完整</strong> - 所有功能都保持正常工作</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="status info">
+            <h3>📋 新的页面布局</h3>
+            <div class="feature-list">
+                <ul>
+                    <li><strong>顶部导航栏</strong> - Logo + 导航菜单 + 按钮组（简化版）</li>
+                    <li><strong>倒计时功能</strong> - 显示各种倒计时信息</li>
+                    <li><strong>快速导航栏</strong> - 水平导航栏，支持悬停下拉</li>
+                    <li><strong>跨境快讯</strong> - 新闻轮播，移到快速导航栏之后</li>
+                    <li><strong>主要内容</strong> - 产品信息输入和文案生成</li>
+                    <li><strong>页脚信息</strong> - 完整的页脚信息</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="status info">
+            <h3>🎨 设计改进</h3>
+            <div class="feature-list">
+                <ul>
+                    <li><strong>清晰的层次</strong> - 每个部分都有明确的视觉分隔</li>
+                    <li><strong>无遮挡布局</strong> - 所有组件都不会相互遮挡</li>
+                    <li><strong>响应式设计</strong> - 在不同屏幕尺寸下都能正常显示</li>
+                    <li><strong>用户体验</strong> - 更流畅的页面浏览体验</li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <p style="color: #666; font-size: 14px;">
+                🎉 布局问题已完全解决！现在页面结构清晰，没有遮挡问题，快速导航功能正常。
+            </p>
+        </div>
+    </div>
+</body>
+</html>

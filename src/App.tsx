@@ -628,24 +628,7 @@ function App() {
 
 
 
-      {/* Regions Section */}
-      <div className="bg-gray-50 py-16" id="regions">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">🌍 支持地区</h2>
-            <p className="text-lg text-gray-600">覆盖全球主要市场，支持多语言广告投放</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {regionGroups.flatMap(group => group.regions).map((region) => (
-              <div key={region.value} className="bg-white p-4 rounded-lg shadow-sm text-center hover:shadow-md transition-shadow">
-                <div className="text-2xl mb-2">{region.label.split(' ')[0]}</div>
-                <div className="text-sm font-medium text-gray-900">{region.label.split(' ').slice(1).join(' ')}</div>
-                <div className="text-xs text-gray-500">{region.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+
 
       {/* 倒计时信息栏 - 复制GitHub Pages的倒计时功能 */}
       <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 text-white py-4">

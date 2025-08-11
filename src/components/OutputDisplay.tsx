@@ -8,7 +8,7 @@ import { useEffectPrediction } from '../hooks/useEffectPrediction';
 import { EffectPrediction } from '../types';
 
 interface OutputDisplayProps {
-  copies: string[];
+  copies: Array<{text: string, region: string, regionName: string}>;
   regions: string[]; // 改为数组支持多地区
   isLoading: boolean;
   error: string | null;
@@ -101,7 +101,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
         
         // 为每条文案生成效果预测
         for (let i = 0; i < copies.length; i++) {
-          const copy = copies[i];
+          const copy = copies[i].text;
           console.log(`📊 正在预测第 ${i + 1} 条文案:`, copy.substring(0, 50) + '...');
           
           const prediction = await predictEffect(copy);
@@ -309,27 +309,27 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                       </span>
                       <div>
                         <span className="text-lg font-semibold text-gray-800">文案 {currentIndex + 1}</span>
-                        {regions.length > 0 && (
+                        {copies.length > 0 && (
                           <div className="text-xs text-gray-600 mt-1">
-                            投放地区: {regions.map(r => r === 'CN' ? '🇨🇳' : r === 'US' ? '🇺🇸' : r === 'JP' ? '🇯🇵' : '🇰🇷').join(' ')}
+                            投放地区: {copies[currentIndex]?.regionName || '未知地区'}
                           </div>
                         )}
                       </div>
                     </div>
-                    <CopyButton text={cleanCopyText(copies[currentIndex])} className="bg-white/80 hover:bg-white shadow-md" />
+                    <CopyButton text={cleanCopyText(copies[currentIndex]?.text || '')} className="bg-white/80 hover:bg-white shadow-md" />
                   </div>
 
                   {/* 文案内容区域 */}
                   <div className="p-6">
                     <div className="bg-white/80 rounded-xl p-6 border border-gray-100 min-h-[200px]">
                       <div className="text-gray-900 leading-relaxed whitespace-pre-wrap text-base">
-                        {highlightSensitiveWords(cleanCopyText(copies[currentIndex]), detectSensitiveWords(cleanCopyText(copies[currentIndex])).detectedWords)}
+                        {highlightSensitiveWords(cleanCopyText(copies[currentIndex]?.text || ''), detectSensitiveWords(cleanCopyText(copies[currentIndex]?.text || '')).detectedWords)}
                       </div>
                     </div>
                   </div>
 
                   {/* 敏感词警告 */}
-                  {detectSensitiveWords(cleanCopyText(copies[currentIndex])).hasSensitiveWords && (
+                  {detectSensitiveWords(cleanCopyText(copies[currentIndex]?.text || '')).hasSensitiveWords && (
                     <div className="mx-6 mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
                       <div className="flex items-start">
                         <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0" />
@@ -338,14 +338,14 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                             检测到可能违反广告政策的词汇：
                           </p>
                           <div className="flex flex-wrap gap-2 mb-2">
-                            {detectSensitiveWords(cleanCopyText(copies[currentIndex])).detectedWords.map((word, idx) => (
+                            {detectSensitiveWords(cleanCopyText(copies[currentIndex]?.text || '')).detectedWords.map((word, idx) => (
                               <span key={idx} className="bg-red-200 text-red-800 px-2 py-1 rounded text-sm">
                                 {word}
                               </span>
                             ))}
                           </div>
                           <p className="text-red-700 text-sm">
-                            建议：{detectSensitiveWords(cleanCopyText(copies[currentIndex])).suggestions.join('；')}
+                            建议：{detectSensitiveWords(cleanCopyText(copies[currentIndex]?.text || '')).suggestions.join('；')}
                           </p>
                         </div>
                       </div>
@@ -477,16 +477,16 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                 生成统计
               </h4>
               <div className="grid grid-cols-2 gap-3">
-                <div className="text-center">
-                  <div className="text-lg font-bold text-green-600">{copies.length}</div>
-                  <div className="text-xs text-green-700">已生成文案</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold text-blue-600">
-                    {copies.filter(copy => detectSensitiveWords(cleanCopyText(copy)).hasSensitiveWords).length}
+                                  <div className="text-center">
+                    <div className="text-lg font-bold text-green-600">{copies.length}</div>
+                    <div className="text-xs text-green-700">已生成文案</div>
                   </div>
-                  <div className="text-xs text-blue-700">需注意文案</div>
-                </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-blue-600">
+                      {copies.filter(copy => detectSensitiveWords(cleanCopyText(copy.text)).hasSensitiveWords).length}
+                    </div>
+                    <div className="text-xs text-blue-700">需注意文案</div>
+                  </div>
               </div>
               <div className="mt-2 pt-2 border-t border-green-200">
                 <p className="text-xs text-green-700">

@@ -12,11 +12,22 @@ export const useEffectPrediction = (): UseEffectPredictionResult => {
   const [isPredicting, setIsPredicting] = useState(false);
   const [predictionError, setPredictionError] = useState<string | null>(null);
 
+  // 缓存预测结果
+  const predictionCache = new Map<string, EffectPrediction>();
+
   const predictEffect = async (copyText: string): Promise<EffectPrediction | null> => {
     setIsPredicting(true);
     setPredictionError(null);
 
-    console.log('开始效果预测，文案:', copyText);
+    console.log('开始效果预测，文案:', copyText.substring(0, 50) + '...');
+
+    // 检查缓存
+    const cacheKey = copyText.substring(0, 100); // 使用前100个字符作为缓存键
+    if (predictionCache.has(cacheKey)) {
+      console.log('使用缓存的预测结果');
+      setIsPredicting(false);
+      return predictionCache.get(cacheKey) || null;
+    }
 
     try {
       // 使用环境变量中的 API key，如果没有则使用默认值
@@ -37,7 +48,7 @@ CTR: [百分比]
 
       console.log('调用 DeepSeek API...');
 
-      // 调用 DeepSeek API
+      // 调用 DeepSeek API，使用更快的参数
       const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -56,9 +67,9 @@ CTR: [百分比]
               content: prompt
             }
           ],
-          max_tokens: 200,
-          temperature: 0.3,
-          top_p: 0.9
+          max_tokens: 150, // 减少token数量
+          temperature: 0.1, // 降低随机性，提高速度
+          top_p: 0.8 // 降低top_p，提高速度
         })
       });
 
@@ -89,6 +100,11 @@ CTR: [百分比]
       }
 
       console.log('解析后的预测结果:', prediction);
+
+      // 缓存结果
+      if (prediction) {
+        predictionCache.set(cacheKey, prediction);
+      }
 
       return prediction;
 

@@ -85,7 +85,7 @@ export const NewsCarousel: React.FC = () => {
                 <div className="text-xs text-gray-900 line-clamp-2 mb-1 leading-tight">
                   {item.title}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-600">
                   {item.date}
                 </div>
               </a>

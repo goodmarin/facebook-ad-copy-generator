@@ -4,6 +4,7 @@ import { Navigation } from './components/Navigation';
 import { OutputDisplay } from './components/OutputDisplay';
 import { CountdownTimer } from './components/CountdownTimer';
 import { TimeDisplay } from './components/TimeDisplay';
+import { ParticleBackground } from './components/ParticleBackground';
 import { checkProductInfo, PolicyCheckResult } from './utils/policyChecker';
 
 function App() {
@@ -1432,9 +1433,9 @@ Requirements:
   }, [showRegionDropdown]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      {/* AMZ123风格的导航栏 */}
-      <div className="bg-white border-b border-gray-200">
+    <div className="min-h-screen">
+      {/* 导航栏 */}
+      <div className="navbar">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* 左侧Logo */}
@@ -1444,37 +1445,39 @@ Requirements:
             
             {/* 中间导航菜单 */}
             <Navigation className="hidden lg:flex" />
-            
-            {/* 删除重复的右侧按钮，Navigation组件已经包含了这些按钮 */}
           </div>
         </div>
       </div>
 
       {/* 倒计时信息栏 */}
-      <CountdownTimer />
+      <div className="countdown-bar relative z-10">
+        <CountdownTimer />
+      </div>
 
       {/* 全球时间显示 */}
-      <TimeDisplay />
+      <div className="time-bar relative z-10">
+        <TimeDisplay />
+      </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8" id="generator">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
           {/* Left: Product Info Input */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg p-6 h-full">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">产品信息</h2>
+            <div className="card p-6 h-full">
+              <h2 className="text-2xl font-bold text-primary mb-6">产品信息</h2>
               
               <form onSubmit={(e) => { e.preventDefault(); handleGenerate(); }} className="space-y-6">
                 {/* 产品名称 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="label">
                     产品名称 *
                   </label>
                   <input
                     type="text"
                     value={productInfo.name}
                     onChange={(e) => setProductInfo(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    className="input-field glass"
                     placeholder="例如：智能无线耳机"
                     required
                   />
@@ -1482,14 +1485,14 @@ Requirements:
 
                 {/* 产品特性 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="label">
                     产品特性 *
                   </label>
                   <textarea
                     value={productInfo.features}
                     onChange={(e) => setProductInfo(prev => ({ ...prev, features: e.target.value }))}
-                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none"
-                     rows={4}
+                    className="input-field glass resize-none"
+                    rows={4}
                     placeholder="描述产品的主要特点和优势，例如：主动降噪、长续航、快速充电"
                     required
                   />
@@ -1497,14 +1500,14 @@ Requirements:
 
                 {/* 受众人群 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="label">
                     目标受众 *
                   </label>
                   <input
                     type="text"
                     value={productInfo.targetAudience}
                     onChange={(e) => setProductInfo(prev => ({ ...prev, targetAudience: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    className="input-field glass"
                     placeholder="例如：年轻上班族、音乐爱好者、运动健身人群"
                     required
                   />
@@ -1512,16 +1515,16 @@ Requirements:
 
                 {/* 投放地区 - 下拉选择 */}
                 <div className="relative">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="label">
                     投放地区 * (可多选)
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowRegionDropdown(!showRegionDropdown)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-left bg-white hover:bg-gray-50"
+                    className="input-field glass text-left hover:bg-gray-50"
                   >
                     <div className="flex items-center justify-between">
-                      <span className={productInfo.regions.length === 0 ? 'text-gray-500' : 'text-gray-900'}>
+                      <span className={productInfo.regions.length === 0 ? 'text-gray-600' : 'text-gray-900'}>
                         {getSelectedRegionsText()}
                       </span>
                       <svg 
@@ -1564,7 +1567,7 @@ Requirements:
                                 />
                                 <div className="ml-3">
                                   <div className="text-sm font-medium text-gray-900">{region.label}</div>
-                                  <div className="text-xs text-gray-500">{region.desc}</div>
+                                  <div className="text-xs text-gray-600">{region.desc}</div>
                                 </div>
                               </label>
                             ))}
@@ -1586,7 +1589,7 @@ Requirements:
                                   />
                                   <div className="ml-3">
                                     <div className="text-sm font-medium text-gray-900">{region.label}</div>
-                                    <div className="text-xs text-gray-500">{region.desc}</div>
+                                    <div className="text-xs text-gray-600">{region.desc}</div>
                                   </div>
                                 </label>
                               ))}
@@ -1605,14 +1608,14 @@ Requirements:
 
                 {/* 文案风格 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="label">
                     文案风格
                   </label>
                   <div className="relative">
                     <select
                       value={productInfo.style}
                       onChange={(e) => setProductInfo(prev => ({ ...prev, style: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white appearance-none pr-10"
+                      className="input-field appearance-none pr-10"
                     >
                       <option value="confident">自信专业</option>
                       <option value="friendly">亲切友好</option>
@@ -1633,14 +1636,14 @@ Requirements:
 
                 {/* 促销方式 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="label">
                     促销方式
                   </label>
                   <div className="relative">
                     <select
                       value={productInfo.promotion}
                       onChange={(e) => setProductInfo(prev => ({ ...prev, promotion: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white appearance-none pr-10"
+                      className="input-field appearance-none pr-10"
                     >
                       <option value="discount">折扣优惠</option>
                       <option value="limited">限时抢购</option>
@@ -1663,7 +1666,7 @@ Requirements:
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+                  className="btn-primary w-full py-4 px-6 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {isLoading ? (
                     <span className="flex items-center justify-center">
@@ -1682,8 +1685,8 @@ Requirements:
               {/* 功能说明 */}
               <div className="mt-6 space-y-4">
                   {/* 快速模板 */}
-                  <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                    <h3 className="text-sm font-semibold text-green-800 mb-2">⚡ 快速模板</h3>
+                  <div className="p-4 glass rounded-lg">
+                    <h3 className="text-sm font-semibold text-primary mb-2">⚡ 快速模板</h3>
                     <div className="space-y-2">
                       <button
                         onClick={() => setProductInfo({
@@ -1694,7 +1697,7 @@ Requirements:
                           style: 'confident',
                           promotion: 'discount'
                         })}
-                        className="w-full text-left p-2 bg-white rounded border border-green-200 hover:bg-green-50 transition-colors text-xs"
+                        className="w-full text-left p-2 glass rounded hover:bg-white/20 transition-colors duration-200 text-xs text-primary"
                       >
                         🎧 智能耳机模板
                       </button>
@@ -1707,7 +1710,7 @@ Requirements:
                           style: 'energetic',
                           promotion: 'limited'
                         })}
-                        className="w-full text-left p-2 bg-white rounded border border-green-200 hover:bg-green-50 transition-colors text-xs"
+                        className="w-full text-left p-2 glass rounded hover:bg-white/20 transition-colors duration-200 text-xs text-primary"
                       >
                         💪 健身器材模板
                       </button>
@@ -1720,7 +1723,7 @@ Requirements:
                           style: 'elegant',
                           promotion: 'premium'
                         })}
-                        className="w-full text-left p-2 bg-white rounded border border-green-200 hover:bg-green-50 transition-colors text-xs"
+                        className="w-full text-left p-2 glass rounded hover:bg-white/20 transition-colors duration-200 text-xs text-primary"
                       >
                         ✨ 护肤产品模板
                       </button>
@@ -1733,7 +1736,7 @@ Requirements:
                           style: 'modern',
                           promotion: 'bundle'
                         })}
-                        className="w-full text-left p-2 bg-white rounded border border-green-200 hover:bg-green-50 transition-colors text-xs"
+                        className="w-full text-left p-2 glass rounded hover:bg-white/20 transition-colors duration-200 text-xs text-primary"
                       >
                         📱 数码配件模板
                       </button>
@@ -1745,7 +1748,7 @@ Requirements:
 
           {/* Right: Generated Results */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full flex flex-col overflow-hidden">
+            <div className="card p-6 h-full flex flex-col overflow-hidden">
               <OutputDisplay
                 copies={copies}
                 regions={productInfo.regions}
@@ -1758,14 +1761,14 @@ Requirements:
         </div>
       </div>
 
-      {/* Footer - 保留页脚信息，但不包括倒计时 */}
-      <div className="bg-gray-900 text-white py-12" id="footer">
+      {/* Footer */}
+      <div className="footer text-white py-12 relative z-10" id="footer">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* 猎豹服务 */}
             <div>
-              <h3 className="text-xl font-bold mb-4">猎豹服务</h3>
-              <ul className="text-gray-400 space-y-2">
+              <h3 className="text-xl font-bold mb-4 text-white">猎豹服务</h3>
+              <ul className="text-gray-300 space-y-2">
                 <li><a href="https://cheetahgo.cmcm.com/classes/facebook/0a4ec1f962875a3c05a4bb915589d5d8" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• Facebook广告</a></li>
                 <li><a href="https://cheetahgo.cmcm.com/classes/tiktok/f6e08a6462875fbf0440ff297acb257d" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• TikTok广告</a></li>
                 <li><a href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">• 客户自助平台</a></li>
@@ -1775,8 +1778,8 @@ Requirements:
             
             {/* 联系我们 */}
             <div>
-              <h3 className="text-xl font-bold mb-4">联系我们</h3>
-              <ul className="text-gray-400 space-y-2">
+              <h3 className="text-xl font-bold mb-4 text-white">联系我们</h3>
+              <ul className="text-gray-300 space-y-2">
                 <li>咨询热线: 400-603-7779</li>
                 <li>咨询邮箱: adoverseas@cmcm.com</li>
                 <li>总部地址: 北京市朝阳区三间房南里7号万东科技文创园11号楼</li>
@@ -1785,7 +1788,7 @@ Requirements:
             
             {/* 官方公众号 */}
             <div>
-              <h3 className="text-xl font-bold mb-4">官方公众号</h3>
+              <h3 className="text-xl font-bold mb-4 text-white">官方公众号</h3>
               <div className="w-32 h-32 mb-3">
                 <img 
                   src="https://7578-ux-new-cms-8gd8ix3g0aa5a108-1252921383.tcb.qcloud.la/cloudbase-cms/upload/2023-03-22/s40ex00l1ikhrlkwx94osckfnwv8bmwp_.png?sign=cca43c2053cdfe248375cc6a08645f52&t=1679467813" 
@@ -1813,8 +1816,8 @@ Requirements:
             
             {/* 关于我们 */}
             <div>
-              <h3 className="text-xl font-bold mb-4">关于我们</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <h3 className="text-xl font-bold mb-4 text-white">关于我们</h3>
+              <p className="text-gray-300 text-sm leading-relaxed">
                 专业的Facebook广告文案生成工具,基于React + Tailwind CSS + DeepSeek构建,为广告主提供高质量的文案创作服务。与猎豹移动深度合作,助力企业出海营销。
               </p>
             </div>

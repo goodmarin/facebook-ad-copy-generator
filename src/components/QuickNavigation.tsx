@@ -107,7 +107,7 @@ export const QuickNavigation: React.FC<QuickNavigationProps> = ({ className = ''
                   )}
                 </span>
                 {item.children && (
-                  <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 group-hover:text-blue-600 transition-colors" />
+                  <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
                 )}
               </div>
               

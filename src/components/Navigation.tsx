@@ -84,7 +84,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
             onMouseLeave={handleMouseLeave}
           >
             <div className="flex items-center space-x-1 cursor-pointer group">
-              <span className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+              <span className="text-gray-800 hover:text-blue-600 transition-colors font-medium font-semibold">
                 {item.url ? (
                   <a href={item.url} target="_blank" rel="noopener noreferrer">
                     {item.label}
@@ -94,13 +94,13 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
                 )}
               </span>
               {item.children && (
-                <ChevronDown className="w-4 h-4 text-gray-500 group-hover:text-blue-600 transition-colors" />
+                <ChevronDown className="w-4 h-4 text-gray-700 group-hover:text-blue-600 transition-colors" />
               )}
             </div>
             
             {/* 下拉菜单 */}
             {item.children && activeDropdown === item.label && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-200/50 py-2 z-[9999]">
                 {item.children.map((child) => (
                   <a
                     key={child.label}
@@ -123,7 +123,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
           href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+          className="text-gray-800 hover:text-blue-600 font-medium font-semibold transition-colors"
         >
           立即开户
         </a>
@@ -131,7 +131,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
           href="https://cheetahgo.cmcm.com/" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+          className="text-gray-800 hover:text-blue-600 font-medium font-semibold transition-colors"
         >
           猎豹学院
         </a>

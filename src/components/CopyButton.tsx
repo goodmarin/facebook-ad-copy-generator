@@ -44,7 +44,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({ text, className = '' }) 
       {copied ? (
         <Check className="w-4 h-4 text-green-600" />
       ) : (
-        <Copy className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+        <Copy className="w-4 h-4 text-gray-600 hover:text-gray-700" />
       )}
     </button>
   );

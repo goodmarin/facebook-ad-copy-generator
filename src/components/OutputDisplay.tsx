@@ -163,7 +163,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
               <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
             </div>
-            <p className="text-gray-500 text-sm">AI正在为您创作精彩的广告文案...</p>
+            <p className="text-gray-600 text-sm">AI正在为您创作精彩的广告文案...</p>
           </div>
         </div>
       </div>
@@ -190,7 +190,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
   if (copies.length === 0) {
     return (
       <div className="min-h-0">
-        <div className="text-center text-gray-500 mb-8">
+        <div className="text-center text-gray-600 mb-8">
           <div className="text-4xl mb-4">📝</div>
           <h3 className="text-lg font-semibold mb-2">等待生成文案</h3>
           <p className="text-sm">填写左侧表单并点击"生成文案"按钮</p>
@@ -360,25 +360,25 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
         </div>
       )}
       
-      <div className="card h-full flex flex-col pb-4 overflow-hidden">
+      <div className="card h-full flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto px-4">
         <div className="flex items-center justify-between mb-4 px-4 sm:px-6">
           <h3 className="text-lg font-semibold text-gray-900">生成的文案</h3>
-          <div className="flex items-center text-sm text-gray-500 flex-shrink-0">
+          <div className="flex items-center text-sm text-gray-600 flex-shrink-0">
             <CheckCircle className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">已生成 {copies.length} 条文案</span>
             <span className="sm:hidden">{copies.length} 条</span>
           </div>
         </div>
 
-        {/* 新的轮播布局 - 只显示一条文案，效果预估放在下面 */}
+        {/* 轮播布局 */}
         <div className="relative flex-1 min-h-0">
           {/* 轮播控制按钮 */}
           {copies.length > 1 && (
             <div className="flex justify-between items-center mb-4 px-4">
               <button
                 onClick={prevCopy}
-                className="flex items-center px-4 py-2 bg-white/90 hover:bg-white shadow-lg rounded-lg transition-all duration-200 hover:scale-105"
+                className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
               >
                 <ChevronLeft className="w-4 h-4 text-gray-600 mr-2" />
                 <span className="text-sm font-medium text-gray-700">上一条</span>
@@ -401,7 +401,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
               
               <button
                 onClick={nextCopy}
-                className="flex items-center px-4 py-2 bg-white/90 hover:bg-white shadow-lg rounded-lg transition-all duration-200 hover:scale-105"
+                className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
               >
                 <span className="text-sm font-medium text-gray-700">下一条</span>
                 <ChevronRight className="w-4 h-4 text-gray-600 ml-2" />
@@ -414,13 +414,13 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
             <div className="w-full px-4 mb-6">
               <div className="max-w-4xl mx-auto">
                 <div
-                  className="border border-gray-200 rounded-2xl hover:border-blue-300 transition-all duration-300 bg-gradient-to-r from-white to-blue-50/30 shadow-lg overflow-hidden"
+                  className="border border-gray-200 rounded-lg hover:border-blue-300 transition-colors duration-200 bg-white shadow-sm overflow-hidden"
                   dir={direction}
                 >
                   {/* 文案卡片头部 */}
-                  <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
+                  <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
                     <div className="flex items-center">
-                      <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-gradient-to-r from-blue-500 to-purple-500 rounded-full shadow-lg mr-3">
+                      <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-blue-600 rounded-full mr-3">
                         {currentIndex + 1}
                       </span>
                       <div>
@@ -432,12 +432,12 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                         )}
                       </div>
                     </div>
-                    <CopyButton text={cleanCopyText(copies[currentIndex]?.text || '')} className="bg-white/80 hover:bg-white shadow-md" />
+                    <CopyButton text={cleanCopyText(copies[currentIndex]?.text || '')} className="bg-white hover:bg-gray-50 shadow-sm" />
                   </div>
 
                   {/* 文案内容区域 */}
                   <div className="p-6">
-                    <div className="bg-white/80 rounded-xl p-6 border border-gray-100 min-h-[200px]">
+                    <div className="bg-white rounded-lg p-6 border border-gray-100 min-h-[200px]">
                       <div className="text-gray-900 leading-relaxed whitespace-pre-wrap text-base">
                         {highlightSensitiveWords(cleanCopyText(copies[currentIndex]?.text || ''), detectSensitiveWords(cleanCopyText(copies[currentIndex]?.text || '')).detectedWords)}
                       </div>
@@ -481,22 +481,22 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
           {copies.length > 0 && (
             <div className="px-4">
               <div className="max-w-4xl mx-auto">
-                <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-400 rounded-xl shadow-lg p-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg shadow-sm p-6">
                   <div className="flex items-center mb-4">
-                    <div className="text-green-600 mr-3 text-2xl">📊</div>
-                    <h4 className="text-lg font-semibold text-green-800">🎯 AI 效果预测分析</h4>
+                    <div className="text-blue-600 mr-3 text-2xl">📊</div>
+                    <h4 className="text-lg font-semibold text-blue-800">AI 效果预测分析</h4>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* CTR 预测 */}
-                    <div className="bg-white/80 rounded-lg p-4 border border-green-100 shadow-sm">
+                    <div className="bg-white rounded-lg p-4 border border-blue-100 shadow-sm">
                       <div className="flex items-center mb-3">
                         <span className="text-sm font-medium text-gray-700">预估点击率 (CTR)</span>
                       </div>
                       <div className="text-2xl font-bold text-blue-600">
                         {predictions[currentIndex]?.ctr || '3.2%'}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-gray-600 mt-1">
                         基于文案吸引力和号召性语言
                       </div>
                     </div>
@@ -554,7 +554,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                           return '★★★☆☆';
                         })()}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-gray-600 mt-1">
                         综合评估文案质量
                       </div>
                     </div>

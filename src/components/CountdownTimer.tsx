@@ -106,34 +106,34 @@ export const CountdownTimer: React.FC = () => {
       {
         name: '2026年',
         targetDate: new Date('2026-01-01T00:00:00'),
-        color: 'bg-white bg-opacity-20'
+        color: 'bg-white/20'
       },
       {
         name: '黑五',
         targetDate: adjustedBlackFriday,
-        color: 'bg-red-500'
+        color: 'bg-white/20'
       },
       {
         name: '网络星期一',
         targetDate: adjustedCyberMonday,
-        color: 'bg-blue-500'
+        color: 'bg-white/20'
       },
       {
         name: '圣诞节',
         targetDate: new Date(currentYear, 11, 25) < currentTime ? 
           new Date(nextYear, 11, 25) : new Date(currentYear, 11, 25),
-        color: 'bg-green-500'
+        color: 'bg-white/20'
       },
       {
         name: '春节',
         targetDate: nextChineseNewYear,
-        color: 'bg-red-500'
+        color: 'bg-white/20'
       },
       {
         name: '情人节',
         targetDate: new Date(currentYear, 1, 14) < currentTime ? 
           new Date(nextYear, 1, 14) : new Date(currentYear, 1, 14),
-        color: 'bg-red-500'
+        color: 'bg-white/20'
       }
     ];
   };
@@ -162,20 +162,27 @@ export const CountdownTimer: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-50 text-gray-700 py-4">
-      <div className="container mx-auto px-4">
+    <div className="relative overflow-hidden py-3 border-b border-blue-200">
+      <div className="absolute top-0 left-0 w-full h-full">
+        <div className="absolute top-4 left-10 w-2 h-2 bg-blue-300/30 rounded-full animate-pulse"></div>
+        <div className="absolute top-8 right-20 w-3 h-3 bg-blue-400/40 rounded-full animate-pulse delay-1000"></div>
+        <div className="absolute bottom-4 left-1/4 w-1 h-1 bg-blue-500/50 rounded-full animate-pulse delay-500"></div>
+        <div className="absolute bottom-6 right-1/3 w-2 h-2 bg-blue-300/35 rounded-full animate-pulse delay-1500"></div>
+      </div>
+      
+      <div className="container mx-auto px-4 relative z-10">
         <div className="flex items-center justify-between text-sm">
-          <div className="font-semibold text-base">
+          <div className="font-semibold text-base text-slate-700 flex-shrink-0">
             {currentTime.getFullYear()}年第{getCurrentWeek()}周
           </div>
-          <div className="flex space-x-6">
+          <div className="flex items-center space-x-4 overflow-x-auto">
             {countdownItems.map((item) => (
-              <div key={item.name} className="flex items-center space-x-2">
-                <span className="text-gray-600 font-medium">距{item.name}还有</span>
-                <span className="text-red-600 font-bold text-lg">
+              <div key={item.name} className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-white/80 backdrop-blur-sm border border-blue-200 flex-shrink-0">
+                <span className="text-slate-600 font-medium text-xs">距{item.name}还有</span>
+                <span className="text-blue-600 font-bold text-lg">
                   {calculateDays(item.targetDate)}
                 </span>
-                <span className="text-gray-600 font-medium">天</span>
+                <span className="text-slate-600 font-medium text-xs">天</span>
               </div>
             ))}
           </div>

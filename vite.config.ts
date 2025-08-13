@@ -5,6 +5,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/', // 本地开发使用根路径
   plugins: [react()],
+  // 添加HTML元标记配置
+  define: {
+    __VITE_APP_TITLE__: JSON.stringify('爆款 Facebook 广告文案生成器'),
+  },
   root: '.', // 明确指定根目录
   build: {
     // 优化构建

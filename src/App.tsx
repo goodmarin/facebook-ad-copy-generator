@@ -4,7 +4,7 @@ import { Navigation } from './components/Navigation';
 import { OutputDisplay } from './components/OutputDisplay';
 import { CountdownTimer } from './components/CountdownTimer';
 import { TimeDisplay } from './components/TimeDisplay';
-import { ParticleBackground } from './components/ParticleBackground';
+
 import { checkProductInfo, PolicyCheckResult } from './utils/policyChecker';
 
 function App() {

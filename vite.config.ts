@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/', // 本地开发使用根路径
+  base: '/facebook-ad-copy-generator/', // GitHub Pages部署路径
   plugins: [react()],
   // 添加HTML元标记配置
   define: {

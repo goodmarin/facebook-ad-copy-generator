@@ -575,22 +575,22 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div className="flex items-center">
                         <span className="text-green-700">
-                          💡 预测状态：{predictions.length > 0 ? '✅ 已完成' : '⏳ 分析中...'}
+                          预测状态：{predictions.length > 0 ? '已完成' : '分析中...'}
                         </span>
                       </div>
                       <div className="flex items-center">
                         <span className="text-green-700">
-                          🔗 API状态：{predictionError ? '❌ 异常' : '✅ 正常'}
+                          API状态：{predictionError ? '异常' : '正常'}
                         </span>
                       </div>
                       <div className="flex items-center">
                         <span className="text-green-700">
-                          📊 文案总数：{copies.length} 条
+                          文案总数：{copies.length} 条
                         </span>
                       </div>
                       <div className="flex items-center">
                         <span className="text-green-700">
-                          ⚡ 当前文案：{currentIndex + 1}
+                          当前文案：{currentIndex + 1}
                         </span>
                       </div>
                     </div>

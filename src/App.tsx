@@ -20,11 +20,11 @@ function App() {
   const [showRegionDropdown, setShowRegionDropdown] = useState(false);
   const [regionSearchTerm, setRegionSearchTerm] = useState('');
   const [policyCheckResult, setPolicyCheckResult] = useState<PolicyCheckResult | null>(null);
+  const [fastMode, _setFastMode] = useState(false); // 快速模式
 
   // 根据地区获取语言和文案风格
   const getLanguageAndStyle = (region: string) => {
     const regionConfig: { [key: string]: { language: string; style: string; culture: string } } = {
-      'CN': { language: '中文', style: '亲切友好，强调实用性和性价比', culture: '注重家庭和实用价值' },
       'US': { language: 'English', style: 'confident and aspirational', culture: 'emphasize innovation and personal achievement' },
       'JP': { language: '日本語', style: '丁寧で品質重視', culture: '細部への注意と品質を重視' },
       'KR': { language: '한국어', style: '트렌디하고 스타일리시', culture: '트렌드와 미용에中점' },
@@ -50,45 +50,62 @@ function App() {
       'BR': { language: 'Português', style: 'warm and social', culture: 'emphasize family and celebration' },
       'AR': { language: 'Español', style: 'passionate and expressive', culture: 'emphasize family and social life' }
     };
-    return regionConfig[region] || regionConfig['CN'];
+    return regionConfig[region] || regionConfig['US'];
   };
 
-  // 生成文案函数 - 支持多地区本土化
+  // 生成文案函数 - 支持多地区本土化（并发优化）
   const generateCopies = async (productInfo: any) => {
     const allCopies: Array<{text: string, region: string, regionName: string}> = [];
     
-    // 为每个选择的地区生成文案
-    for (const region of productInfo.regions) {
+    // 并发为所有选择的地区生成文案
+    const regionPromises = productInfo.regions.map(async (region: string) => {
       const config = getLanguageAndStyle(region);
       
       console.log(`📝 为地区 ${region} 生成本土化文案，语言: ${config.language}`);
 
-      // 使用DeepSeek API生成本土化文案
-      const regionCopies = await generateLocalizedCopiesWithAI(productInfo, region, config);
+      try {
+        // 使用DeepSeek API生成本土化文案
+        const regionCopies = await generateLocalizedCopiesWithAI(productInfo, region, config);
 
-      // 为每条文案添加地区信息
-      const regionNames: { [key: string]: string } = {
-        'CN': '中国大陆', 'US': '美国', 'JP': '日本', 'KR': '韩国', 'IN': '印度', 'SG': '新加坡', 'MY': '马来西亚', 'TH': '泰国',
-        'VN': '越南', 'ID': '印度尼西亚', 'PH': '菲律宾', 'TW': '台湾', 'HK': '香港', 'CA': '加拿大', 'MX': '墨西哥', 'GB': '英国',
-        'DE': '德国', 'FR': '法国', 'IT': '意大利', 'ES': '西班牙', 'NL': '荷兰', 'AU': '澳大利亚', 'NZ': '新西兰', 'BR': '巴西', 'AR': '阿根廷'
-      };
-      const regionName = regionNames[region] || '全球';
-      
-      regionCopies.forEach((copy: string) => {
-        allCopies.push({
+        // 为每条文案添加地区信息
+        const regionNames: { [key: string]: string } = {
+          'US': '美国', 'JP': '日本', 'KR': '韩国', 'IN': '印度', 'SG': '新加坡', 'MY': '马来西亚', 'TH': '泰国',
+          'VN': '越南', 'ID': '印度尼西亚', 'PH': '菲律宾', 'TW': '台湾', 'HK': '香港', 'CA': '加拿大', 'MX': '墨西哥', 'GB': '英国',
+          'DE': '德国', 'FR': '法国', 'IT': '意大利', 'ES': '西班牙', 'NL': '荷兰', 'AU': '澳大利亚', 'NZ': '新西兰', 'BR': '巴西', 'AR': '阿根廷'
+        };
+        const regionName = regionNames[region] || '全球';
+        
+        return regionCopies.map((copy: string) => ({
           text: copy,
           region: region,
           regionName: regionName
-        });
-      });
-    }
+        }));
+      } catch (error) {
+        console.error(`生成文案失败 for ${region}:`, error);
+        return [];
+      }
+    });
+
+    // 等待所有地区完成
+    const results = await Promise.all(regionPromises);
+    
+    // 合并所有结果
+    results.forEach(regionCopies => {
+      allCopies.push(...regionCopies);
+    });
 
     return allCopies;
   };
 
-  // 使用DeepSeek API生成本土化文案的函数
+  // 使用DeepSeek API生成本土化文案的函数 - 优化版本
   const generateLocalizedCopiesWithAI = async (productInfo: any, region: string, config: any) => {
-    const { language, style, culture } = config;
+    const { language, style } = config;
+    
+    // 快速模式：直接使用备用模板，跳过AI生成
+    if (fastMode) {
+      console.log(`🚀 快速模式：为地区 ${region} 使用备用模板`);
+      return generateFallbackCopies(productInfo, region, config);
+    }
     
     try {
       const apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY || 'sk-674b29e0b86846bca55195b66eb3e3aa';
@@ -96,34 +113,22 @@ function App() {
       // 先翻译产品信息
       const translatedProduct = translateProductInfo(productInfo, region);
       
-      const prompt = `请为以下产品生成3条Facebook广告文案，要求：
 
-1. 使用${language}语言
-2. 文案风格：${style}
-3. 文化特点：${culture}
-4. 促销方式：${getPromotionText(productInfo.promotion)}
-5. 每条文案都要有吸引力，包含情感共鸣和明确的行动召唤
-6. 文案长度控制在100-150字之间
-7. 要针对${translatedProduct.audience}这个目标受众
+      
+      const prompt = `Create 3 engaging Facebook ad copies in ${language} for:
+Product: ${translatedProduct.name}
+Features: ${translatedProduct.features}
+Audience: ${translatedProduct.audience}
+Style: ${style}
+Promotion: ${getPromotionText(productInfo.promotion)}
 
-CRITICAL REQUIREMENTS:
-- 产品名称"${translatedProduct.name}"已经翻译成${language}
-- 产品特性"${translatedProduct.features}"已经翻译成${language}
-- 目标受众"${translatedProduct.audience}"已经翻译成${language}
-- 整个文案必须完全使用${language}，绝对禁止包含任何中文字符
-- 绝对不要使用原始的中文产品信息
-- 如果遇到无法翻译的中文词汇，请用${language}的对应词汇替换
-- 确保所有文案都是纯${language}，没有任何中文混合
-
-产品信息（已翻译成${language}）：
-- 产品名称：${translatedProduct.name}
-- 产品特性：${translatedProduct.features}
-- 目标受众：${translatedProduct.audience}
-
-请严格按照以下格式返回，每条文案用换行分隔：
-文案1：[内容]
-文案2：[内容]
-文案3：[内容]`;
+Requirements:
+- 100% ${language}, no Chinese characters
+- 120-180 characters each
+- Include relevant emojis naturally throughout the copy
+- Use emotional triggers and compelling call-to-action
+- Make it engaging, creative and conversion-focused
+- Format: Copy 1: [content] | Copy 2: [content] | Copy 3: [content]`;
 
       const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
@@ -136,27 +141,18 @@ CRITICAL REQUIREMENTS:
           messages: [
             {
               role: 'system',
-              content: `你是一个专业的Facebook广告文案创作专家，擅长为不同地区和文化背景创作本土化的广告文案。
-
-CRITICAL RULES:
-1. 所有文案必须完全使用${language}语言
-2. 绝对禁止包含任何中文字符、中文标点符号
-3. 产品信息已经翻译完成，请直接使用翻译后的信息
-4. 如果遇到无法翻译的中文词汇，请用${language}的对应词汇替换
-5. 确保所有文案都是纯${language}，没有任何中文混合
-6. 文案风格要符合${culture}文化特点
-7. 每条文案都要有吸引力，包含情感共鸣和明确的行动召唤
-
-请严格按照要求生成文案。`
+              content: `You are a creative ${language} Facebook ad copywriter specializing in engaging, conversion-focused content. Generate 100% ${language} content only, no Chinese characters. Use relevant emojis naturally, create emotional connections and include compelling calls-to-action. Make each copy unique and memorable.`
             },
             {
               role: 'user',
               content: prompt
             }
           ],
-          max_tokens: 800,
+          max_tokens: 600,
           temperature: 0.7,
-          top_p: 0.9
+          top_p: 0.8,
+          presence_penalty: 0.1,
+          frequency_penalty: 0.1
         })
       });
 
@@ -171,27 +167,23 @@ CRITICAL RULES:
         throw new Error('AI未返回有效内容');
       }
 
-      // 解析返回的文案
-      const lines = content.split('\n').filter((line: string) => line.trim());
-      const copies = lines
-        .filter((line: string) => line.includes('文案') || line.includes('：') || line.includes(':'))
-        .map((line: string) => {
-          // 提取文案内容
-          const match = line.match(/文案\d+[：:]\s*(.+)/);
-          return match ? match[1].trim() : line.trim();
-        })
-        .filter((copy: string) => copy.length > 10); // 过滤掉太短的内容
+      // 快速解析返回的文案
+      const copies = content
+        .split(/copy\s*\d+[：:]\s*/i)
+        .slice(1) // 移除第一个空元素
+        .map((copy: string) => copy.trim().replace(/^[|:]\s*/, '').replace(/\s*[|:]\s*.*$/, ''))
+        .filter((copy: string) => copy.length > 20 && copy.length < 500); // 过滤长度
 
-      // 后处理：确保文案中没有中文
+      console.log('🔍 AI原始返回内容:', content);
+      console.log('🔍 解析后的文案:', copies);
+
+      // 智能后处理：确保文案完全本土化
       const processedCopies = copies.map((copy: string) => {
-        // 移除所有中文字符
-        let processedCopy = copy.replace(/[\u4e00-\u9fff]/g, '');
-        // 移除中文标点符号
-        processedCopy = processedCopy.replace(/[，。！？；：""''（）【】]/g, '');
-        // 清理多余的空格
-        processedCopy = processedCopy.replace(/\s+/g, ' ').trim();
-        return processedCopy;
-      }).filter((copy: string) => copy.length > 10); // 再次过滤太短的内容
+        console.log('🔍 处理前文案:', copy);
+        const processed = processCopyForLocalization(copy, language, region);
+        console.log('🔍 处理后文案:', processed);
+        return processed;
+      }).filter((copy: string) => copy.length > 20); // 再次过滤太短的内容
 
       // 如果AI生成失败或处理后没有有效文案，使用备用模板
       if (processedCopies.length === 0) {
@@ -206,6 +198,69 @@ CRITICAL RULES:
       // 使用备用模板
       return generateFallbackCopies(productInfo, region, config);
     }
+  };
+
+
+
+  // 清理异常emoji的函数
+  const cleanEmojis = (text: string): string => {
+    console.log('cleanEmojis 输入:', text);
+    
+    // 只保留安全的emoji，移除所有其他emoji
+    let cleanedText = text;
+    
+
+    
+    // 直接移除所有已知的emoji和符号
+    const symbolsToRemove = [
+      '❓', '❔', '❕', '❖', '🔥', '💥', '💢', '💣', '💤', '♪', '♫', '♬', '♩', '💎', '⏳', '→',
+      '✨', '⭐', '💡', '🎯', '🚀', '💪', '🎧', '🎵', '🎶', '🎤', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🎻',
+      '🎮', '🎲', '🧩', '🎳', '🎪', '🎭', '🎨', '🎬', '⚙️', '🎭', '🎪', '🎨', '🎬', '🎤', '🎧', '🎼', '🎹',
+      '🥁', '🎷', '🎺', '🎸', '🎻', '🎮', '🎲', '🧩', '🎯', '🎳', '🎪', '🎭', '🎨', '🎬', '🎤', '🎧', '🎼',
+      '🎹', '🥁', '🎷', '🎺', '🎸', '🎻', '🎮', '🎲', '🧩', '🎯', '🎳', '🎪', '🎭', '🎨', '🎬', '🎤', '🎧',
+      '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🎻', '🎮', '🎲', '🧩', '🎯', '🎳', '🎪', '🎭', '🎨', '🎬', '🎤',
+      '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🎻', '🎮', '🎲', '🧩', '🎯', '🎳', '🎪', '🎭', '🎨', '🎬'
+    ];
+    
+    symbolsToRemove.forEach(symbol => {
+      cleanedText = cleanedText.replace(new RegExp(symbol, 'g'), '');
+    });
+    
+    console.log('cleanEmojis 输出:', cleanedText);
+    return cleanedText;
+  };
+
+  // 智能文案后处理函数
+  const processCopyForLocalization = (copy: string, language: string, _region: string) => {
+    let processedCopy = copy;
+    
+    // 清理异常emoji
+    processedCopy = cleanEmojis(processedCopy);
+    
+    // 移除所有中文字符和标点符号
+    processedCopy = processedCopy.replace(/[\u4e00-\u9fff]/g, '');
+    processedCopy = processedCopy.replace(/[，。！？；：""''（）【】]/g, '');
+    
+    // 根据语言进行特定的清理
+    switch (language) {
+      case 'English':
+        // 确保英语文案的标点符号正确
+        processedCopy = processedCopy.replace(/\s+/g, ' ').trim();
+        break;
+      case '日本語':
+        // 确保日语文案的标点符号正确
+        processedCopy = processedCopy.replace(/\s+/g, ' ').trim();
+        break;
+      case '한국어':
+        // 确保韩语文案的标点符号正确
+        processedCopy = processedCopy.replace(/\s+/g, ' ').trim();
+        break;
+      default:
+        // 其他语言的基本清理
+        processedCopy = processedCopy.replace(/\s+/g, ' ').trim();
+    }
+    
+    return processedCopy;
   };
 
   // 备用文案生成函数
@@ -228,6 +283,400 @@ CRITICAL RULES:
   // 翻译产品信息 - 彻底修复版本
   const translateProductInfo = (productInfo: any, region: string) => {
     const translations: { [key: string]: { [key: string]: string } } = {
+      // 通用产品词汇
+      '产品': {
+        'US': 'Product',
+        'JP': '製品',
+        'KR': '제품',
+        'GB': 'Product',
+        'DE': 'Produkt',
+        'FR': 'Produit',
+        'IT': 'Prodotto',
+        'ES': 'Producto',
+        'SG': 'Product',
+        'MY': 'Produk',
+        'TH': 'ผลิตภัณฑ์',
+        'VN': 'Sản Phẩm'
+      },
+      '商品': {
+        'US': 'Product',
+        'JP': '商品',
+        'KR': '상품',
+        'GB': 'Product',
+        'DE': 'Produkt',
+        'FR': 'Produit',
+        'IT': 'Prodotto',
+        'ES': 'Producto',
+        'SG': 'Product',
+        'MY': 'Produk',
+        'TH': 'สินค้า',
+        'VN': 'Sản Phẩm'
+      },
+      '设备': {
+        'US': 'Device',
+        'JP': 'デバイス',
+        'KR': '기기',
+        'GB': 'Device',
+        'DE': 'Gerät',
+        'FR': 'Appareil',
+        'IT': 'Dispositivo',
+        'ES': 'Dispositivo',
+        'SG': 'Device',
+        'MY': 'Peranti',
+        'TH': 'อุปกรณ์',
+        'VN': 'Thiết Bị'
+      },
+      '工具': {
+        'US': 'Tool',
+        'JP': 'ツール',
+        'KR': '도구',
+        'GB': 'Tool',
+        'DE': 'Werkzeug',
+        'FR': 'Outil',
+        'IT': 'Strumento',
+        'ES': 'Herramienta',
+        'SG': 'Tool',
+        'MY': 'Alat',
+        'TH': 'เครื่องมือ',
+        'VN': 'Công Cụ'
+      },
+      '系统': {
+        'US': 'System',
+        'JP': 'システム',
+        'KR': '시스템',
+        'GB': 'System',
+        'DE': 'System',
+        'FR': 'Système',
+        'IT': 'Sistema',
+        'ES': 'Sistema',
+        'SG': 'System',
+        'MY': 'Sistem',
+        'TH': 'ระบบ',
+        'VN': 'Hệ Thống'
+      },
+      '软件': {
+        'US': 'Software',
+        'JP': 'ソフトウェア',
+        'KR': '소프트웨어',
+        'GB': 'Software',
+        'DE': 'Software',
+        'FR': 'Logiciel',
+        'IT': 'Software',
+        'ES': 'Software',
+        'SG': 'Software',
+        'MY': 'Perisian',
+        'TH': 'ซอฟต์แวร์',
+        'VN': 'Phần Mềm'
+      },
+      '应用': {
+        'US': 'App',
+        'JP': 'アプリ',
+        'KR': '앱',
+        'GB': 'App',
+        'DE': 'App',
+        'FR': 'Application',
+        'IT': 'App',
+        'ES': 'Aplicación',
+        'SG': 'App',
+        'MY': 'Aplikasi',
+        'TH': 'แอป',
+        'VN': 'Ứng Dụng'
+      },
+      '服务': {
+        'US': 'Service',
+        'JP': 'サービス',
+        'KR': '서비스',
+        'GB': 'Service',
+        'DE': 'Dienst',
+        'FR': 'Service',
+        'IT': 'Servizio',
+        'ES': 'Servicio',
+        'SG': 'Service',
+        'MY': 'Perkhidmatan',
+        'TH': 'บริการ',
+        'VN': 'Dịch Vụ'
+      },
+      // 产品特性词汇
+      '智能': {
+        'US': 'Smart',
+        'JP': 'スマート',
+        'KR': '스마트',
+        'GB': 'Smart',
+        'DE': 'Intelligent',
+        'FR': 'Intelligent',
+        'IT': 'Intelligente',
+        'ES': 'Inteligente',
+        'SG': 'Smart',
+        'MY': 'Pintar',
+        'TH': 'อัจฉริยะ',
+        'VN': 'Thông Minh'
+      },
+      '无线': {
+        'US': 'Wireless',
+        'JP': 'ワイヤレス',
+        'KR': '무선',
+        'GB': 'Wireless',
+        'DE': 'Drahtlos',
+        'FR': 'Sans Fil',
+        'IT': 'Senza Fili',
+        'ES': 'Inalámbrico',
+        'SG': 'Wireless',
+        'MY': 'Tanpa Wayar',
+        'TH': 'ไร้สาย',
+        'VN': 'Không Dây'
+      },
+      '便携': {
+        'US': 'Portable',
+        'JP': 'ポータブル',
+        'KR': '휴대용',
+        'GB': 'Portable',
+        'DE': 'Tragbar',
+        'FR': 'Portable',
+        'IT': 'Portatile',
+        'ES': 'Portátil',
+        'SG': 'Portable',
+        'MY': 'Mudah Alih',
+        'TH': 'พกพา',
+        'VN': 'Di Động'
+      },
+      '高效': {
+        'US': 'High Efficiency',
+        'JP': '高効率',
+        'KR': '고효율',
+        'GB': 'High Efficiency',
+        'DE': 'Hocheffizient',
+        'FR': 'Haute Efficacité',
+        'IT': 'Alta Efficienza',
+        'ES': 'Alta Eficiencia',
+        'SG': 'High Efficiency',
+        'MY': 'Kecekapan Tinggi',
+        'TH': 'ประสิทธิภาพสูง',
+        'VN': 'Hiệu Quả Cao'
+      },
+      '节能': {
+        'US': 'Energy Saving',
+        'JP': '省エネ',
+        'KR': '절약',
+        'GB': 'Energy Saving',
+        'DE': 'Energiesparend',
+        'FR': 'Économie d\'Énergie',
+        'IT': 'Risparmio Energetico',
+        'ES': 'Ahorro de Energía',
+        'SG': 'Energy Saving',
+        'MY': 'Penjimatan Tenaga',
+        'TH': 'ประหยัดพลังงาน',
+        'VN': 'Tiết Kiệm Năng Lượng'
+      },
+      '环保': {
+        'US': 'Eco-friendly',
+        'JP': 'エコフレンドリー',
+        'KR': '친환경',
+        'GB': 'Eco-friendly',
+        'DE': 'Umweltfreundlich',
+        'FR': 'Écologique',
+        'IT': 'Eco-compatibile',
+        'ES': 'Ecológico',
+        'SG': 'Eco-friendly',
+        'MY': 'Mesra Alam',
+        'TH': 'เป็นมิตรกับสิ่งแวดล้อม',
+        'VN': 'Thân Thiện Môi Trường'
+      },
+      '时尚': {
+        'US': 'Fashionable',
+        'JP': 'ファッショナブル',
+        'KR': '패셔너블',
+        'GB': 'Fashionable',
+        'DE': 'Modisch',
+        'FR': 'À la Mode',
+        'IT': 'Alla Moda',
+        'ES': 'Fashionable',
+        'SG': 'Fashionable',
+        'MY': 'Bergaya',
+        'TH': 'ทันสมัย',
+        'VN': 'Thời Trang'
+      },
+      '实用': {
+        'US': 'Practical',
+        'JP': '実用的',
+        'KR': '실용적',
+        'GB': 'Practical',
+        'DE': 'Praktisch',
+        'FR': 'Pratique',
+        'IT': 'Pratico',
+        'ES': 'Práctico',
+        'SG': 'Practical',
+        'MY': 'Praktikal',
+        'TH': 'ใช้งานได้จริง',
+        'VN': 'Thực Tế'
+      },
+      '创新': {
+        'US': 'Innovative',
+        'JP': '革新的',
+        'KR': '혁신적',
+        'GB': 'Innovative',
+        'DE': 'Innovativ',
+        'FR': 'Innovant',
+        'IT': 'Innovativo',
+        'ES': 'Innovador',
+        'SG': 'Innovative',
+        'MY': 'Inovatif',
+        'TH': 'นวัตกรรม',
+        'VN': 'Sáng Tạo'
+      },
+      '优质': {
+        'US': 'High Quality',
+        'JP': '高品質',
+        'KR': '고품질',
+        'GB': 'High Quality',
+        'DE': 'Hochwertig',
+        'FR': 'Haute Qualité',
+        'IT': 'Alta Qualità',
+        'ES': 'Alta Calidad',
+        'SG': 'High Quality',
+        'MY': 'Kualiti Tinggi',
+        'TH': 'คุณภาพสูง',
+        'VN': 'Chất Lượng Cao'
+      },
+      '专业': {
+        'US': 'Professional',
+        'JP': 'プロフェッショナル',
+        'KR': '전문적',
+        'GB': 'Professional',
+        'DE': 'Professionell',
+        'FR': 'Professionnel',
+        'IT': 'Professionale',
+        'ES': 'Profesional',
+        'SG': 'Professional',
+        'MY': 'Profesional',
+        'TH': 'มืออาชีพ',
+        'VN': 'Chuyên Nghiệp'
+      },
+      '先进': {
+        'US': 'Advanced',
+        'JP': '先進的',
+        'KR': '선진적',
+        'GB': 'Advanced',
+        'DE': 'Fortschrittlich',
+        'FR': 'Avancé',
+        'IT': 'Avanzato',
+        'ES': 'Avanzado',
+        'SG': 'Advanced',
+        'MY': 'Maju',
+        'TH': 'ก้าวหน้า',
+        'VN': 'Tiên Tiến'
+      },
+      '可靠': {
+        'US': 'Reliable',
+        'JP': '信頼性',
+        'KR': '신뢰할 수 있는',
+        'GB': 'Reliable',
+        'DE': 'Zuverlässig',
+        'FR': 'Fiable',
+        'IT': 'Affidabile',
+        'ES': 'Confiable',
+        'SG': 'Reliable',
+        'MY': 'Boleh Dipercayai',
+        'TH': 'เชื่อถือได้',
+        'VN': 'Đáng Tin Cậy'
+      },
+      '安全': {
+        'US': 'Safe',
+        'JP': '安全',
+        'KR': '안전한',
+        'GB': 'Safe',
+        'DE': 'Sicher',
+        'FR': 'Sûr',
+        'IT': 'Sicuro',
+        'ES': 'Seguro',
+        'SG': 'Safe',
+        'MY': 'Selamat',
+        'TH': 'ปลอดภัย',
+        'VN': 'An Toàn'
+      },
+      '快速': {
+        'US': 'Fast',
+        'JP': '高速',
+        'KR': '빠른',
+        'GB': 'Fast',
+        'DE': 'Schnell',
+        'FR': 'Rapide',
+        'IT': 'Veloce',
+        'ES': 'Rápido',
+        'SG': 'Fast',
+        'MY': 'Pantas',
+        'TH': 'เร็ว',
+        'VN': 'Nhanh'
+      },
+      '便捷': {
+        'US': 'Convenient',
+        'JP': '便利',
+        'KR': '편리한',
+        'GB': 'Convenient',
+        'DE': 'Bequem',
+        'FR': 'Pratique',
+        'IT': 'Conveniente',
+        'ES': 'Conveniente',
+        'SG': 'Convenient',
+        'MY': 'Mudah',
+        'TH': 'สะดวก',
+        'VN': 'Tiện Lợi'
+      },
+      '舒适': {
+        'US': 'Comfortable',
+        'JP': '快適',
+        'KR': '편안한',
+        'GB': 'Comfortable',
+        'DE': 'Komfortabel',
+        'FR': 'Confortable',
+        'IT': 'Comodo',
+        'ES': 'Cómodo',
+        'SG': 'Comfortable',
+        'MY': 'Selesa',
+        'TH': 'สบาย',
+        'VN': 'Thoải Mái'
+      },
+      '耐用': {
+        'US': 'Durable',
+        'JP': '耐久性',
+        'KR': '내구성',
+        'GB': 'Durable',
+        'DE': 'Langlebig',
+        'FR': 'Durable',
+        'IT': 'Durevole',
+        'ES': 'Duradero',
+        'SG': 'Durable',
+        'MY': 'Tahan Lama',
+        'TH': 'ทนทาน',
+        'VN': 'Bền Bỉ'
+      },
+      '轻便': {
+        'US': 'Lightweight',
+        'JP': '軽量',
+        'KR': '가벼운',
+        'GB': 'Lightweight',
+        'DE': 'Leicht',
+        'FR': 'Léger',
+        'IT': 'Leggero',
+        'ES': 'Ligero',
+        'SG': 'Lightweight',
+        'MY': 'Ringan',
+        'TH': 'น้ำหนักเบา',
+        'VN': 'Nhẹ'
+      },
+      '小巧': {
+        'US': 'Compact',
+        'JP': 'コンパクト',
+        'KR': '컴팩트',
+        'GB': 'Compact',
+        'DE': 'Kompakt',
+        'FR': 'Compact',
+        'IT': 'Compatto',
+        'ES': 'Compacto',
+        'SG': 'Compact',
+        'MY': 'Padat',
+        'TH': 'กะทัดรัด',
+        'VN': 'Nhỏ Gọn'
+      },
       // 金融投资类
       '股票': {
         'US': 'Investment Products',
@@ -257,6 +706,20 @@ CRITICAL RULES:
         'TH': 'การสร้างความมั่งคั่ง',
         'VN': 'Xây Dựng Tài Sản'
       },
+      '一夜暴富,低投资高回报': {
+        'US': 'Wealth Building with Affordable Investment and Good Returns',
+        'JP': '資産構築、手頃な投資で良いリターン',
+        'KR': '부자 되기, 저렴한 투자로 좋은 수익',
+        'GB': 'Wealth Building with Affordable Investment and Good Returns',
+        'DE': 'Vermögensaufbau mit erschwinglicher Investition und guten Renditen',
+        'FR': 'Construction de Richesse avec Investissement Abordable et Bons Rendements',
+        'IT': 'Costruzione di Ricchezza con Investimento Accessibile e Buoni Rendimenti',
+        'ES': 'Construcción de Riqueza con Inversión Asequible y Buenos Rendimientos',
+        'SG': 'Wealth Building with Affordable Investment and Good Returns',
+        'MY': 'Pembinaan Kekayaan dengan Pelaburan Berpatutan dan Pulangan Baik',
+        'TH': 'การสร้างความมั่งคั่งกับการลงทุนที่เหมาะสมและผลตอบแทนที่ดี',
+        'VN': 'Xây Dựng Tài Sản với Đầu Tư Phù Hợp và Lợi Nhuận Tốt'
+      },
       '高回报': {
         'US': 'Good Returns',
         'JP': '良いリターン',
@@ -284,6 +747,20 @@ CRITICAL RULES:
         'MY': 'Pelaburan Berpatutan',
         'TH': 'การลงทุนที่เหมาะสม',
         'VN': 'Đầu Tư Phù Hợp'
+      },
+      '低投资高回报': {
+        'US': 'Affordable Investment with Good Returns',
+        'JP': '手頃な投資で良いリターン',
+        'KR': '저렴한 투자로 좋은 수익',
+        'GB': 'Affordable Investment with Good Returns',
+        'DE': 'Erschwingliche Investition mit guten Renditen',
+        'FR': 'Investissement Abordable avec de Bons Rendements',
+        'IT': 'Investimento Accessibile con Buoni Rendimenti',
+        'ES': 'Inversión Asequible con Buenos Rendimientos',
+        'SG': 'Affordable Investment with Good Returns',
+        'MY': 'Pelaburan Berpatutan dengan Pulangan Baik',
+        'TH': 'การลงทุนที่เหมาะสมกับผลตอบแทนที่ดี',
+        'VN': 'Đầu Tư Phù Hợp với Lợi Nhuận Tốt'
       },
       '投资': {
         'US': 'Financial Products',
@@ -426,6 +903,7 @@ CRITICAL RULES:
         'TH': 'กลุ่มคนออกกำลังกายที่บ้าน',
         'VN': 'Nhóm Tập Thể Dục Tại Nhà'
       },
+      // 电子产品
       '智能无线耳机': {
         'US': 'Smart Wireless Headphones',
         'JP': 'スマートワイヤレスヘッドフォン',
@@ -496,6 +974,7 @@ CRITICAL RULES:
         'TH': 'การสวมใส่ที่สบาย',
         'VN': 'Đeo Thoải Mái'
       },
+      // 目标受众
       '年轻上班族': {
         'US': 'Young Professionals',
         'JP': '若い会社員',
@@ -529,6 +1008,12 @@ CRITICAL RULES:
     const translateText = (text: string) => {
       if (!text) return '';
       
+      // 首先尝试翻译整个文本（处理复合短语）
+      const fullTextTranslation = translations[text];
+      if (fullTextTranslation) {
+        return fullTextTranslation[region] || fullTextTranslation['US'] || text;
+      }
+      
       // 分割文本，支持多种分隔符
       const words = text.split(/[,，、\s]+/).filter(word => word.trim());
       
@@ -557,25 +1042,21 @@ CRITICAL RULES:
   // 获取本土化文案模板
   const getLocalizedTemplates = (region: string, _language: string) => {
     const templates: { [key: string]: string[] } = {
-      'CN': [
-        '🚀 {product} - 改变你的生活方式！{features}，专为{audience}设计。立即体验科技与生活的完美融合！',
-        '💎 发现{product}的独特魅力！{features}让你在{audience}中脱颖而出。限时特价，错过就没有了！',
-        '🔥 热销爆款！{product}凭借{features}成为{audience}的首选。现在购买享受专属优惠，快来抢购吧！'
-      ],
+
       'US': [
-        '🚀 Transform your life with {product}! {features} designed for {audience}. Experience the perfect fusion of technology and lifestyle!',
-        '💎 Discover the unique charm of {product}! {features} help you stand out among {audience}. Limited time offer, don\'t miss out!',
-        '🔥 Hot selling! {product} with {features} becomes the first choice for {audience}. Get exclusive discounts now!'
+        '✨ Transform your life with {product}! {features} designed for {audience}. Experience the perfect fusion of technology and lifestyle!',
+        '⭐ Discover the unique charm of {product}! {features} help you stand out among {audience}. Limited time offer, don\'t miss out!',
+        '💪 Hot selling! {product} with {features} becomes the first choice for {audience}. Get exclusive discounts now!'
       ],
       'JP': [
-        '🚀 {product}で人生を変えよう！{features}、{audience}のために設計されました。テクノロジーとライフスタイルの完璧な融合を体験しよう！',
-        '💎 {product}の独特な魅力を発見！{features}で{audience}の中で際立とう。期間限定オファー、お見逃しなく！',
-        '🔥 人気商品！{product}は{features}で{audience}の第一選択肢に。今すぐ特別割引をゲット！'
+        '✨ {product}で人生を変えよう！{features}、{audience}のために設計されました。テクノロジーとライフスタイルの完璧な融合を体験しよう！',
+        '⭐ {product}の独特な魅力を発見！{features}で{audience}の中で際立とう。期間限定オファー、お見逃しなく！',
+        '💪 人気商品！{product}は{features}で{audience}の第一選択肢に。今すぐ特別割引をゲット！'
       ],
       'KR': [
-        '🚀 {product}로 인생을 바꿔보세요! {features}, {audience}를 위해 설계되었습니다. 기술과 라이프스타일의 완벽한 융합을 경험하세요!',
-        '💎 {product}의 독특한 매력을 발견하세요! {features}로 {audience} 중에서 돋보이세요. 한정 시간 특가, 놓치지 마세요!',
-        '🔥 인기 상품! {product}는 {features}로 {audience}의 첫 번째 선택이 됩니다. 지금 특별 할인을 받으세요!'
+        '✨ {product}로 인생을 바꿔보세요! {features}, {audience}를 위해 설계되었습니다. 기술과 라이프스타일의 완벽한 융합을 경험하세요!',
+        '⭐ {product}의 독특한 매력을 발견하세요! {features}로 {audience} 중에서 돋보이세요. 한정 시간 특가, 놓치지 마세요!',
+        '💪 인기 상품! {product}는 {features}로 {audience}의 첫 번째 선택이 됩니다. 지금 특별 할인을 받으세요!'
       ],
       'MY': [
         '🚀 Tukar hidup anda dengan {product}! {features} direka untuk {audience}. Alami gabungan sempurna teknologi dan gaya hidup!',
@@ -803,7 +1284,6 @@ CRITICAL RULES:
     {
       name: '热门地区',
       regions: [
-        { value: 'CN', label: '🇨🇳 中国大陆', desc: '中文市场' },
         { value: 'US', label: '🇺🇸 美国', desc: '英语市场' },
         { value: 'JP', label: '🇯🇵 日本', desc: '日语市场' },
         { value: 'KR', label: '🇰🇷 韩国', desc: '韩语市场' },
@@ -978,10 +1458,10 @@ CRITICAL RULES:
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8" id="generator">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
           {/* Left: Product Info Input */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="bg-white rounded-xl shadow-lg p-6 h-full">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">产品信息</h2>
               
               <form onSubmit={(e) => { e.preventDefault(); handleGenerate(); }} className="space-y-6">
@@ -1265,7 +1745,7 @@ CRITICAL RULES:
 
           {/* Right: Generated Results */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full flex flex-col overflow-hidden">
               <OutputDisplay
                 copies={copies}
                 regions={productInfo.regions}

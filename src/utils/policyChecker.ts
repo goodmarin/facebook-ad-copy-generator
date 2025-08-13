@@ -288,14 +288,16 @@ export const checkPolicyViolations = (text: string): PolicyCheckResult => {
 
   // 生成摘要
   let summary = '';
+  const totalViolations = violations.length;
+  
   if (riskLevel === 'high') {
-    summary = `⚠️ 高风险：检测到${highCount}个高风险词汇，建议修改后再投放`;
+    summary = `高风险：检测到${totalViolations}个风险词汇，建议修改后再投放`;
   } else if (riskLevel === 'medium') {
-    summary = `⚠️ 中风险：检测到${mediumCount}个中风险词汇，建议优化文案`;
+    summary = `中风险：检测到${totalViolations}个风险词汇，建议优化文案`;
   } else if (riskLevel === 'low') {
-    summary = `⚠️ 低风险：检测到${lowCount}个低风险词汇，建议注意`;
+    summary = `低风险：检测到${totalViolations}个风险词汇，建议注意`;
   } else {
-    summary = '✅ 安全：未检测到违反政策的词汇';
+    summary = '安全：未检测到违反政策的词汇';
   }
 
   return {

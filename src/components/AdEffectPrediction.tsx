@@ -2,6 +2,63 @@ import { JSX } from 'react';
 import { EffectPrediction } from '../types';
 import { TrendingUp, Star, Lightbulb, AlertTriangle } from 'lucide-react';
 
+// 统一评分格式为星星符号
+const normalizeRating = (rating: string): string => {
+  // 移除所有空格
+  const cleanRating = rating.replace(/\s+/g, '');
+  
+  // 如果已经是星星格式，确保总是5颗星
+  if (cleanRating.includes('★') || cleanRating.includes('☆')) {
+    const starCount = (cleanRating.match(/★/g) || []).length;
+    const emptyStarCount = (cleanRating.match(/☆/g) || []).length;
+    const totalStars = starCount + emptyStarCount;
+    
+    // 如果已经是5颗星，直接返回
+    if (totalStars === 5) {
+      return cleanRating;
+    }
+    
+    // 如果不是5颗星，重新构建
+    let result = '';
+    for (let i = 0; i < starCount; i++) {
+      result += '★';
+    }
+    while (result.length < 5) {
+      result += '☆';
+    }
+    return result;
+  }
+  
+  // 提取数字评分
+  const numberMatch = cleanRating.match(/(\d+(?:\.\d+)?)/);
+  if (numberMatch) {
+    const score = parseFloat(numberMatch[1]);
+    const maxScore = cleanRating.includes('5') || cleanRating.includes('10') ? 
+      (cleanRating.includes('10') ? 10 : 5) : 5;
+    
+    // 将评分转换为5星制
+    const normalizedScore = maxScore === 10 ? score / 2 : score;
+    const fullStars = Math.floor(normalizedScore);
+    const hasHalfStar = normalizedScore % 1 >= 0.5;
+    
+    let result = '';
+    for (let i = 0; i < fullStars; i++) {
+      result += '★';
+    }
+    if (hasHalfStar) {
+      result += '☆';
+    }
+    while (result.length < 5) {
+      result += '☆';
+    }
+    
+    return result;
+  }
+  
+  // 如果无法解析，返回默认值
+  return '★★★☆☆';
+};
+
 interface AdEffectPredictionProps {
   prediction: EffectPrediction | null;
   isPredicting: boolean;
@@ -64,7 +121,11 @@ export const AdEffectPrediction = ({
             <Star className="w-4 h-4 text-yellow-600 mr-1" />
             <span className="text-xs font-medium text-gray-700">效果评分</span>
           </div>
-          <div className="text-base sm:text-lg font-bold text-yellow-600">{prediction.rating}</div>
+          <div className="text-base sm:text-lg font-bold text-yellow-600">
+            {prediction.rating.includes('★') || prediction.rating.includes('☆') 
+              ? prediction.rating 
+              : normalizeRating(prediction.rating)}
+          </div>
         </div>
 
         {/* 优化建议 */}

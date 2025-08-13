@@ -69,8 +69,8 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
   isForbiddenProduct,
   policyCheckResult
 }) => {
-  // 使用第一个地区作为主要方向，或者默认使用CN
-  const primaryRegion = regions.length > 0 ? regions[0] : 'CN';
+  // 使用第一个地区作为主要方向，或者默认使用US
+  const primaryRegion = regions.length > 0 ? regions[0] : 'US';
   const direction = getDirectionByRegion(primaryRegion);
   const [currentIndex, setCurrentIndex] = useState(0);
   
@@ -245,7 +245,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
   }
 
   return (
-    <div className="relative">
+    <div className="relative h-full flex flex-col">
       {/* 风险检测结果 */}
       {policyCheckResult && (
         <div className="mb-4">
@@ -279,7 +279,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                       ? 'text-blue-700'
                       : 'text-green-700'
                   }`}>
-                    🛡️ 风险预估检测结果
+                    风险预估检测结果
                   </h4>
                   <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
                     policyCheckResult.riskLevel === 'high' 
@@ -361,6 +361,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
       )}
       
       <div className="card h-full flex flex-col pb-4 overflow-hidden">
+        <div className="flex-1 overflow-y-auto px-4">
         <div className="flex items-center justify-between mb-4 px-4 sm:px-6">
           <h3 className="text-lg font-semibold text-gray-900">生成的文案</h3>
           <div className="flex items-center text-sm text-gray-500 flex-shrink-0">
@@ -506,7 +507,52 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                         <span className="text-sm font-medium text-gray-700">效果评分</span>
                       </div>
                       <div className="text-2xl font-bold text-yellow-600">
-                        {predictions[currentIndex]?.rating || '★★★★☆'}
+                        {(() => {
+                          const rating = predictions[currentIndex]?.rating || '★★★★☆';
+                          // 确保评分是星星格式
+                          if (rating.includes('★') || rating.includes('☆')) {
+                            const starCount = (rating.match(/★/g) || []).length;
+                            const emptyStarCount = (rating.match(/☆/g) || []).length;
+                            const totalStars = starCount + emptyStarCount;
+                            
+                            // 如果已经是5颗星，直接返回
+                            if (totalStars === 5) {
+                              return rating;
+                            }
+                            
+                            // 如果不是5颗星，重新构建
+                            let result = '';
+                            for (let i = 0; i < starCount; i++) {
+                              result += '★';
+                            }
+                            while (result.length < 5) {
+                              result += '☆';
+                            }
+                            return result;
+                          }
+                          // 如果是数字格式，转换为星星
+                          const numberMatch = rating.match(/(\d+(?:\.\d+)?)/);
+                          if (numberMatch) {
+                            const score = parseFloat(numberMatch[1]);
+                            const maxScore = rating.includes('5') || rating.includes('10') ? 
+                              (rating.includes('10') ? 10 : 5) : 5;
+                            const normalizedScore = maxScore === 10 ? score / 2 : score;
+                            const fullStars = Math.floor(normalizedScore);
+                            const hasHalfStar = normalizedScore % 1 >= 0.5;
+                            let result = '';
+                            for (let i = 0; i < fullStars; i++) {
+                              result += '★';
+                            }
+                            if (hasHalfStar) {
+                              result += '☆';
+                            }
+                            while (result.length < 5) {
+                              result += '☆';
+                            }
+                            return result;
+                          }
+                          return '★★★☆☆';
+                        })()}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         综合评估文案质量
@@ -635,6 +681,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
             </p>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

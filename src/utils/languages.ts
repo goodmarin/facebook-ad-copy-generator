@@ -2,14 +2,7 @@ import { RegionConfig, StyleOption, ToneOption } from '../types';
 
 // 支持的地区配置 - 全球扩展版
 export const REGIONS: RegionConfig[] = [
-  // 亚洲地区
-  {
-    code: 'CN',
-    name: '中国',
-    language: 'zh-CN',
-    flag: '🇨🇳',
-    direction: 'ltr'
-  },
+
   {
     code: 'JP',
     name: '日本',

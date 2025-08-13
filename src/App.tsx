@@ -3,6 +3,10 @@ import { Logo } from './components/Logo';
 import { Navigation } from './components/Navigation';
 import { OutputDisplay } from './components/OutputDisplay';
 import { CountdownTimer } from './components/CountdownTimer';
+
+
+import { NewsCarousel } from './components/NewsCarousel';
+import ProductAnalysis from './components/ProductAnalysis';
 import { TimeDisplay } from './components/TimeDisplay';
 
 import { checkProductInfo, PolicyCheckResult } from './utils/policyChecker';
@@ -1459,6 +1463,10 @@ Requirements:
         <TimeDisplay />
       </div>
 
+
+
+
+
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8" id="generator">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
@@ -1697,7 +1705,7 @@ Requirements:
                           style: 'confident',
                           promotion: 'discount'
                         })}
-                        className="w-full text-left p-2 glass rounded hover:bg-white/20 transition-colors duration-200 text-xs text-primary"
+                        className="w-full text-left p-2 glass rounded hover:bg-white/30 hover:shadow-lg hover:scale-105 transition-all duration-300 ease-in-out text-xs text-primary transform hover:-translate-y-0.5"
                       >
                         🎧 智能耳机模板
                       </button>
@@ -1710,7 +1718,7 @@ Requirements:
                           style: 'energetic',
                           promotion: 'limited'
                         })}
-                        className="w-full text-left p-2 glass rounded hover:bg-white/20 transition-colors duration-200 text-xs text-primary"
+                        className="w-full text-left p-2 glass rounded hover:bg-white/30 hover:shadow-lg hover:scale-105 transition-all duration-300 ease-in-out text-xs text-primary transform hover:-translate-y-0.5"
                       >
                         💪 健身器材模板
                       </button>
@@ -1723,7 +1731,7 @@ Requirements:
                           style: 'elegant',
                           promotion: 'premium'
                         })}
-                        className="w-full text-left p-2 glass rounded hover:bg-white/20 transition-colors duration-200 text-xs text-primary"
+                        className="w-full text-left p-2 glass rounded hover:bg-white/30 hover:shadow-lg hover:scale-105 transition-all duration-300 ease-in-out text-xs text-primary transform hover:-translate-y-0.5"
                       >
                         ✨ 护肤产品模板
                       </button>
@@ -1736,7 +1744,7 @@ Requirements:
                           style: 'modern',
                           promotion: 'bundle'
                         })}
-                        className="w-full text-left p-2 glass rounded hover:bg-white/20 transition-colors duration-200 text-xs text-primary"
+                        className="w-full text-left p-2 glass rounded hover:bg-white/30 hover:shadow-lg hover:scale-105 transition-all duration-300 ease-in-out text-xs text-primary transform hover:-translate-y-0.5"
                       >
                         📱 数码配件模板
                       </button>
@@ -1756,6 +1764,12 @@ Requirements:
                 error={null}
                 policyCheckResult={policyCheckResult}
               />
+              
+              {/* 新闻资讯轮播 - 只在未生成文案时显示 */}
+              <NewsCarousel show={copies.length === 0 && !isLoading} />
+              
+              {/* 选品分析 - 只在未生成文案时显示 */}
+              <ProductAnalysis copies={copies} isLoading={isLoading} />
             </div>
           </div>
         </div>

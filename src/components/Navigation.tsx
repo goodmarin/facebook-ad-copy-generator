@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ExternalLink } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 interface MenuItem {
   label: string;
@@ -94,23 +94,22 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
                 )}
               </span>
               {item.children && (
-                <ChevronDown className="w-4 h-4 text-gray-700 group-hover:text-blue-600 transition-colors" />
+                <ChevronDown className="w-4 h-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
               )}
             </div>
             
-            {/* 下拉菜单 */}
+            {/* 下拉菜单 - 增加动画效果 */}
             {item.children && activeDropdown === item.label && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-200/50 py-2 z-[9999]">
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-200/50 py-2 z-[9999] animate-in fade-in-0 slide-in-from-top-2 duration-300 ease-out">
                 {item.children.map((child) => (
                   <a
                     key={child.label}
                     href={child.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 ease-in-out transform hover:translate-x-1"
                   >
                     <span>{child.label}</span>
-                    <ExternalLink className="w-3 h-3 text-gray-400" />
                   </a>
                 ))}
               </div>

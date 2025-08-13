@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ExternalLink } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 interface NavigationItem {
   label: string;
@@ -95,7 +95,7 @@ export const QuickNavigation: React.FC<QuickNavigationProps> = ({ className = ''
               onMouseLeave={handleMouseLeave}
             >
               {/* 一级导航项 */}
-              <div className="flex items-center space-x-1 sm:space-x-2 cursor-pointer px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 hover:bg-white hover:shadow-md">
+              <div className="flex items-center space-x-1 sm:space-x-2 cursor-pointer px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 hover:bg-white hover:shadow-md hover:scale-105">
                 <span className="text-lg sm:text-xl">{item.icon}</span>
                 <span className="font-medium text-gray-700 group-hover:text-blue-600 transition-colors whitespace-nowrap text-sm sm:text-base">
                   {item.url ? (
@@ -107,13 +107,13 @@ export const QuickNavigation: React.FC<QuickNavigationProps> = ({ className = ''
                   )}
                 </span>
                 {item.children && (
-                  <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
+                  <ChevronDown className="w-4 h-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
                 )}
               </div>
               
-              {/* 下拉菜单 */}
+              {/* 下拉菜单 - 增强动画效果 */}
               {item.children && activeDropdown === item.label && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-3 z-50 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-3 z-50 animate-in fade-in-0 slide-in-from-top-2 duration-300 ease-out scale-in-95">
                   <div className="px-4 py-2 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
                     <h3 className="font-semibold text-gray-900 text-sm flex items-center">
                       <span className="mr-2">{item.icon}</span>
@@ -127,10 +127,9 @@ export const QuickNavigation: React.FC<QuickNavigationProps> = ({ className = ''
                         href={child.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors rounded mx-2"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 ease-in-out transform hover:translate-x-1 rounded mx-2"
                       >
                         <span>{child.label}</span>
-                        <ExternalLink className="w-3 h-3 text-gray-400" />
                       </a>
                     ))}
                   </div>

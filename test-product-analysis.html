@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选品分析功能测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-4xl font-bold text-white mb-8 text-center">选品分析功能测试</h1>
+            
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-4 mb-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900">选品分析</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                    <!-- Seller Sprite -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://www.sellersprite.com/', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <img src="https://img.amz123.com/upload/index_icon/20201231/5fed724e2be8a.png/icon52" alt="Seller Sprite" class="w-6 h-6 object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-white text-xs font-bold\'>S</span>'; this.parentElement.className='w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0';">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    Seller Sprite (卖家精灵)
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    覆盖多维选品视角，挖掘隐藏机会市场
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 美亚销售榜 -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://www.amazon.com/Best-Sellers/zgbs', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <img src="https://img.amz123.com/upload/index_icon/20201203/5fc8faefabdc8.jpg/icon52" alt="美亚销售榜" class="w-6 h-6 object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-white text-xs font-bold\'>A</span>'; this.parentElement.className='w-8 h-8 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0';">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    美亚销售榜
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    美国亚马逊销售排行榜
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 美亚新品榜 -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://www.amazon.com/gp/new-releases', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-bold">N</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    美亚新品榜
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    美国亚马逊新品排行榜
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Temu Bestsellers -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://www.temu.com/', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-bold">T</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    Temu Bestsellers
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    每日更新的Temu最受欢迎榜单
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google Trends -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://trends.google.com/', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <img src="https://img.amz123.com/upload/index_icon/20201203/5fc8faef823dc.jpg/icon52" alt="Google Trends" class="w-6 h-6 object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-white text-xs font-bold\'>G</span>'; this.parentElement.className='w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0';">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    Google Trends
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    查看关键词搜索量和趋势变化
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 英亚销售榜 -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://www.amazon.co.uk/Best-Sellers/zgbs', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-bold">UK</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    英亚销售榜
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    英国亚马逊销售排行榜
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 德亚销售榜 -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://www.amazon.de/Best-Sellers/zgbs', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-yellow-500 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-bold">DE</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    德亚销售榜
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    德国亚马逊销售排行榜
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 日亚销售榜 -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://www.amazon.co.jp/Best-Sellers/zgbs', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-red-500 to-white rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-bold">JP</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    日亚销售榜
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    日本亚马逊销售排行榜（需VPN）
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Walmart Bestsellers -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://www.walmart.com/browse/top-sellers', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-bold">W</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    Walmart Bestsellers
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    Walmart平台最受欢迎产品列表
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google商机洞察 -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://www.thinkwithgoogle.com/', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-bold">G</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    Google商机洞察
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    查看全球各国产品类别的具体市场需求
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Most Wished For -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://www.amazon.com/gp/registry/wishlist', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-pink-500 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-bold">♥</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    Most Wished For
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    亚马逊买家愿望清单
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Deals -->
+                    <div class="group cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 hover:scale-105" onclick="window.open('https://www.amazon.com/gp/goldbox', '_blank')">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-bold">D</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors duration-200 line-clamp-1">
+                                    Today's Deals
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    美国亚马逊每日促销
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <p class="text-xs text-gray-500">
+                        点击任意工具即可跳转到对应平台进行选品分析
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

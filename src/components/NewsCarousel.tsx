@@ -1,124 +1,135 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronUp, ChevronDown, ExternalLink } from 'lucide-react';
 
 interface NewsItem {
   title: string;
-  url: string;
   date: string;
+  url: string;
 }
 
-export const NewsCarousel: React.FC = () => {
+interface NewsCarouselProps {
+  show?: boolean;
+}
+
+export const NewsCarousel: React.FC<NewsCarouselProps> = ({ show = true }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [news] = useState<NewsItem[]>([
+  const [newsItems] = useState<NewsItem[]>([
     {
-      title: "Facebook广告政策更新：2024年最新投放指南",
-      url: "https://cheetahgo.cmcm.com/zixun/zhengcejiedu",
-      date: "2小时前"
+      title: "猎豹移动宣布控股UFACTORY",
+      date: "2025-07-28",
+      url: "https://www.cmcm.com/zh-CN/cm-news"
     },
     {
-      title: "TikTok Shop在英国市场表现突出：54%增长",
-      url: "https://cheetahgo.cmcm.com/zixun/anlijingxuan",
-      date: "3小时前"
+      title: "猎户星空语音交互机器人上岗SAP中国研究院",
+      date: "2025-07-16",
+      url: "https://www.cmcm.com/zh-CN/cm-news"
     },
     {
-      title: "跨境电商新趋势：AI驱动的广告文案优化",
-      url: "https://cheetahgo.cmcm.com/zixun/dujiazhuanlan",
-      date: "5小时前"
+      title: "喜讯！猎豹旗下聚云科技与极狐GitLab达成战略合作",
+      date: "2025-07-16",
+      url: "https://www.cmcm.com/zh-CN/cm-news"
     },
     {
-      title: "Google广告账户优化技巧：提升ROI的实用方法",
-      url: "https://cheetahgo.cmcm.com/zixun/chanpingengxin",
-      date: "1天前"
+      title: "祝贺！猎豹旗下聚云科技荣膺亚马逊云科技核心级合作伙伴",
+      date: "2025-07-08",
+      url: "https://www.cmcm.com/zh-CN/cm-news"
     },
     {
-      title: "亚马逊广告投放策略：从新手到专家的完整指南",
-      url: "https://cheetahgo.cmcm.com/zixun/all",
-      date: "2天前"
+      title: "傅盛：机器人行业的\"非共识\"实践",
+      date: "2025-06-09",
+      url: "https://www.cmcm.com/zh-CN/cm-news"
+    },
+    {
+      title: "猎户星空大模型发布！傅盛：企业应用百亿参数就够了",
+      date: "2024-01-23",
+      url: "https://www.cmcm.com/zh-CN/cm-news"
+    },
+    {
+      title: "傅盛在央视财经解密Sora：AI如何复刻人类推理和直觉？",
+      date: "2024-03-01",
+      url: "https://www.cmcm.com/zh-CN/cm-news"
+    },
+    {
+      title: "《财经》专访傅盛：开启企业私有化大模型新纪元",
+      date: "2024-03-01",
+      url: "https://www.cmcm.com/zh-CN/cm-news"
     }
   ]);
 
-  // 自动轮播
+  // 计算显示区域能容纳的新闻条数
+  const visibleCount = 4; // 显示4条新闻
+  const itemHeight = 48; // 每条新闻高度48px
+
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % news.length);
-    }, 4000);
+      setCurrentIndex((prevIndex) => {
+        // 当到达最后一组时，重置到开始位置
+        if (prevIndex >= newsItems.length - visibleCount) {
+          return 0;
+        }
+        return prevIndex + 1;
+      });
+    }, 3000); // 每3秒切换一次
 
     return () => clearInterval(timer);
-  }, [news.length]);
+  }, [newsItems.length, visibleCount]);
 
-  const nextNews = () => {
-    setCurrentIndex((prev) => (prev + 1) % news.length);
+  const handleNewsClick = (url: string) => {
+    window.open(url, '_blank');
   };
 
-  const prevNews = () => {
-    setCurrentIndex((prev) => (prev - 1 + news.length) % news.length);
-  };
+  if (!show) return null;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-semibold text-gray-900">跨境快讯</h3>
-        <a 
-          href="https://cheetahgo.cmcm.com/zixun/all" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-xs text-blue-600 hover:text-blue-800 flex items-center"
-        >
-          更多
-          <ExternalLink className="w-3 h-3 ml-1" />
-        </a>
+    <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 mb-6">
+      <div className="flex items-center mb-3">
+        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-bold text-gray-900">新闻资讯</h3>
       </div>
       
-      <div className="relative h-16 overflow-hidden">
-        <div 
-          className="transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateY(-${currentIndex * 100}%)` }}
-        >
-          {news.map((item, index) => (
-            <div key={index} className="h-16 flex-shrink-0">
-              <a 
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block hover:bg-gray-50 p-2 rounded transition-colors h-full"
+      <div className="flex">
+        <div className="flex-1 relative overflow-hidden" style={{ height: `${visibleCount * itemHeight}px` }}>
+          <div 
+            className="transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateY(-${currentIndex * itemHeight}px)` }}
+          >
+            {newsItems.map((item, index) => (
+              <div
+                key={index}
+                className="h-12 flex items-center cursor-pointer group py-2"
+                onClick={() => handleNewsClick(item.url)}
               >
-                <div className="text-xs text-gray-900 line-clamp-2 mb-1 leading-tight">
-                  {item.title}
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">
+                    {item.title}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {item.date}
+                  </div>
                 </div>
-                <div className="text-xs text-gray-600">
-                  {item.date}
+                <div className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
                 </div>
-              </a>
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
         
-        {/* 轮播控制按钮 */}
-        <button
-          onClick={prevNews}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white shadow-sm rounded-full p-1 transition-all"
-        >
-          <ChevronUp className="w-3 h-3 text-gray-600" />
-        </button>
-        <button
-          onClick={nextNews}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white shadow-sm rounded-full p-1 transition-all"
-        >
-          <ChevronDown className="w-3 h-3 text-gray-600" />
-        </button>
-      </div>
-      
-      {/* 轮播指示器 */}
-      <div className="flex justify-center mt-2 space-x-1">
-        {news.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-1.5 h-1.5 rounded-full transition-all ${
-              index === currentIndex ? 'bg-blue-500' : 'bg-gray-300'
-            }`}
-          />
-        ))}
+        <div className="ml-4 flex flex-col space-y-1 justify-center">
+          {newsItems.map((_, index) => (
+            <div
+              key={index}
+              className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                index === currentIndex ? 'bg-blue-500' : 'bg-gray-300'
+              }`}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

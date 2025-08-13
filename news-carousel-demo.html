@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻轮播新布局演示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .line-clamp-1 {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="text-center mb-8 fade-in-up">
+                <h1 class="text-3xl font-bold text-gray-900 mb-4">📰 新闻轮播新布局</h1>
+                <p class="text-gray-600">纵向进度条 + 一次性展示多条新闻</p>
+            </div>
+
+            <!-- 新闻轮播组件 -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-4 mb-8 fade-in-up">
+                <div class="flex items-center mb-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900">新闻资讯</h3>
+                </div>
+                
+                <div class="flex">
+                    <div class="flex-1 relative h-48 overflow-hidden">
+                        <div class="transition-transform duration-500 ease-in-out" style="transform: translateY(0px);">
+                            <div class="h-12 flex items-center cursor-pointer group py-2">
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">
+                                        猎豹移动宣布控股UFACTORY
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        2025-07-28
+                                    </div>
+                                </div>
+                                <div class="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <div class="h-12 flex items-center cursor-pointer group py-2">
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">
+                                        猎户星空语音交互机器人上岗SAP中国研究院
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        2025-07-16
+                                    </div>
+                                </div>
+                                <div class="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <div class="h-12 flex items-center cursor-pointer group py-2">
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">
+                                        喜讯！猎豹旗下聚云科技与极狐GitLab达成战略合作
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        2025-07-16
+                                    </div>
+                                </div>
+                                <div class="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <div class="h-12 flex items-center cursor-pointer group py-2">
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">
+                                        祝贺！猎豹旗下聚云科技荣膺亚马逊云科技核心级合作伙伴
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        2025-07-08
+                                    </div>
+                                </div>
+                                <div class="ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ml-4 flex flex-col space-y-1 justify-center">
+                        <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 功能说明 -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 fade-in-up">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">✨ 布局优化</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">📊 进度条对齐</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• 进度条与新闻内容垂直对齐</li>
+                            <li>• 减少标题上方空间</li>
+                            <li>• 整体布局更加协调</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">🎯 空间优化</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• 减少内边距，更紧凑</li>
+                            <li>• 删除全球时间板块</li>
+                            <li>• 专注核心功能展示</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟新闻轮播动画
+        let currentNewsIndex = 0;
+        const newsItems = [
+            "猎豹移动宣布控股UFACTORY",
+            "猎户星空语音交互机器人上岗SAP中国研究院", 
+            "喜讯！猎豹旗下聚云科技与极狐GitLab达成战略合作",
+            "祝贺！猎豹旗下聚云科技荣膺亚马逊云科技核心级合作伙伴",
+            "傅盛：机器人行业的\"非共识\"实践",
+            "猎户星空大模型发布！傅盛：企业应用百亿参数就够了",
+            "傅盛在央视财经解密Sora：AI如何复刻人类推理和直觉？",
+            "《财经》专访傅盛：开启企业私有化大模型新纪元"
+        ];
+        
+        function updateNewsCarousel() {
+            const container = document.querySelector('.transition-transform');
+            const dots = document.querySelectorAll('.w-2.h-2.rounded-full');
+            const visibleCount = 4; // 显示4条新闻
+            
+            // 更新轮播内容
+            container.style.transform = `translateY(-${currentNewsIndex * 48}px)`;
+            
+            // 更新指示器
+            dots.forEach((dot, index) => {
+                if (index === currentNewsIndex) {
+                    dot.classList.remove('bg-gray-300');
+                    dot.classList.add('bg-blue-500');
+                } else {
+                    dot.classList.remove('bg-blue-500');
+                    dot.classList.add('bg-gray-300');
+                }
+            });
+            
+            // 当到达最后一组时，重置到开始位置，确保无缝循环
+            if (currentNewsIndex >= newsItems.length - visibleCount) {
+                currentNewsIndex = 0;
+            } else {
+                currentNewsIndex = (currentNewsIndex + 1);
+            }
+        }
+        
+        // 每3秒切换新闻
+        setInterval(updateNewsCarousel, 3000);
+    </script>
+</body>
+</html>

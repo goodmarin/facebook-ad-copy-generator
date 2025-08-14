@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蓝白主题测试 - 爆款文案生成器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e1 50%, #94a3b8 75%, #64748b 100%);
+            background-attachment: fixed;
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .input-field {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="card rounded-2xl p-8 mb-8">
+                <h1 class="text-3xl font-bold text-center text-slate-800 mb-8">🎨 蓝白主题测试页面</h1>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 主题预览 -->
+                    <div class="space-y-4">
+                        <h2 class="text-xl font-semibold text-slate-700 mb-4">✨ 新主题特色</h2>
+                        <ul class="space-y-2 text-slate-600">
+                            <li>• 🌊 蓝白渐变背景，简洁大方</li>
+                            <li>• 💎 毛玻璃效果卡片</li>
+                            <li>• 🔵 蓝色主题按钮</li>
+                            <li>• 📝 深色文字，高对比度</li>
+                            <li>• ✨ 蓝色粒子动画</li>
+                        </ul>
+                    </div>
+
+                    <!-- 组件预览 -->
+                    <div class="space-y-4">
+                        <h2 class="text-xl font-semibold text-slate-700 mb-4">🎯 组件预览</h2>
+                        
+                        <!-- 按钮预览 -->
+                        <div class="space-y-2">
+                            <button class="btn-primary px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300 hover:transform hover:translateY(-2px)">
+                                主要按钮
+                            </button>
+                            <button class="px-6 py-3 rounded-xl font-semibold bg-white/80 border border-blue-200 text-slate-700 transition-all duration-300 hover:bg-blue-50">
+                                次要按钮
+                            </button>
+                        </div>
+
+                        <!-- 输入框预览 -->
+                        <div class="space-y-2">
+                            <input type="text" placeholder="输入框示例" class="input-field w-full px-4 py-3 rounded-xl outline-none transition-all duration-300">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 颜色对比 -->
+                <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-lg text-center">
+                        <div class="w-8 h-8 bg-slate-100 rounded mx-auto mb-2"></div>
+                        <span class="text-sm text-slate-600">浅灰</span>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg text-center">
+                        <div class="w-8 h-8 bg-blue-100 rounded mx-auto mb-2"></div>
+                        <span class="text-sm text-slate-600">浅蓝</span>
+                    </div>
+                    <div class="bg-slate-200 p-4 rounded-lg text-center">
+                        <div class="w-8 h-8 bg-slate-300 rounded mx-auto mb-2"></div>
+                        <span class="text-sm text-slate-600">中灰</span>
+                    </div>
+                    <div class="bg-blue-200 p-4 rounded-lg text-center">
+                        <div class="w-8 h-8 bg-blue-300 rounded mx-auto mb-2"></div>
+                        <span class="text-sm text-slate-600">中蓝</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 测试链接 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <a href="http://localhost:5173/" 
+                   class="card p-6 text-center hover:transform hover:translateY(-2px) transition-all duration-300">
+                    <h3 class="text-lg font-semibold text-slate-700 mb-2">🚀 访问主站</h3>
+                    <p class="text-slate-600 text-sm">查看完整的蓝白主题效果</p>
+                </a>
+                <a href="http://localhost:5173/facebook-ad-copy-generator/" 
+                   class="card p-6 text-center hover:transform hover:translateY(-2px) transition-all duration-300">
+                    <h3 class="text-lg font-semibold text-slate-700 mb-2">🎯 文案生成器</h3>
+                    <p class="text-slate-600 text-sm">体验新的界面设计</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🎨 蓝白主题测试页面加载完成');
+        console.log('✨ 新主题特点：简洁、专业、易读');
+    </script>
+</body>
+</html>

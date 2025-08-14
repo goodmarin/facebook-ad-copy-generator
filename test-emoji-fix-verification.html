@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji修复验证测试 - 更新版</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            background: #f0f8ff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007acc;
+        }
+        .error {
+            background: #fff0f0;
+            border-left-color: #ff4444;
+        }
+        .success {
+            background: #f0fff0;
+            border-left-color: #44ff44;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .emoji-display {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Emoji修复验证测试 - 更新版</h1>
+    
+    <div class="test-section">
+        <h2>测试1: 快速模式文案模板</h2>
+        <p>测试快速模式下日本文案模板的emoji显示：</p>
+        <button onclick="testJapaneseTemplates()">测试日本文案模板</button>
+        <div id="japanese-test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>测试2: cleanEmojis函数</h2>
+        <p>测试cleanEmojis函数是否正确保留安全的emoji：</p>
+        <button onclick="testCleanEmojis()">测试cleanEmojis函数</button>
+        <div id="clean-emoji-test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>测试3: 字符安全验证</h2>
+        <p>测试新的字符安全验证功能：</p>
+        <button onclick="testCharacterSafety()">测试字符安全验证</button>
+        <div id="character-safety-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>测试4: 符号显示</h2>
+        <p>测试各种符号是否正确显示：</p>
+        <div class="emoji-display">
+            ✨ 🔥 💪 🚀 💎 🔥 ◆ ◇ ■ □ ▲ △ ▶ ▷ ● ○ ★ ☆
+        </div>
+        <div id="symbol-test-result"></div>
+    </div>
+
+    <script>
+        // 模拟cleanEmojis函数（修复后的版本）
+        function cleanEmojis(text) {
+            if (!text) return '';
+            
+            let cleanedText = text;
+            
+            // 第一轮：移除替换字符（真正的乱码）
+            cleanedText = cleanedText.replace(/[\uFFFD\uFFFE\uFFFF]/g, '');
+            
+            // 第二轮：移除孤立的Unicode代理对
+            cleanedText = cleanedText.replace(/[\uD800-\uDFFF](?![\uDC00-\uDFFF])/g, '');
+            cleanedText = cleanedText.replace(/(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
+            
+            // 第三轮：移除控制字符（除了换行符和制表符）
+            cleanedText = cleanedText.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '');
+            
+            // 第四轮：移除零宽字符
+            cleanedText = cleanedText.replace(/[\u200B-\u200D\uFEFF]/g, '');
+            
+            // 第五轮：移除可能有问题的几何图形符号，但保留安全的符号
+            cleanedText = cleanedText.replace(/[\u25A0-\u25FF]/g, char => {
+                const safeGeometricSymbols = ['◆', '◇', '■', '□', '▲', '△', '▶', '▷', '●', '○', '★', '☆'];
+                return safeGeometricSymbols.includes(char) ? char : '';
+            });
+            
+            // 第六轮：移除可能有问题的符号，但保留安全的符号
+            cleanedText = cleanedText.replace(/[\u2600-\u26FF]/g, char => {
+                const safeSymbols = ['⭐', '🌟', '💫', '⚡', '⚪', '⚫'];
+                return safeSymbols.includes(char) ? char : '';
+            });
+            
+            // 第七轮：智能emoji清理 - 只保留安全的emoji
+            cleanedText = cleanedText.replace(/[\u{1F000}-\u{1FFFF}]/gu, char => {
+                return isSafeEmoji(char) ? char : '';
+            });
+            
+            // 第八轮：清理多余的空格（保留换行符以维持文案结构）
+            cleanedText = cleanedText.replace(/[ \t]+/g, ' ').trim();
+            
+            return cleanedText;
+        }
+
+        // 验证emoji是否安全的函数
+        function isSafeEmoji(char) {
+            const safeEmojiRanges = [
+                [0x1F600, 0x1F64F], // 表情符号
+                [0x1F300, 0x1F5FF], // 杂项符号和象形文字
+                [0x1F680, 0x1F6FF], // 交通和地图符号
+                [0x1F1E0, 0x1F1FF], // 区域指示符号
+                [0x2600, 0x26FF],   // 杂项符号
+                [0x2700, 0x27BF],   // 装饰符号
+                [0xFE00, 0xFE0F],   // 变体选择器
+                [0x1F900, 0x1F9FF], // 补充符号和象形文字
+                [0x1F018, 0x1F270], // 封闭字母数字补充
+                [0x2B00, 0x2BFF],   // 杂项符号和箭头 (包含⭐ U+2B50)
+                [0x2300, 0x23FF],   // 技术符号
+                [0x2000, 0x206F],   // 通用标点
+                [0x2100, 0x214F],   // 字母类符号
+                [0x2190, 0x21FF],   // 箭头
+                [0x2200, 0x22FF],   // 数学运算符
+                [0x25A0, 0x25FF],   // 几何图形
+            ];
+            
+            const codePoint = char.codePointAt(0);
+            if (!codePoint) return false;
+            
+            return safeEmojiRanges.some(([start, end]) => codePoint >= start && codePoint <= end);
+        }
+
+        // 🔥 新增：确保所有字符都能正常显示的函数
+        function ensureDisplayableCharacters(text) {
+            if (!text) return '';
+            
+            let safeText = '';
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                
+                // 检查字符是否安全
+                if (isCharSafe(char)) {
+                    safeText += char;
+                } else {
+                    // 如果字符不安全，尝试找到安全的替代品
+                    const replacement = getSafeReplacement(char);
+                    safeText += replacement;
+                    console.log(`⚠️ 替换不安全的字符: "${char}" -> "${replacement}"`);
+                }
+            }
+            
+            return safeText;
+        }
+
+        // 检查单个字符是否安全
+        function isCharSafe(char) {
+            // 基本ASCII字符（英文、数字、标点）
+            if (char.charCodeAt(0) < 128) return true;
+            
+            // 安全的emoji
+            if (isSafeEmoji(char)) return true;
+            
+            // 安全的几何符号
+            const safeGeometricSymbols = ['◆', '◇', '■', '□', '▲', '△', '▶', '▷', '●', '○', '★', '☆'];
+            if (safeGeometricSymbols.includes(char)) return true;
+            
+            // 安全的其他符号
+            const safeOtherSymbols = ['⭐', '🌟', '💫', '⚡', '⚪', '⚫'];
+            if (safeOtherSymbols.includes(char)) return true;
+            
+            // 日文字符范围
+            const japaneseRanges = [
+                [0x3040, 0x309F], // 平假名
+                [0x30A0, 0x30FF], // 片假名
+                [0x4E00, 0x9FFF], // 汉字
+                [0xFF00, 0xFFEF], // 全角字符
+            ];
+            
+            const codePoint = char.codePointAt(0);
+            if (codePoint) {
+                for (const [start, end] of japaneseRanges) {
+                    if (codePoint >= start && codePoint <= end) return true;
+                }
+            }
+            
+            // 韩文字符范围
+            const koreanRanges = [
+                [0xAC00, 0xD7AF], // 谚文
+            ];
+            
+            if (codePoint) {
+                for (const [start, end] of koreanRanges) {
+                    if (codePoint >= start && codePoint <= end) return true;
+                }
+            }
+            
+            return false;
+        }
+
+        // 获取安全的字符替代品
+        function getSafeReplacement(char) {
+            // 定义字符替换映射
+            const replacements = {
+                '⭐': '🔥',  // 星形符号 -> 火焰
+                '🌟': '✨',  // 星形符号 -> 闪烁
+                '💫': '✨',  // 星形符号 -> 闪烁
+                '⚡': '🔥',  // 闪电 -> 火焰
+                '⚪': '●',   // 白色圆圈 -> 黑色圆圈
+                '⚫': '●',   // 黑色圆圈 -> 黑色圆圈
+                '◆': '✨',  // 黑色菱形 -> 闪烁
+                '◇': '✨',  // 白色菱形 -> 闪烁
+                '■': '●',   // 黑色方块 -> 黑色圆圈
+                '□': '●',   // 白色方块 -> 黑色圆圈
+                '▲': '▲',   // 黑色三角形 -> 保留
+                '△': '△',   // 白色三角形 -> 保留
+                '▶': '▶',   // 黑色右三角 -> 保留
+                '▷': '▷',   // 白色右三角 -> 保留
+                '': '✨',   // 替换字符 -> 闪烁
+            };
+            
+            return replacements[char] || '✨'; // 默认替换为闪烁符号
+        }
+
+        // 测试日本文案模板
+        function testJapaneseTemplates() {
+            const templates = [
+                '✨ 数码配件で人生を変えよう！高品质 兼容性强 时尚设计 实用功能、数码爱好者 3C 用户のために設計されました。テクノロジーとライフスタイルの完璧な融合を体験しよう！',
+                '🔥 数码配件の独特な魅力を発見！高品质 兼容性强 时尚设计 实用功能で数码爱好者 3C 用户の中で際立とう。期間限定オファー、お見逃しなく！',
+                '💪 人気商品！数码配件は高品质 兼容性强 时尚设计 实用功能で数码爱好者 3C 用户の第一選択肢に。今すぐ特別割引をゲット！'
+            ];
+
+            const resultDiv = document.getElementById('japanese-test-result');
+            let html = '<h3>测试结果：</h3>';
+
+            templates.forEach((template, index) => {
+                const cleaned = cleanEmojis(template);
+                const hasReplacementChar = cleaned.includes('');
+                const status = hasReplacementChar ? '❌ 失败' : '✅ 成功';
+                const statusClass = hasReplacementChar ? 'error' : 'success';
+
+                html += `
+                    <div class="test-result ${statusClass}">
+                        <strong>文案 ${index + 1}:</strong> ${status}<br>
+                        <strong>原始文案:</strong> ${template}<br>
+                        <strong>清理后文案:</strong> ${cleaned}<br>
+                        <strong>包含替换字符:</strong> ${hasReplacementChar ? '是' : '否'}
+                    </div>
+                `;
+            });
+
+            resultDiv.innerHTML = html;
+        }
+
+        // 测试cleanEmojis函数
+        function testCleanEmojis() {
+            const testCases = [
+                '✨ 正常emoji',
+                '🔥 火焰emoji',
+                '💪 肌肉emoji',
+                '◆ 黑色菱形',
+                '◇ 白色菱形',
+                '■ 黑色方块',
+                '□ 白色方块',
+                '▲ 黑色三角形',
+                '△ 白色三角形',
+                '▶ 黑色右三角',
+                '▷ 白色右三角',
+                '● 黑色圆形',
+                '○ 白色圆形',
+                '★ 黑色星形',
+                '☆ 白色星形'
+            ];
+
+            const resultDiv = document.getElementById('clean-emoji-test-result');
+            let html = '<h3>测试结果：</h3>';
+
+            testCases.forEach(testCase => {
+                const cleaned = cleanEmojis(testCase);
+                const hasReplacementChar = cleaned.includes('');
+                const status = hasReplacementChar ? '❌ 失败' : '✅ 成功';
+                const statusClass = hasReplacementChar ? 'error' : 'success';
+
+                html += `
+                    <div class="test-result ${statusClass}">
+                        <strong>测试用例:</strong> ${testCase}<br>
+                        <strong>清理结果:</strong> ${cleaned}<br>
+                        <strong>状态:</strong> ${status}
+                    </div>
+                `;
+            });
+
+            resultDiv.innerHTML = html;
+        }
+
+        // 测试字符安全验证
+        function testCharacterSafety() {
+            const testCases = [
+                '✨ 正常emoji',
+                '🔥 火焰emoji',
+                '💪 肌肉emoji',
+                '◆ 黑色菱形',
+                '◇ 白色菱形',
+                '■ 黑色方块',
+                '□ 白色方块',
+                '▲ 黑色三角形',
+                '△ 白色三角形',
+                '▶ 黑色右三角',
+                '▷ 白色右三角',
+                '● 黑色圆形',
+                '○ 白色圆形',
+                '★ 黑色星形',
+                '☆ 白色星形',
+                '⭐ 星形符号（将被替换）',
+                '🌟 星形符号（将被替换）',
+                '💫 星形符号（将被替换）',
+                '⚡ 闪电符号（将被替换）',
+                '⚪ 白色圆圈（将被替换）',
+                '⚫ 黑色圆圈（将被替换）'
+            ];
+
+            const resultDiv = document.getElementById('character-safety-result');
+            let html = '<h3>字符安全验证测试结果：</h3>';
+
+            testCases.forEach(testCase => {
+                const step1 = cleanEmojis(testCase);
+                const step2 = ensureDisplayableCharacters(step1);
+                const hasReplacementChar = step2.includes('');
+                const status = hasReplacementChar ? '❌ 失败' : '✅ 成功';
+                const statusClass = hasReplacementChar ? 'error' : 'success';
+
+                html += `
+                    <div class="test-result ${statusClass}">
+                        <strong>测试用例:</strong> ${testCase}<br>
+                        <strong>步骤1 - cleanEmojis:</strong> ${step1}<br>
+                        <strong>步骤2 - 字符安全验证:</strong> ${step2}<br>
+                        <strong>状态:</strong> ${status}
+                    </div>
+                `;
+            });
+
+            resultDiv.innerHTML = html;
+        }
+
+        // 页面加载完成后自动运行测试
+        window.onload = function() {
+            console.log('🚀 开始emoji修复验证测试...');
+            testJapaneseTemplates();
+            testCleanEmojis();
+            testCharacterSafety();
+        };
+    </script>
+</body>
+</html>

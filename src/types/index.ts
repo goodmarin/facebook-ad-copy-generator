@@ -76,4 +76,34 @@ export interface EffectPredictionResponse {
       content: string;
     };
   }>;
+}
+
+// 语言生成重试状态接口
+export interface LanguageRetryAttempt {
+  attempt: number;
+  language: string;
+  success: boolean;
+  errorMessage?: string;
+}
+
+// 语言生成结果接口
+export interface LanguageGenerationResult {
+  copies: string[];
+  finalLanguage: string;
+  retryHistory: LanguageRetryAttempt[];
+  fallbackToEnglish: boolean;
+}
+
+// 缓存条目接口
+export interface CacheEntry {
+  key: string;
+  data: Array<{text: string, region: string, regionName: string}>;
+  timestamp: number;
+  expiry: number; // 过期时间戳
+}
+
+// 缓存配置接口
+export interface CacheConfig {
+  maxEntries: number;
+  ttl: number; // 生存时间(毫秒)
 } 

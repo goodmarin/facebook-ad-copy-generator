@@ -16,42 +16,42 @@ export const NewsCarousel: React.FC<NewsCarouselProps> = ({ show = true }) => {
     {
       title: "猎豹移动宣布控股UFACTORY",
       date: "2025-07-28",
-      url: "https://www.cmcm.com/zh-CN/cm-news"
+      url: "https://www.cmcm.com/zh-CN/cm-news/aff2f1d06b9c11f0a4dce97112b7e54e"
     },
     {
       title: "猎户星空语音交互机器人上岗SAP中国研究院",
       date: "2025-07-16",
-      url: "https://www.cmcm.com/zh-CN/cm-news"
+      url: "https://www.cmcm.com/zh-CN/cm-news/eac07890620b11f0a95dd35758408ee0"
     },
     {
       title: "喜讯！猎豹旗下聚云科技与极狐GitLab达成战略合作",
       date: "2025-07-16",
-      url: "https://www.cmcm.com/zh-CN/cm-news"
+      url: "https://www.cmcm.com/zh-CN/cm-news/35058fb0620911f0b5fb2154be146e63"
     },
     {
       title: "祝贺！猎豹旗下聚云科技荣膺亚马逊云科技核心级合作伙伴",
       date: "2025-07-08",
-      url: "https://www.cmcm.com/zh-CN/cm-news"
+      url: "https://www.cmcm.com/zh-CN/cm-news/32f98e005bb111f0951b415d004e2a4b"
     },
     {
       title: "傅盛：机器人行业的\"非共识\"实践",
       date: "2025-06-09",
-      url: "https://www.cmcm.com/zh-CN/cm-news"
+      url: "https://www.cmcm.com/zh-CN/cm-news/3700fe00451f11f0bbc035dab960a19a"
     },
     {
       title: "猎户星空大模型发布！傅盛：企业应用百亿参数就够了",
       date: "2024-01-23",
-      url: "https://www.cmcm.com/zh-CN/cm-news"
+      url: "https://www.cmcm.com/zh-CN/cm-news/d31b9cb0b99211ee919baf2a0011ad63"
     },
     {
       title: "傅盛在央视财经解密Sora：AI如何复刻人类推理和直觉？",
       date: "2024-03-01",
-      url: "https://www.cmcm.com/zh-CN/cm-news"
+      url: "https://www.cmcm.com/zh-CN/cm-news/a9152f40d7be11ee891f5f35df119b60"
     },
     {
       title: "《财经》专访傅盛：开启企业私有化大模型新纪元",
       date: "2024-03-01",
-      url: "https://www.cmcm.com/zh-CN/cm-news"
+      url: "https://www.cmcm.com/zh-CN/cm-news/98f8c340d7bb11ee9fc2b5783cd7cde2"
     }
   ]);
 

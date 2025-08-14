@@ -75,7 +75,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
   return (
     <nav className={`flex items-center justify-end w-full ${className}`}>
       {/* 所有菜单项右对齐 */}
-      <div className="flex items-center space-x-8">
+      <div className="flex items-center space-x-8 px-6 py-3">
         {menuItems.map((item) => (
           <div
             key={item.label}
@@ -84,7 +84,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
             onMouseLeave={handleMouseLeave}
           >
             <div className="flex items-center space-x-1 cursor-pointer group">
-              <span className="text-gray-800 hover:text-blue-600 transition-colors font-medium font-semibold">
+              <span className="text-white hover:text-orange-100 transition-colors font-medium font-semibold">
                 {item.url ? (
                   <a href={item.url} target="_blank" rel="noopener noreferrer">
                     {item.label}
@@ -94,7 +94,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
                 )}
               </span>
               {item.children && (
-                <ChevronDown className="w-4 h-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
+                <ChevronDown className="w-4 h-4 text-white group-hover:text-orange-100 transition-colors" />
               )}
             </div>
             
@@ -107,7 +107,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
                     href={child.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 ease-in-out transform hover:translate-x-1"
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 ease-in-out transform hover:translate-x-1"
                   >
                     <span>{child.label}</span>
                   </a>
@@ -122,7 +122,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
           href="https://advertiser.cheetahgo.cmcm.com/login/register?s_channel=6rA2Pqzk&source=e1qmXBp9" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-gray-800 hover:text-blue-600 font-medium font-semibold transition-colors"
+          className="text-white hover:text-orange-100 font-medium font-semibold transition-colors"
         >
           立即开户
         </a>
@@ -130,7 +130,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
           href="https://cheetahgo.cmcm.com/" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-gray-800 hover:text-blue-600 font-medium font-semibold transition-colors"
+          className="text-white hover:text-orange-100 font-medium font-semibold transition-colors"
         >
           猎豹学院
         </a>

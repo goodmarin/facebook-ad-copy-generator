@@ -26,7 +26,6 @@ function App() {
   const [regionSearchTerm, setRegionSearchTerm] = useState('');
   const [policyCheckResult, setPolicyCheckResult] = useState<PolicyCheckResult | null>(null);
   const [fastMode, _setFastMode] = useState(false); // 快速模式
-  const [showRegionError, setShowRegionError] = useState(false); // 控制投放地区错误提示显示
 
   // 根据地区获取语言和文案风格
   const getLanguageAndStyle = (region: string) => {
@@ -41,10 +40,6 @@ function App() {
       'VN': { language: 'Tiếng Việt', style: 'direct and value-conscious', culture: 'emphasize family and education' },
       'ID': { language: 'Bahasa Indonesia', style: 'friendly and community-oriented', culture: 'emphasize social connection' },
       'PH': { language: 'English', style: 'warm and family-oriented', culture: 'emphasize family values and community' },
-      'MM': { language: 'မြန်မာဘာသာ', style: 'respectful and traditional', culture: 'emphasize family values and Buddhist culture' },
-      'KH': { language: 'ភាសាខ្មែរ', style: 'polite and family-oriented', culture: 'emphasize family harmony and traditional values' },
-      'LA': { language: 'ພາສາລາວ', style: 'gentle and community-focused', culture: 'emphasize community and Buddhist traditions' },
-      'BN': { language: 'Bahasa Melayu', style: 'formal and respectful', culture: 'emphasize tradition and Islamic values' },
       'TW': { language: '繁體中文', style: '精緻優雅，注重品質', culture: '注重細節和品質追求' },
       'HK': { language: '繁體中文', style: '時尚前衛，追求卓越', culture: '注重效率和品質' },
       'CA': { language: 'English', style: 'inclusive and diverse', culture: 'emphasize multiculturalism and quality of life' },
@@ -58,74 +53,7 @@ function App() {
       'AU': { language: 'English', style: 'laid-back and friendly', culture: 'emphasize lifestyle and outdoor activities' },
       'NZ': { language: 'English', style: 'adventure-seeking and natural', culture: 'emphasize nature and sustainability' },
       'BR': { language: 'Português', style: 'warm and social', culture: 'emphasize family and celebration' },
-      'AR': { language: 'Español', style: 'passionate and expressive', culture: 'emphasize family and social life' },
-      // 欧洲其他地区
-      'BE': { language: 'Nederlands', style: 'practical and quality-focused', culture: 'emphasize efficiency and tradition' },
-      'CH': { language: 'Deutsch', style: 'precise and reliable', culture: 'emphasize quality and precision' },
-      'AT': { language: 'Deutsch', style: 'traditional and quality-focused', culture: 'emphasize heritage and reliability' },
-      'SE': { language: 'Svenska', style: 'modern and sustainable', culture: 'emphasize innovation and environmental consciousness' },
-      'NO': { language: 'Norsk', style: 'natural and adventurous', culture: 'emphasize outdoor lifestyle and quality' },
-      'DK': { language: 'Dansk', style: 'hygge and practical', culture: 'emphasize comfort and functionality' },
-      'FI': { language: 'Suomi', style: 'simple and reliable', culture: 'emphasize quality and nature' },
-      'PL': { language: 'Polski', style: 'traditional and family-oriented', culture: 'emphasize family values and tradition' },
-      'CZ': { language: 'Čeština', style: 'practical and quality-focused', culture: 'emphasize craftsmanship and reliability' },
-      'HU': { language: 'Magyar', style: 'proud and traditional', culture: 'emphasize heritage and family values' },
-      'RO': { language: 'Română', style: 'warm and family-oriented', culture: 'emphasize family and tradition' },
-      'BG': { language: 'Български', style: 'traditional and respectful', culture: 'emphasize family and cultural heritage' },
-      'HR': { language: 'Hrvatski', style: 'warm and family-focused', culture: 'emphasize family and Mediterranean lifestyle' },
-      'SI': { language: 'Slovenščina', style: 'practical and quality-conscious', culture: 'emphasize efficiency and nature' },
-      'SK': { language: 'Slovenčina', style: 'traditional and family-oriented', culture: 'emphasize family values and tradition' },
-      'LT': { language: 'Lietuvių', style: 'proud and traditional', culture: 'emphasize heritage and family values' },
-      'LV': { language: 'Latviešu', style: 'practical and nature-loving', culture: 'emphasize nature and tradition' },
-      'EE': { language: 'Eesti', style: 'modern and efficient', culture: 'emphasize innovation and nature' },
-      'IE': { language: 'English', style: 'friendly and welcoming', culture: 'emphasize community and tradition' },
-      'PT': { language: 'Português', style: 'warm and traditional', culture: 'emphasize family and cultural heritage' },
-      'GR': { language: 'Ελληνικά', style: 'passionate and family-oriented', culture: 'emphasize family and Mediterranean culture' },
-      // 美洲其他地区
-      'CL': { language: 'Español', style: 'modern and progressive', culture: 'emphasize innovation and quality of life' },
-      'CO': { language: 'Español', style: 'warm and social', culture: 'emphasize family and social connection' },
-      'PE': { language: 'Español', style: 'traditional and family-oriented', culture: 'emphasize family and cultural heritage' },
-      'VE': { language: 'Español', style: 'passionate and expressive', culture: 'emphasize family and social life' },
-      'EC': { language: 'Español', style: 'diverse and family-focused', culture: 'emphasize family and natural beauty' },
-      'BO': { language: 'Español', style: 'traditional and community-oriented', culture: 'emphasize community and indigenous culture' },
-      'PY': { language: 'Español', style: 'warm and family-oriented', culture: 'emphasize family and tradition' },
-      'UY': { language: 'Español', style: 'progressive and family-friendly', culture: 'emphasize family and quality of life' },
-      'CR': { language: 'Español', style: 'peaceful and nature-loving', culture: 'emphasize nature and family values' },
-      'PA': { language: 'Español', style: 'modern and business-oriented', culture: 'emphasize efficiency and family' },
-      'GT': { language: 'Español', style: 'traditional and family-oriented', culture: 'emphasize family and Mayan heritage' },
-      'SV': { language: 'Español', style: 'warm and community-focused', culture: 'emphasize family and community' },
-      'HN': { language: 'Español', style: 'friendly and family-oriented', culture: 'emphasize family and tradition' },
-      'NI': { language: 'Español', style: 'warm and family-focused', culture: 'emphasize family and natural beauty' },
-      'DO': { language: 'Español', style: 'passionate and family-oriented', culture: 'emphasize family and Caribbean culture' },
-      'CU': { language: 'Español', style: 'passionate and cultural', culture: 'emphasize family and cultural heritage' },
-      'JM': { language: 'English', style: 'vibrant and family-oriented', culture: 'emphasize family and Caribbean culture' },
-      'TT': { language: 'English', style: 'diverse and family-friendly', culture: 'emphasize family and multiculturalism' },
-      'BB': { language: 'English', style: 'friendly and family-oriented', culture: 'emphasize family and Caribbean lifestyle' },
-      'GY': { language: 'English', style: 'diverse and family-focused', culture: 'emphasize family and multicultural heritage' },
-      'SR': { language: 'Nederlands', style: 'diverse and family-oriented', culture: 'emphasize family and multiculturalism' },
-      'GF': { language: 'Français', style: 'diverse and family-friendly', culture: 'emphasize family and multicultural values' },
-      // 其他地区
-      'ZA': { language: 'English', style: 'diverse and family-oriented', culture: 'emphasize family and multiculturalism' },
-      'EG': { language: 'العربية', style: 'traditional and family-oriented', culture: 'emphasize family and Islamic values' },
-      'SA': { language: 'العربية', style: 'traditional and respectful', culture: 'emphasize family and Islamic culture' },
-      'AE': { language: 'العربية', style: 'modern and family-oriented', culture: 'emphasize family and innovation' },
-      'QA': { language: 'العربية', style: 'traditional and family-focused', culture: 'emphasize family and Islamic values' },
-      'KW': { language: 'العربية', style: 'traditional and family-oriented', culture: 'emphasize family and Islamic culture' },
-      'BH': { language: 'العربية', style: 'traditional and family-focused', culture: 'emphasize family and Islamic values' },
-      'OM': { language: 'العربية', style: 'traditional and respectful', culture: 'emphasize family and Islamic culture' },
-      'JO': { language: 'العربية', style: 'traditional and family-oriented', culture: 'emphasize family and Islamic values' },
-      'LB': { language: 'العربية', style: 'diverse and family-focused', culture: 'emphasize family and multiculturalism' },
-      'IL': { language: 'עברית', style: 'innovative and family-oriented', culture: 'emphasize family and Jewish values' },
-      'TR': { language: 'Türkçe', style: 'warm and family-oriented', culture: 'emphasize family and Turkish culture' },
-      'IR': { language: 'فارسی', style: 'traditional and family-oriented', culture: 'emphasize family and Persian culture' },
-      'PK': { language: 'اردو', style: 'traditional and family-oriented', culture: 'emphasize family and Islamic values' },
-      'BD': { language: 'বাংলা', style: 'traditional and family-oriented', culture: 'emphasize family and Bengali culture' },
-      'LK': { language: 'සිංහල', style: 'traditional and family-oriented', culture: 'emphasize family and Buddhist culture' },
-      'NP': { language: 'नेपाली', style: 'traditional and family-oriented', culture: 'emphasize family and Hindu culture' },
-      'MV': { language: 'ދިވެހިބަހުން', style: 'traditional and family-oriented', culture: 'emphasize family and Islamic culture' },
-      'BT': { language: 'རྫོང་ཁ', style: 'traditional and family-oriented', culture: 'emphasize family and Buddhist culture' },
-      'MN': { language: 'Монгол', style: 'traditional and family-oriented', culture: 'emphasize family and nomadic culture' },
-      'KZ': { language: 'Қазақ', style: 'traditional and family-oriented', culture: 'emphasize family and Kazakh culture' }
+      'AR': { language: 'Español', style: 'passionate and expressive', culture: 'emphasize family and social life' }
     };
     return regionConfig[region] || regionConfig['US'];
   };
@@ -146,26 +74,9 @@ function App() {
 
         // 为每条文案添加地区信息
         const regionNames: { [key: string]: string } = {
-          // 热门地区
-          'US': '美国', 'JP': '日本', 'KR': '韩国', 'SG': '新加坡', 'MY': '马来西亚', 'TH': '泰国', 'VN': '越南',
-          // 东南亚
-          'ID': '印度尼西亚', 'PH': '菲律宾', 'MM': '缅甸', 'KH': '柬埔寨', 'LA': '老挝', 'BN': '文莱',
-          // 欧美地区
-          'GB': '英国', 'CA': '加拿大', 'DE': '德国', 'FR': '法国', 'IT': '意大利', 'ES': '西班牙', 'NL': '荷兰',
-          'BE': '比利时', 'CH': '瑞士', 'AT': '奥地利', 'SE': '瑞典', 'NO': '挪威', 'DK': '丹麦', 'FI': '芬兰',
-          'PL': '波兰', 'CZ': '捷克', 'HU': '匈牙利', 'RO': '罗马尼亚', 'BG': '保加利亚', 'HR': '克罗地亚',
-          'SI': '斯洛文尼亚', 'SK': '斯洛伐克', 'LT': '立陶宛', 'LV': '拉脱维亚', 'EE': '爱沙尼亚', 'IE': '爱尔兰', 'PT': '葡萄牙', 'GR': '希腊',
-          // 美洲地区
-          'MX': '墨西哥', 'BR': '巴西', 'AR': '阿根廷', 'CL': '智利', 'CO': '哥伦比亚', 'PE': '秘鲁', 'VE': '委内瑞拉',
-          'EC': '厄瓜多尔', 'BO': '玻利维亚', 'PY': '巴拉圭', 'UY': '乌拉圭', 'CR': '哥斯达黎加', 'PA': '巴拿马',
-          'GT': '危地马拉', 'SV': '萨尔瓦多', 'HN': '洪都拉斯', 'NI': '尼加拉瓜', 'DO': '多米尼加', 'CU': '古巴',
-          'JM': '牙买加', 'TT': '特立尼达和多巴哥', 'BB': '巴巴多斯', 'GY': '圭亚那', 'SR': '苏里南', 'GF': '法属圭亚那',
-          // 其他地区
-          'IN': '印度', 'TW': '台湾', 'HK': '香港', 'AU': '澳大利亚', 'NZ': '新西兰', 'ZA': '南非',
-          'EG': '埃及', 'SA': '沙特阿拉伯', 'AE': '阿联酋', 'QA': '卡塔尔', 'KW': '科威特', 'BH': '巴林',
-          'OM': '阿曼', 'JO': '约旦', 'LB': '黎巴嫩', 'IL': '以色列', 'TR': '土耳其', 'IR': '伊朗',
-          'PK': '巴基斯坦', 'BD': '孟加拉国', 'LK': '斯里兰卡', 'NP': '尼泊尔', 'MV': '马尔代夫', 'BT': '不丹',
-          'MN': '蒙古', 'KZ': '哈萨克斯坦'
+          'US': '美国', 'JP': '日本', 'KR': '韩国', 'IN': '印度', 'SG': '新加坡', 'MY': '马来西亚', 'TH': '泰国',
+          'VN': '越南', 'ID': '印度尼西亚', 'PH': '菲律宾', 'TW': '台湾', 'HK': '香港', 'CA': '加拿大', 'MX': '墨西哥', 'GB': '英国',
+          'DE': '德国', 'FR': '法国', 'IT': '意大利', 'ES': '西班牙', 'NL': '荷兰', 'AU': '澳大利亚', 'NZ': '新西兰', 'BR': '巴西', 'AR': '阿根廷'
         };
         const regionName = regionNames[region] || '全球';
         
@@ -209,182 +120,7 @@ function App() {
       
 
       
-      // 根据语言生成对应的提示词
-      let prompt;
-      if (language === '한국어') {
-        prompt = `당신은 한국어 Facebook 광고 카피라이터입니다. 제공된 제품 정보를 기반으로 3개의 Facebook 광고 카피를 작성하세요.
-
-중요 규칙:
-1. 모든 카피 내용을 100% 한국어로만 생성하세요
-2. 중국어 문자나 중국어 표현을 절대 사용하지 마세요
-3. 한국 문화 요소와 표현 습관을 포함하세요
-4. 한국어 문법과 어순을 정확히 사용하세요
-
-요구사항:
-1. 각 카피를 60단어 이내로 유지하고, 간결하고 강력하게 작성
-2. 적절한 이모지 추가 (😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨)
-3. 강력한 행동 촉구 포함
-4. Facebook 광고 정책을 준수하고 과장된 주장 피하기
-5. 타겟 오디언스와 지역에 최적화
-6. ${style} 스타일과 ${getPromotionText(productInfo.promotion)} 프로모션 방식 사용
-
-제품 정보:
-제품: ${translatedProduct.name}
-특징: ${translatedProduct.features}
-타겟: ${translatedProduct.audience}
-
-형식: Copy 1: [내용] | Copy 2: [내용] | Copy 3: [내용]`;
-      } else if (language === '日本語') {
-        prompt = `あなたは日本語のFacebook広告コピーライターです。提供された製品情報に基づいて3つのFacebook広告コピーを作成してください。
-
-重要規則：
-1. すべてのコピー内容を100%日本語でのみ生成してください
-2. 中国語文字や中国語表現を絶対に使用しないでください
-3. 日本の文化要素と表現習慣を含めてください
-4. 日本語の文法と語順を正確に使用してください
-
-要件：
-1. 各コピーを60語以内に保ち、簡潔で力強く作成
-2. 適切な絵文字を追加 (😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨)
-3. 強力な行動喚起を含める
-4. Facebook広告ポリシーを遵守し、誇張された主張を避ける
-5. ターゲットオーディエンスと地域に最適化
-6. ${style}スタイルと${getPromotionText(productInfo.promotion)}プロモーション方式を使用
-
-製品情報：
-製品：${translatedProduct.name}
-特徴：${translatedProduct.features}
-ターゲット：${translatedProduct.audience}
-
-形式：Copy 1: [内容] | Copy 2: [内容] | Copy 3: [内容]`;
-      } else if (language === 'ไทย') {
-        prompt = `คุณเป็นนักเขียนคัดลอกโฆษณา Facebook ที่สร้างสรรค์และเชี่ยวชาญในการสร้างเนื้อหาที่น่าสนใจและเน้นการแปลง 100% เนื้อหาภาษาไทยเท่านั้น ไม่ใช้ตัวอักษรจีน ใช้เฉพาะอิโมจิมาตรฐานที่รองรับอย่างกว้างขวาง (เช่น 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) และหลีกเลี่ยงอิโมจิที่ซับซ้อนหรือหายากที่อาจแสดงเป็นกล่องหรือเครื่องหมายคำถาม สร้างการเชื่อมต่อทางอารมณ์และรวมการเรียกร้องให้ดำเนินการที่น่าสนใจ ทำให้แต่ละคัดลอกไม่ซ้ำใครและน่าจดจำ
-
-สร้างโฆษณา Facebook 3 ชิ้นที่น่าสนใจในภาษาไทยสำหรับ:
-ผลิตภัณฑ์: ${translatedProduct.name}
-คุณสมบัติ: ${translatedProduct.features}
-กลุ่มเป้าหมาย: ${translatedProduct.audience}
-สไตล์: ${style}
-โปรโมชั่น: ${getPromotionText(productInfo.promotion)}
-
-ข้อกำหนด:
-- 100% ภาษาไทย ไม่มีตัวอักษรจีน
-- 120-180 ตัวอักษรต่อชิ้น
-- ใช้เฉพาะอิโมจิมาตรฐานที่รองรับอย่างกว้างขวาง
-- หลีกเลี่ยงอิโมจิที่ซับซ้อนหรือหายาก
-- ใช้ทริกเกอร์ทางอารมณ์และการเรียกร้องให้ดำเนินการที่น่าสนใจ
-- ทำให้น่าสนใจ สร้างสรรค์และเน้นการแปลง
-- รูปแบบ: Copy 1: [เนื้อหา] | Copy 2: [เนื้อหา] | Copy 3: [เนื้อหา]`;
-      } else if (language === 'Tiếng Việt') {
-        prompt = `Bạn là một copywriter quảng cáo Facebook sáng tạo chuyên về nội dung hấp dẫn và tập trung vào chuyển đổi. Tạo 100% nội dung tiếng Việt, không sử dụng ký tự tiếng Trung. Chỉ sử dụng emoji tiêu chuẩn được hỗ trợ rộng rãi (như 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) và tránh emoji phức tạp hoặc hiếm có thể hiển thị dưới dạng hộp hoặc dấu hỏi. Tạo kết nối cảm xúc và bao gồm lời kêu gọi hành động hấp dẫn. Làm cho mỗi bản sao độc đáo và đáng nhớ.
-
-Tạo 3 bản sao quảng cáo Facebook hấp dẫn bằng tiếng Việt cho:
-Sản phẩm: ${translatedProduct.name}
-Tính năng: ${translatedProduct.features}
-Đối tượng: ${translatedProduct.audience}
-Phong cách: ${style}
-Khuyến mãi: ${getPromotionText(productInfo.promotion)}
-
-Yêu cầu:
-- 100% tiếng Việt, không có ký tự tiếng Trung
-- 120-180 ký tự mỗi bản sao
-- Chỉ sử dụng emoji tiêu chuẩn được hỗ trợ rộng rãi
-- Tránh emoji phức tạp hoặc hiếm
-- Sử dụng kích hoạt cảm xúc và lời kêu gọi hành động hấp dẫn
-- Làm cho nó hấp dẫn, sáng tạo và tập trung vào chuyển đổi
-- Định dạng: Copy 1: [nội dung] | Copy 2: [nội dung] | Copy 3: [nội dung]`;
-      } else if (language === '繁體中文') {
-        prompt = `你是一位專門從事吸引人且注重轉換的內容的創意Facebook廣告文案撰寫者。生成100%繁體中文內容，不使用簡體中文字符。僅使用標準且廣泛支持的emoji（如😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨），避免可能顯示為方框或問號的複雜或罕見emoji。創造情感連接並包含引人注目的行動呼籲。讓每個文案都獨特且令人難忘。
-
-為以下內容創建3個吸引人的Facebook廣告文案：
-產品：${translatedProduct.name}
-特色：${translatedProduct.features}
-受眾：${translatedProduct.audience}
-風格：${style}
-促銷：${getPromotionText(productInfo.promotion)}
-
-要求：
-- 100%繁體中文，不使用簡體中文字符
-- 每個文案120-180個字符
-- 僅使用標準且廣泛支持的emoji
-- 避免複雜或罕見的emoji
-- 使用情感觸發器和引人注目的行動呼籲
-- 使其吸引人、創意且注重轉換
-- 格式：Copy 1: [內容] | Copy 2: [內容] | Copy 3: [內容]`;
-      } else if (language === 'Bahasa Melayu' || language === 'Bahasa Indonesia') {
-        prompt = `Anda adalah copywriter iklan Facebook yang kreatif yang mengkhususkan diri dalam konten yang menarik dan berfokus pada konversi. Buat 100% konten ${language}, jangan gunakan karakter Cina. Gunakan hanya emoji standar yang didukung secara luas (seperti 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) dan hindari emoji yang kompleks atau langka yang mungkin ditampilkan sebagai kotak atau tanda tanya. Buat koneksi emosional dan sertakan seruan untuk bertindak yang menarik. Buat setiap salinan unik dan berkesan.
-
-Buat 3 salinan iklan Facebook yang menarik dalam ${language} untuk:
-Produk: ${translatedProduct.name}
-Fitur: ${translatedProduct.features}
-Audience: ${translatedProduct.audience}
-Gaya: ${style}
-Promosi: ${getPromotionText(productInfo.promotion)}
-
-Persyaratan:
-- 100% ${language}, tidak ada karakter Cina
-- 120-180 karakter per salinan
-- Gunakan hanya emoji standar yang didukung secara luas
-- Hindari emoji yang kompleks atau langka
-- Gunakan pemicu emosional dan seruan untuk bertindak yang menarik
-- Buat menarik, kreatif dan berfokus pada konversi
-- Format: Copy 1: [konten] | Copy 2: [konten] | Copy 3: [konten]`;
-      } else if (language === 'မြန်မာဘာသာ') {
-        prompt = `သင်သည် စိတ်ဝင်စားဖွယ်ရာ နှင့် ပြောင်းလဲမှုကို အာရုံစိုက်သော အကြောင်းအရာများတွင် အထူးကျွမ်းကျင်သော ဖန်တီးမှုဆန်သော Facebook ကြော်ငြာကူးယူသူဖြစ်သည်။ 100% မြန်မာဘာသာဖြင့် အကြောင်းအရာများကို ဖန်တီးပါ၊ တရုတ်စာလုံးများကို မသုံးပါနှင့်။ စံနှင့်ကိုက်ညီပြီး ကျယ်ပြန့်စွာ ထောက်ပံ့ထားသော emoji များကိုသာ သုံးပါ (ဥပမာ 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) နှင့် ရှုပ်ထွေးသော သို့မဟုတ် ရှားပါးသော emoji များကို ရှောင်ကြဉ်ပါ။ စိတ်ခံစားမှုဆိုင်ရာ ချိတ်ဆက်မှုများကို ဖန်တီးပြီး ဆွဲဆောင်မှုရှိသော လုပ်ဆောင်မှုများကို ထည့်သွင်းပါ။ ကူးယူမှုတိုင်းကို ထူးခြားပြီး မှတ်မိဖွယ်ဖြစ်စေပါ။
-
-အောက်ပါအတွက် စိတ်ဝင်စားဖွယ်ရာ Facebook ကြော်ငြာကူးယူမှု 3 ခုကို မြန်မာဘာသာဖြင့် ဖန်တီးပါ:
-ထုတ်ကုန်: ${translatedProduct.name}
-အင်္ဂါရပ်များ: ${translatedProduct.features}
-ပရိသတ်: ${translatedProduct.audience}
-ပုံစံ: ${style}
-ပရိုမိုရှင်း: ${getPromotionText(productInfo.promotion)}
-
-လိုအပ်ချက်များ:
-- 100% မြန်မာဘာသာ၊ တရုတ်စာလုံးများ မပါဝင်
-- ကူးယူမှုတိုင်းအတွက် စာလုံး 120-180 လုံး
-- စံနှင့်ကိုက်ညီပြီး ကျယ်ပြန့်စွာ ထောက်ပံ့ထားသော emoji များကိုသာ သုံးပါ
-- ရှုပ်ထွေးသော သို့မဟုတ် ရှားပါးသော emoji များကို ရှောင်ကြဉ်ပါ
-- စိတ်ခံစားမှုဆိုင်ရာ လှုံ့ဆော်မှုများနှင့် ဆွဲဆောင်မှုရှိသော လုပ်ဆောင်မှုများကို သုံးပါ
-- စိတ်ဝင်စားဖွယ်ရာ၊ ဖန်တီးမှုဆန်ပြီး ပြောင်းလဲမှုကို အာရုံစိုက်စေပါ
-- ပုံစံ: Copy 1: [အကြောင်းအရာ] | Copy 2: [အကြောင်းအရာ] | Copy 3: [အကြောင်းအရာ]`;
-      } else if (language === 'ភាសាខ្មែរ') {
-        prompt = `អ្នកគឺជាអ្នកសរសេរការផ្ទុកចម្លងពាណិជ្ជកម្ម Facebook ដែលមានភាពច្នៃប្រឌិតដែលជំនាញក្នុងការបង្កើតមាតិកាដែលទាក់ទាញនិងផ្តោតលើការបំប្លែង។ បង្កើតមាតិកា 100% ជាភាសាខ្មែរ កុំប្រើអក្សរចិន។ ប្រើតែ emoji ស្តង់ដារដែលគាំទ្រយ៉ាងទូលំទូលាយ (ដូចជា 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) និងជៀសវាង emoji ស្មុគស្មាញឬកម្រដែលអាចបង្ហាញជាប្រអប់ឬសញ្ញាសំណួរ។ បង្កើតការតភ្ជាប់ផ្នែកផ្លូវចិត្តនិងរួមបញ្ចូលការហៅឱ្យធ្វើសកម្មភាពដែលទាក់ទាញ។ ធ្វើឱ្យការចម្លងនីមួយៗមានលក្ខណៈពិសេសនិងគួរចងចាំ។
-
-បង្កើតការចម្លងពាណិជ្ជកម្ម Facebook ដែលទាក់ទាញ 3 ជាភាសាខ្មែរសម្រាប់:
-ផលិតផល: ${translatedProduct.name}
-មុខងារ: ${translatedProduct.features}
-ទស្សនិកជន: ${translatedProduct.audience}
-រចនាបថ: ${style}
-ការផ្សព្វផ្សាយ: ${getPromotionText(productInfo.promotion)}
-
-តម្រូវការ:
-- 100% ភាសាខ្មែរ គ្មានអក្សរចិន
-- តួអក្សរ 120-180 ក្នុងមួយការចម្លង
-- ប្រើតែ emoji ស្តង់ដារដែលគាំទ្រយ៉ាងទូលំទូលាយ
-- ជៀសវាង emoji ស្មុគស្មាញឬកម្រ
-- ប្រើការបង្កើតអារម្មណ៍និងការហៅឱ្យធ្វើសកម្មភាពដែលទាក់ទាញ
-- ធ្វើឱ្យវាទាក់ទាញ ច្នៃប្រឌិតនិងផ្តោតលើការបំប្លែង
-- ទម្រង់: Copy 1: [មាតិកា] | Copy 2: [មាតិកា] | Copy 3: [មាតិកា]`;
-      } else if (language === 'ພາສາລາວ') {
-        prompt = `ທ່ານເປັນນັກຂຽນສຳຮອງການໂຄສະນາ Facebook ທີ່ມີຄວາມຄິດສ້າງສັນທີ່ຊ່ຽວຊານໃນການສ້າງເນື້ອຫາທີ່ດູດດື່ມແລະມຸ່ງໄປທີ່ການປ່ຽນແປງ. ສ້າງເນື້ອຫາ 100% ພາສາລາວ, ບໍ່ໃຊ້ຕົວອັກສອນຈີນ. ໃຊ້ພຽງແຕ່ emoji ມາດຕະຖານທີ່ຮອງຮັບຢ່າງກວ້າງຂວາງ (ເຊັ່ນ 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) ແລະຫຼີກລ່ຽງ emoji ທີ່ສັບສົນຫຼືຫາຍາກທີ່ອາດສະແດງເປັນກ່ອງຫຼືເຄື່ອງໝາຍຄຳຖາມ. ສ້າງການເຊື່ອມຕໍ່ທາງອາລົມແລະລວມການເອີ້ນຮ້ອງໃຫ້ປະຕິບັດທີ່ດູດດື່ມ. ເຮັດໃຫ້ການສຳຮອງແຕ່ລະອັນເປັນເອກະລັກແລະຈົດຈຳໄດ້.
-
-ສ້າງການສຳຮອງການໂຄສະນາ Facebook ທີ່ດູດດື່ມ 3 ອັນໃນພາສາລາວສຳລັບ:
-ຜະລິດຕະພັນ: ${translatedProduct.name}
-ຄຸນສົມບັດ: ${translatedProduct.features}
-ຜູ້ຊົມ: ${translatedProduct.audience}
-ຮູບແບບ: ${style}
-ການໂຄສະນາ: ${getPromotionText(productInfo.promotion)}
-
-ຄວາມຕ້ອງການ:
-- 100% ພາສາລາວ, ບໍ່ມີຕົວອັກສອນຈີນ
-- ຕົວອັກສອນ 120-180 ຕໍ່ການສຳຮອງ
-- ໃຊ້ພຽງແຕ່ emoji ມາດຕະຖານທີ່ຮອງຮັບຢ່າງກວ້າງຂວາງ
-- ຫຼີກລ່ຽງ emoji ທີ່ສັບສົນຫຼືຫາຍາກ
-- ໃຊ້ການກະຕຸ້ນທາງອາລົມແລະການເອີ້ນຮ້ອງໃຫ້ປະຕິບັດທີ່ດູດດື່ມ
-- ເຮັດໃຫ້ມັນດູດດື່ມ, ມີຄວາມຄິດສ້າງສັນແລະມຸ່ງໄປທີ່ການປ່ຽນແປງ
-- ຮູບແບບ: Copy 1: [ເນື້ອຫາ] | Copy 2: [ເນື້ອຫາ] | Copy 3: [ເນື້ອຫາ]`;
-      } else {
-        prompt = `Create 3 engaging Facebook ad copies in ${language} for:
+      const prompt = `Create 3 engaging Facebook ad copies in ${language} for:
 Product: ${translatedProduct.name}
 Features: ${translatedProduct.features}
 Audience: ${translatedProduct.audience}
@@ -394,12 +130,10 @@ Promotion: ${getPromotionText(productInfo.promotion)}
 Requirements:
 - 100% ${language}, no Chinese characters
 - 120-180 characters each
-- Use only standard, widely-supported emojis (like 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨)
-- Avoid complex or rare emojis that might display as boxes or question marks
+- Include relevant emojis naturally throughout the copy
 - Use emotional triggers and compelling call-to-action
 - Make it engaging, creative and conversion-focused
 - Format: Copy 1: [content] | Copy 2: [content] | Copy 3: [content]`;
-      }
 
       const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
@@ -412,67 +146,7 @@ Requirements:
           messages: [
             {
               role: 'system',
-              content: language === '한국어' 
-                ? `당신은 창의적인 한국어 Facebook 광고 카피라이터입니다. 
-
-중요 규칙:
-1. 100% 한국어로만 콘텐츠를 생성하세요
-2. 중국어 문자나 중국어 표현을 절대 사용하지 마세요
-3. 한국어 문법과 어순을 정확히 사용하세요
-4. 한국 문화 요소와 표현 습관을 포함하세요
-
-기술적 요구사항:
-- 표준적이고 널리 지원되는 이모지만 사용 (예: 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨)
-- 복잡하거나 희귀한 이모지는 피하세요
-- 감정적 연결을 만들고 강력한 행동 촉구를 포함하세요
-- 각 카피를 독특하고 기억에 남게 만드세요`
-                : language === '日本語'
-                ? `あなたは創造的な日本語Facebook広告コピーライターです。
-
-重要規則：
-1. 100%日本語でのみコンテンツを生成してください
-2. 中国語文字や中国語表現を絶対に使用しないでください
-3. 日本語の文法と語順を正確に使用してください
-4. 日本の文化要素と表現習慣を含めてください
-
-技術要件：
-- 標準的で広くサポートされている絵文字のみを使用（例：😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨）
-- 複雑で珍しい絵文字は避けてください
-- 感情的なつながりを作り、強力な行動喚起を含めてください
-- 各コピーをユニークで記憶に残るものにしてください`
-                : language === 'ไทย'
-                ? `คุณเป็นนักเขียนคัดลอกโฆษณา Facebook ที่สร้างสรรค์และเชี่ยวชาญในการสร้างเนื้อหาที่น่าสนใจและเน้นการแปลง 100% เนื้อหาภาษาไทยเท่านั้น ไม่ใช้ตัวอักษรจีน ใช้เฉพาะอิโมจิมาตรฐานที่รองรับอย่างกว้างขวาง (เช่น 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) และหลีกเลี่ยงอิโมจิที่ซับซ้อนหรือหายากที่อาจแสดงเป็นกล่องหรือเครื่องหมายคำถาม สร้างการเชื่อมต่อทางอารมณ์และรวมการเรียกร้องให้ดำเนินการที่น่าสนใจ ทำให้แต่ละคัดลอกไม่ซ้ำใครและน่าจดจำ`
-                : language === 'Tiếng Việt'
-                ? `Bạn là một copywriter quảng cáo Facebook sáng tạo chuyên về nội dung hấp dẫn và tập trung vào chuyển đổi. Tạo 100% nội dung tiếng Việt, không sử dụng ký tự tiếng Trung. Chỉ sử dụng emoji tiêu chuẩn được hỗ trợ rộng rãi (như 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) và tránh emoji phức tạp hoặc hiếm có thể hiển thị dưới dạng hộp hoặc dấu hỏi. Tạo kết nối cảm xúc và bao gồm lời kêu gọi hành động hấp dẫn. Làm cho mỗi bản sao độc đáo và đáng nhớ.`
-                : language === '繁體中文'
-                ? `你是一位專門從事吸引人且注重轉換的內容的創意Facebook廣告文案撰寫者。生成100%繁體中文內容，不使用簡體中文字符。僅使用標準且廣泛支持的emoji（如😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨），避免可能顯示為方框或問號的複雜或罕見emoji。創造情感連接並包含引人注目的行動呼籲。讓每個文案都獨特且令人難忘。`
-                : language === 'Bahasa Melayu' || language === 'Bahasa Indonesia'
-                ? `Anda adalah copywriter iklan Facebook yang kreatif yang mengkhususkan diri dalam konten yang menarik dan berfokus pada konversi. Buat 100% konten ${language}, jangan gunakan karakter Cina. Gunakan hanya emoji standar yang didukung secara luas (seperti 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) dan hindari emoji yang kompleks atau langka yang mungkin ditampilkan sebagai kotak atau tanda tanya. Buat koneksi emosional dan sertakan seruan untuk bertindak yang menarik. Buat setiap salinan unik dan berkesan.`
-                : language === 'မြန်မာဘာသာ'
-                ? `သင်သည် စိတ်ဝင်စားဖွယ်ရာ နှင့် ပြောင်းလဲမှုကို အာရုံစိုက်သော အကြောင်းအရာများတွင် အထူးကျွမ်းကျင်သော ဖန်တီးမှုဆန်သော Facebook ကြော်ငြာကူးယူသူဖြစ်သည်။ 100% မြန်မာဘာသာဖြင့် အကြောင်းအရာများကို ဖန်တီးပါ၊ တရုတ်စာလုံးများကို မသုံးပါနှင့်။ စံနှင့်ကိုက်ညီပြီး ကျယ်ပြန့်စွာ ထောက်ပံ့ထားသော emoji များကိုသာ သုံးပါ (ဥပမာ 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) နှင့် ရှုပ်ထွေးသော သို့မဟုတ် ရှားပါးသော emoji များကို ရှောင်ကြဉ်ပါ။ စိတ်ခံစားမှုဆိုင်ရာ ချိတ်ဆက်မှုများကို ဖန်တီးပြီး ဆွဲဆောင်မှုရှိသော လုပ်ဆောင်မှုများကို ထည့်သွင်းပါ။ ကူးယူမှုတိုင်းကို ထူးခြားပြီး မှတ်မိဖွယ်ဖြစ်စေပါ။`
-                : language === 'ភាសាខ្មែរ'
-                ? `អ្នកគឺជាអ្នកសរសេរការផ្ទុកចម្លងពាណិជ្ជកម្ម Facebook ដែលមានភាពច្នៃប្រឌិតដែលជំនាញក្នុងការបង្កើតមាតិកាដែលទាក់ទាញនិងផ្តោតលើការបំប្លែង។ បង្កើតមាតិកា 100% ជាភាសាខ្មែរ កុំប្រើអក្សរចិន។ ប្រើតែ emoji ស្តង់ដារដែលគាំទ្រយ៉ាងទូលំទូលាយ (ដូចជា 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) និងជៀសវាង emoji ស្មុគស្មាញឬកម្រដែលអាចបង្ហាញជាប្រអប់ឬសញ្ញាសំណួរ។ បង្កើតការតភ្ជាប់ផ្នែកផ្លូវចិត្តនិងរួមបញ្ចូលការហៅឱ្យធ្វើសកម្មភាពដែលទាក់ទាញ។ ធ្វើឱ្យការចម្លងនីមួយៗមានលក្ខណៈពិសេសនិងគួរចងចាំ។`
-                : language === 'ພາສາລາວ'
-                ? `ທ່ານເປັນນັກຂຽນສຳຮອງການໂຄສະນາ Facebook ທີ່ມີຄວາມຄິດສ້າງສັນທີ່ຊ່ຽວຊານໃນການສ້າງເນື້ອຫາທີ່ດູດດື່ມແລະມຸ່ງໄປທີ່ການປ່ຽນແປງ. ສ້າງເນື້ອຫາ 100% ພາສາລາວ, ບໍ່ໃຊ້ຕົວອັກສອນຈີນ. ໃຊ້ພຽງແຕ່ emoji ມາດຕະຖານທີ່ຮອງຮັບຢ່າງກວ້າງຂວາງ (ເຊັ່ນ 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) ແລະຫຼີກລ່ຽງ emoji ທີ່ສັບສົນຫຼືຫາຍາກທີ່ອາດສະແດງເປັນກ່ອງຫຼືເຄື່ອງໝາຍຄຳຖາມ. ສ້າງການເຊື່ອມຕໍ່ທາງອາລົມແລະລວມການເອີ້ນຮ້ອງໃຫ້ປະຕິບັດທີ່ດູດດື່ມ. ເຮັດໃຫ້ການສຳຮອງແຕ່ລະອັນເປັນເອກະລັກແລະຈົດຈຳໄດ້.`
-                : language === "Nederlands"
-                ? `Je bent een creatieve ${language} Facebook advertentie copywriter die gespecialiseerd is in boeiende, conversie-gerichte content. Genereer 100% ${language} content alleen, geen Chinese karakters. Gebruik alleen standaard, breed ondersteunde emoji's (zoals 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) en vermijd complexe of zeldzame emoji's die mogelijk als vakjes of vraagtekens worden weergegeven. Maak emotionele verbindingen en neem overtuigende calls-to-action op. Maak elke kopie uniek en memorabel.`
-                : language === "Deutsch"
-                ? `Sie sind ein kreativer ${language} Facebook-Werbung Copywriter, der sich auf fesselnde, konversionsorientierte Inhalte spezialisiert hat. Generieren Sie nur 100% ${language} Inhalte, keine chinesischen Zeichen. Verwenden Sie nur Standard-Emojis mit breiter Unterstützung (wie 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) und vermeiden Sie komplexe oder seltene Emojis, die möglicherweise als Kästchen oder Fragezeichen angezeigt werden. Schaffen Sie emotionale Verbindungen und fügen Sie überzeugende Call-to-Actions hinzu. Machen Sie jede Kopie einzigartig und unvergesslich.`
-                : language === "Français"
-                ? `Vous êtes un rédacteur publicitaire Facebook ${language} créatif spécialisé dans le contenu engageant et axé sur la conversion. Générez 100% de contenu ${language} uniquement, pas de caractères chinois. Utilisez uniquement des emojis standard largement supportés (comme 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) et évitez les emojis complexes ou rares qui pourraient s'afficher comme des boîtes ou des points d'interrogation. Créez des connexions émotionnelles et incluez des appels à l'action convaincants. Rendez chaque copie unique et mémorable.`
-                : language === "Italiano"
-                ? `Sei un copywriter pubblicitario Facebook ${language} creativo specializzato in contenuti coinvolgenti e focalizzati sulla conversione. Genera solo contenuti 100% ${language}, nessun carattere cinese. Usa solo emoji standard ampiamente supportati (come 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) ed evita emoji complessi o rari che potrebbero essere visualizzati come scatole o punti interrogativi. Crea connessioni emotive e includi call-to-action convincenti. Rendi ogni copia unica e memorabile.`
-                : language === "Español"
-                ? `Eres un copywriter publicitario de Facebook ${language} creativo especializado en contenido atractivo y enfocado en conversiones. Genera 100% contenido ${language} únicamente, sin caracteres chinos. Usa solo emojis estándar ampliamente compatibles (como 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) y evita emojis complejos o raros que podrían mostrarse como cajas o signos de interrogación. Crea conexiones emocionales e incluye llamadas a la acción convincentes. Haz que cada copia sea única y memorable.`
-                : language === "Português"
-                ? `Você é um copywriter publicitário do Facebook ${language} criativo especializado em conteúdo envolvente e focado em conversão. Gere 100% de conteúdo ${language} apenas, sem caracteres chineses. Use apenas emojis padrão amplamente suportados (como 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) e evite emojis complexos ou raros que podem ser exibidos como caixas ou pontos de interrogação. Crie conexões emocionais e inclua chamadas para ação convincentes. Torne cada cópia única e memorável.`
-                : language === "Svenska"
-                ? `Du är en kreativ ${language} Facebook-annons copywriter som specialiserar sig på engagerande, konverteringsinriktat innehåll. Generera endast 100% ${language} innehåll, inga kinesiska tecken. Använd endast standard-emoji med brett stöd (som 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) och undvik komplexa eller sällsynta emoji som kan visas som rutor eller frågetecken. Skapa känslomässiga anslutningar och inkludera övertygande calls-to-action. Gör varje kopia unik och minnesvärd.`
-                : language === "Norsk"
-                ? `Du er en kreativ ${language} Facebook-annonse copywriter som spesialiserer seg på engasjerende, konverteringsfokusert innhold. Generer kun 100% ${language} innhold, ingen kinesiske tegn. Bruk kun standard-emoji med bred støtte (som 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) og unngå komplekse eller sjeldne emoji som kan vises som bokser eller spørsmålstegn. Skap følelsesmessige forbindelser og inkluder overbevisende calls-to-action. Gjør hver kopi unik og minneverdig.`
-                : language === "Dansk"
-                ? `Du er en kreativ ${language} Facebook-annonce copywriter der specialiserer sig i engagerende, konverteringsfokuseret indhold. Generer kun 100% ${language} indhold, ingen kinesiske tegn. Brug kun standard-emoji med bred support (som 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) og undgå komplekse eller sjældne emoji der kan vises som bokse eller spørgsmålstegn. Skab følelsesmæssige forbindelser og inkluder overbevisende calls-to-action. Gør hver kopi unik og mindeværdig.`
-                : `You are a creative ${language} Facebook ad copywriter specializing in engaging, conversion-focused content. Generate 100% ${language} content only, no Chinese characters. Use only standard, widely-supported emojis (like 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) and avoid complex or rare emojis that might display as boxes or question marks. Create emotional connections and include compelling calls-to-action. Make each copy unique and memorable.`
+              content: `You are a creative ${language} Facebook ad copywriter specializing in engaging, conversion-focused content. Generate 100% ${language} content only, no Chinese characters. Use relevant emojis naturally, create emotional connections and include compelling calls-to-action. Make each copy unique and memorable.`
             },
             {
               role: 'user',
@@ -533,149 +207,61 @@ Requirements:
 
 
 
-  // 清理异常emoji的函数 - 强化版本
+  // 清理异常emoji的函数
   const cleanEmojis = (text: string): string => {
     console.log('cleanEmojis 输入:', text);
     
+    // 只保留安全的emoji，移除所有其他emoji
     let cleanedText = text;
     
-    // 移除损坏的Unicode字符（乱码）
-    cleanedText = cleanedText.replace(/[\uFFFD\uFFFE\uFFFF]/g, '');
+
     
-    // 移除孤立的Unicode代理对
-    cleanedText = cleanedText.replace(/[\uD800-\uDFFF](?![\uDC00-\uDFFF])/g, '');
-    cleanedText = cleanedText.replace(/(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
-    
-    // 移除控制字符（除了换行符和制表符）
-    cleanedText = cleanedText.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '');
-    
-    // 移除零宽字符
-    cleanedText = cleanedText.replace(/[\u200B-\u200D\uFEFF]/g, '');
-    
-    // 移除一些可能导致显示问题的特殊符号
-    const problematicSymbols = [
-      '', // 替换字符
-      '\uFFFD', // Unicode替换字符
-      '\uFFFE', // Unicode字节顺序标记
-      '\uFFFF'  // Unicode私有使用区域
+    // 直接移除所有已知的emoji和符号
+    const symbolsToRemove = [
+      '❓', '❔', '❕', '❖', '🔥', '💥', '💢', '💣', '💤', '♪', '♫', '♬', '♩', '💎', '⏳', '→',
+      '✨', '⭐', '💡', '🎯', '🚀', '💪', '🎧', '🎵', '🎶', '🎤', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🎻',
+      '🎮', '🎲', '🧩', '🎳', '🎪', '🎭', '🎨', '🎬', '⚙️', '🎭', '🎪', '🎨', '🎬', '🎤', '🎧', '🎼', '🎹',
+      '🥁', '🎷', '🎺', '🎸', '🎻', '🎮', '🎲', '🧩', '🎯', '🎳', '🎪', '🎭', '🎨', '🎬', '🎤', '🎧', '🎼',
+      '🎹', '🥁', '🎷', '🎺', '🎸', '🎻', '🎮', '🎲', '🧩', '🎯', '🎳', '🎪', '🎭', '🎨', '🎬', '🎤', '🎧',
+      '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🎻', '🎮', '🎲', '🧩', '🎯', '🎳', '🎪', '🎭', '🎨', '🎬', '🎤',
+      '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🎻', '🎮', '🎲', '🧩', '🎯', '🎳', '🎪', '🎭', '🎨', '🎬'
     ];
     
-    problematicSymbols.forEach(symbol => {
+    symbolsToRemove.forEach(symbol => {
       cleanedText = cleanedText.replace(new RegExp(symbol, 'g'), '');
     });
-    
-    // 保留所有语言字符，只清理损坏的emoji
-    cleanedText = cleanedText.split('').map(char => {
-      const codePoint = char.codePointAt(0);
-      if (!codePoint) return '';
-      
-      // 保留所有语言字符（包括韩语、日语、中文等）
-      if (codePoint <= 127 || // ASCII
-          (codePoint >= 0x3040 && codePoint <= 0x309F) || // 平假名
-          (codePoint >= 0x30A0 && codePoint <= 0x30FF) || // 片假名
-          (codePoint >= 0x4E00 && codePoint <= 0x9FFF) || // 中文汉字
-          (codePoint >= 0xAC00 && codePoint <= 0xD7AF) || // 韩语谚文
-          (codePoint >= 0x0E00 && codePoint <= 0x0E7F) || // 泰语
-          (codePoint >= 0x1E00 && codePoint <= 0x1EFF) || // 拉丁文扩展
-          (codePoint >= 0x0100 && codePoint <= 0x017F)) { // 拉丁文扩展A
-        return char;
-      }
-      
-      // 只保留安全的emoji
-      const safeEmojiRanges = [
-        [0x1F600, 0x1F64F], // 表情符号
-        [0x1F300, 0x1F5FF], // 杂项符号和象形文字
-        [0x1F680, 0x1F6FF], // 交通和地图符号
-        [0x1F1E0, 0x1F1FF], // 区域指示符号
-        [0x2600, 0x26FF],   // 杂项符号
-        [0x2700, 0x27BF],   // 装饰符号
-        [0xFE00, 0xFE0F],   // 变体选择器
-        [0x1F900, 0x1F9FF], // 补充符号和象形文字
-        [0x1F018, 0x1F270], // 封闭字母数字补充
-      ];
-      
-      const isSafe = safeEmojiRanges.some(([start, end]) => codePoint >= start && codePoint <= end);
-      return isSafe ? char : '';
-    }).join('');
-    
-    // 清理多余的空格
-    cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
     
     console.log('cleanEmojis 输出:', cleanedText);
     return cleanedText;
   };
 
-  // 验证emoji是否安全的函数
-  const isSafeEmoji = (char: string): boolean => {
-    // 定义安全的emoji范围
-    const safeEmojiRanges = [
-      [0x1F600, 0x1F64F], // 表情符号
-      [0x1F300, 0x1F5FF], // 杂项符号和象形文字
-      [0x1F680, 0x1F6FF], // 交通和地图符号
-      [0x1F1E0, 0x1F1FF], // 区域指示符号
-      [0x2600, 0x26FF],   // 杂项符号
-      [0x2700, 0x27BF],   // 装饰符号
-      [0xFE00, 0xFE0F],   // 变体选择器
-      [0x1F900, 0x1F9FF], // 补充符号和象形文字
-      [0x1F018, 0x1F270], // 封闭字母数字补充
-    ];
-    
-    const codePoint = char.codePointAt(0);
-    if (!codePoint) return false;
-    
-    return safeEmojiRanges.some(([start, end]) => codePoint >= start && codePoint <= end);
-  };
-
-  // 智能文案后处理函数 - 修复版本
+  // 智能文案后处理函数
   const processCopyForLocalization = (copy: string, language: string, _region: string) => {
     let processedCopy = copy;
     
     // 清理异常emoji
     processedCopy = cleanEmojis(processedCopy);
     
+    // 移除所有中文字符和标点符号
+    processedCopy = processedCopy.replace(/[\u4e00-\u9fff]/g, '');
+    processedCopy = processedCopy.replace(/[，。！？；：""''（）【】]/g, '');
+    
     // 根据语言进行特定的清理
     switch (language) {
       case 'English':
-        // 英语：移除所有非英语字符，只保留英文、数字、英文标点和安全emoji
-        processedCopy = processedCopy.replace(/[^\x00-\x7F\s]/g, char => {
-          return isSafeEmoji(char) ? char : '';
-        });
+        // 确保英语文案的标点符号正确
         processedCopy = processedCopy.replace(/\s+/g, ' ').trim();
         break;
-        
       case '日本語':
-        // 日语：保留日语字符（平假名、片假名、汉字）、英文、数字、日文标点和安全emoji
-        processedCopy = processedCopy.replace(/[^\x00-\x7F\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uFF00-\uFFEF\s]/g, char => {
-          return isSafeEmoji(char) ? char : '';
-        });
-        // 移除中文标点，保留日文标点
-        processedCopy = processedCopy.replace(/[，。！？；：""''（）【】]/g, '');
+        // 确保日语文案的标点符号正确
         processedCopy = processedCopy.replace(/\s+/g, ' ').trim();
         break;
-        
       case '한국어':
-        // 韩语：保留韩语字符（谚文、汉字）、英文、数字、韩文标点和安全emoji
-        processedCopy = processedCopy.replace(/[^\x00-\x7F\uAC00-\uD7AF\u4E00-\u9FFF\uFF00-\uFFEF\s]/g, char => {
-          return isSafeEmoji(char) ? char : '';
-        });
-        // 移除中文标点，保留韩文标点
-        processedCopy = processedCopy.replace(/[，。！？；：""''（）【】]/g, '');
+        // 确保韩语文案的标点符号正确
         processedCopy = processedCopy.replace(/\s+/g, ' ').trim();
         break;
-        
-      case '中文':
-        // 中文：保留中文字符、英文、数字、中文标点和安全emoji
-        processedCopy = processedCopy.replace(/[^\x00-\x7F\u4E00-\u9FFF\uFF00-\uFFEF\s]/g, char => {
-          return isSafeEmoji(char) ? char : '';
-        });
-        processedCopy = processedCopy.replace(/\s+/g, ' ').trim();
-        break;
-        
       default:
-        // 其他语言：保留所有语言字符，只移除不安全的emoji
-        processedCopy = processedCopy.replace(/[^\x00-\x7F\u0080-\uFFFF\s]/g, char => {
-          return isSafeEmoji(char) ? char : '';
-        });
+        // 其他语言的基本清理
         processedCopy = processedCopy.replace(/\s+/g, ' ').trim();
     }
     
@@ -1619,11 +1205,6 @@ Requirements:
         ? prev.regions.filter(r => r !== region)
         : [...prev.regions, region]
     }));
-    
-    // 当用户选择了地区后，隐藏错误提示
-    if (showRegionError) {
-      setShowRegionError(false);
-    }
   };
 
   // 搜索过滤逻辑
@@ -1655,12 +1236,6 @@ Requirements:
         targetAudience: productInfo.targetAudience,
         regions: productInfo.regions
       });
-      
-      // 如果没有选择地区，显示错误提示
-      if (productInfo.regions.length === 0) {
-        setShowRegionError(true);
-      }
-      
       alert('请填写所有必填字段并至少选择一个投放地区');
       return;
     }
@@ -1851,13 +1426,6 @@ Requirements:
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const dropdown = document.getElementById('region-dropdown');
-      const button = (event.target as Element)?.closest('button');
-      
-      // 如果点击的是按钮本身，不处理（让按钮自己的逻辑处理）
-      if (button && button.getAttribute('type') === 'button') {
-        return;
-      }
-      
       if (dropdown && !dropdown.contains(event.target as Node)) {
         setShowRegionDropdown(false);
         setRegionSearchTerm(''); // 清空搜索词
@@ -1958,57 +1526,25 @@ Requirements:
                   <label className="label">
                     投放地区 * (可多选)
                   </label>
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        // 阻止事件冒泡，避免触发点击外部关闭逻辑
-                        e.stopPropagation();
-                        // 点击按钮切换下拉菜单状态
-                        setShowRegionDropdown(!showRegionDropdown);
-                        // 如果关闭下拉菜单，清空搜索词
-                        if (showRegionDropdown) {
-                          setRegionSearchTerm('');
-                        }
-                      }}
-                      className={`input-field glass text-left hover:bg-gray-50 ${productInfo.regions.length > 0 ? 'pr-16' : 'pr-10'}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className={productInfo.regions.length === 0 ? 'text-gray-600' : 'text-gray-900'}>
-                          {getSelectedRegionsText()}
-                        </span>
-                        <svg 
-                          className={`w-4 h-4 text-gray-400 transition-transform ${showRegionDropdown ? 'rotate-180' : ''}`} 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </button>
-                    
-                    {/* 清除按钮 - 只在有选择时显示 */}
-                    {productInfo.regions.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setProductInfo(prev => ({ ...prev, regions: [] }));
-                          // 如果之前显示过错误提示，清除后重新显示
-                          if (showRegionError) {
-                            setShowRegionError(true);
-                          }
-                        }}
-                        className="absolute right-8 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
-                        title="清除所有选择"
+                  <button
+                    type="button"
+                    onClick={() => setShowRegionDropdown(!showRegionDropdown)}
+                    className="input-field glass text-left hover:bg-gray-50"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={productInfo.regions.length === 0 ? 'text-gray-600' : 'text-gray-900'}>
+                        {getSelectedRegionsText()}
+                      </span>
+                      <svg 
+                        className={`w-4 h-4 text-gray-400 transition-transform ${showRegionDropdown ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </button>
 
                   {/* 下拉菜单 */}
                   {showRegionDropdown && (
@@ -2073,7 +1609,7 @@ Requirements:
                   )}
 
                   {/* 错误提示 */}
-                  {showRegionError && productInfo.regions.length === 0 && (
+                  {productInfo.regions.length === 0 && (
                     <p className="text-xs text-red-600 mt-1">请至少选择一个投放地区</p>
                   )}
                 </div>

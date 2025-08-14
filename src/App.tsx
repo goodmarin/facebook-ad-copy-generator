@@ -10,6 +10,12 @@ import ProductAnalysis from './components/ProductAnalysis';
 import { TimeDisplay } from './components/TimeDisplay';
 
 import { checkProductInfo, PolicyCheckResult } from './utils/policyChecker';
+import { 
+  EmojiEnhancer, 
+  generateEmojiPromptRules, 
+  validateEmojiCompliance,
+  SMART_EMOJI_CONFIG 
+} from './utils/enhancedEmojiRules';
 
 function App() {
   const [productInfo, setProductInfo] = useState({
@@ -191,6 +197,9 @@ function App() {
     return allCopies;
   };
 
+  // 初始化Emoji增强器
+  const emojiEnhancer = new EmojiEnhancer(SMART_EMOJI_CONFIG);
+
   // 使用DeepSeek API生成本土化文案的函数 - 优化版本
   const generateLocalizedCopiesWithAI = async (productInfo: any, region: string, config: any) => {
     const { language, style } = config;
@@ -209,6 +218,9 @@ function App() {
       
 
       
+      // 🎯 生成增强版Emoji规则
+      const enhancedEmojiRules = generateEmojiPromptRules(region);
+      
       // 根据语言生成对应的提示词
       let prompt;
       if (language === '한국어') {
@@ -220,13 +232,14 @@ function App() {
 3. 한국 문화 요소와 표현 습관을 포함하세요
 4. 한국어 문법과 어순을 정확히 사용하세요
 
+${enhancedEmojiRules}
+
 요구사항:
 1. 각 카피를 60단어 이내로 유지하고, 간결하고 강력하게 작성
-2. 적절한 이모지 추가 (😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨)
-3. 강력한 행동 촉구 포함
-4. Facebook 광고 정책을 준수하고 과장된 주장 피하기
-5. 타겟 오디언스와 지역에 최적화
-6. ${style} 스타일과 ${getPromotionText(productInfo.promotion)} 프로모션 방식 사용
+2. 강력한 행동 촉구 포함
+3. Facebook 광고 정책을 준수하고 과장된 주장 피하기
+4. 타겟 오디언스와 지역에 최적화
+5. ${style} 스타일과 ${getPromotionText(productInfo.promotion)} 프로모션 방식 사용
 
 제품 정보:
 제품: ${translatedProduct.name}
@@ -243,13 +256,14 @@ function App() {
 3. 日本の文化要素と表現習慣を含めてください
 4. 日本語の文法と語順を正確に使用してください
 
+${enhancedEmojiRules}
+
 要件：
 1. 各コピーを60語以内に保ち、簡潔で力強く作成
-2. 適切な絵文字を追加 (😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨)
-3. 強力な行動喚起を含める
-4. Facebook広告ポリシーを遵守し、誇張された主張を避ける
-5. ターゲットオーディエンスと地域に最適化
-6. ${style}スタイルと${getPromotionText(productInfo.promotion)}プロモーション方式を使用
+2. 強力な行動喚起を含める
+3. Facebook広告ポリシーを遵守し、誇張された主張を避ける
+4. ターゲットオーディエンスと地域に最適化
+5. ${style}スタイルと${getPromotionText(productInfo.promotion)}プロモーション方式を使用
 
 製品情報：
 製品：${translatedProduct.name}
@@ -258,7 +272,11 @@ function App() {
 
 形式：Copy 1: [内容] | Copy 2: [内容] | Copy 3: [内容]`;
       } else if (language === 'ไทย') {
-        prompt = `คุณเป็นนักเขียนคัดลอกโฆษณา Facebook ที่สร้างสรรค์และเชี่ยวชาญในการสร้างเนื้อหาที่น่าสนใจและเน้นการแปลง 100% เนื้อหาภาษาไทยเท่านั้น ไม่ใช้ตัวอักษรจีน ใช้เฉพาะอิโมจิมาตรฐานที่รองรับอย่างกว้างขวาง (เช่น 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) และหลีกเลี่ยงอิโมจิที่ซับซ้อนหรือหายากที่อาจแสดงเป็นกล่องหรือเครื่องหมายคำถาม สร้างการเชื่อมต่อทางอารมณ์และรวมการเรียกร้องให้ดำเนินการที่น่าสนใจ ทำให้แต่ละคัดลอกไม่ซ้ำใครและน่าจดจำ
+        prompt = `คุณเป็นนักเขียนคัดลอกโฆษณา Facebook ที่สร้างสรรค์และเชี่ยวชาญในการสร้างเนื้อหาที่น่าสนใจและเน้นการแปลง 100% เนื้อหาภาษาไทยเท่านั้น ไม่ใช้ตัวอักษรจีน
+
+${enhancedEmojiRules}
+
+สร้างการเชื่อมต่อทางอารมณ์และรวมการเรียกร้องให้ดำเนินการที่น่าสนใจ ทำให้แต่ละคัดลอกไม่ซ้ำใครและน่าจดจำ
 
 สร้างโฆษณา Facebook 3 ชิ้นที่น่าสนใจในภาษาไทยสำหรับ:
 ผลิตภัณฑ์: ${translatedProduct.name}
@@ -270,13 +288,15 @@ function App() {
 ข้อกำหนด:
 - 100% ภาษาไทย ไม่มีตัวอักษรจีน
 - 120-180 ตัวอักษรต่อชิ้น
-- ใช้เฉพาะอิโมจิมาตรฐานที่รองรับอย่างกว้างขวาง
-- หลีกเลี่ยงอิโมจิที่ซับซ้อนหรือหายาก
 - ใช้ทริกเกอร์ทางอารมณ์และการเรียกร้องให้ดำเนินการที่น่าสนใจ
 - ทำให้น่าสนใจ สร้างสรรค์และเน้นการแปลง
 - รูปแบบ: Copy 1: [เนื้อหา] | Copy 2: [เนื้อหา] | Copy 3: [เนื้อหา]`;
       } else if (language === 'Tiếng Việt') {
-        prompt = `Bạn là một copywriter quảng cáo Facebook sáng tạo chuyên về nội dung hấp dẫn và tập trung vào chuyển đổi. Tạo 100% nội dung tiếng Việt, không sử dụng ký tự tiếng Trung. Chỉ sử dụng emoji tiêu chuẩn được hỗ trợ rộng rãi (như 😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨) và tránh emoji phức tạp hoặc hiếm có thể hiển thị dưới dạng hộp hoặc dấu hỏi. Tạo kết nối cảm xúc và bao gồm lời kêu gọi hành động hấp dẫn. Làm cho mỗi bản sao độc đáo và đáng nhớ.
+        prompt = `Bạn là một copywriter quảng cáo Facebook sáng tạo chuyên về nội dung hấp dẫn và tập trung vào chuyển đổi. Tạo 100% nội dung tiếng Việt, không sử dụng ký tự tiếng Trung.
+
+${enhancedEmojiRules}
+
+Tạo kết nối cảm xúc và bao gồm lời kêu gọi hành động hấp dẫn. Làm cho mỗi bản sao độc đáo và đáng nhớ.
 
 Tạo 3 bản sao quảng cáo Facebook hấp dẫn bằng tiếng Việt cho:
 Sản phẩm: ${translatedProduct.name}
@@ -288,13 +308,15 @@ Khuyến mãi: ${getPromotionText(productInfo.promotion)}
 Yêu cầu:
 - 100% tiếng Việt, không có ký tự tiếng Trung
 - 120-180 ký tự mỗi bản sao
-- Chỉ sử dụng emoji tiêu chuẩn được hỗ trợ rộng rãi
-- Tránh emoji phức tạp hoặc hiếm
 - Sử dụng kích hoạt cảm xúc và lời kêu gọi hành động hấp dẫn
 - Làm cho nó hấp dẫn, sáng tạo và tập trung vào chuyển đổi
 - Định dạng: Copy 1: [nội dung] | Copy 2: [nội dung] | Copy 3: [nội dung]`;
       } else if (language === '繁體中文') {
-        prompt = `你是一位專門從事吸引人且注重轉換的內容的創意Facebook廣告文案撰寫者。生成100%繁體中文內容，不使用簡體中文字符。僅使用標準且廣泛支持的emoji（如😊, 🎉, 💡, 🚀, ⭐, 🎯, 💪, 🎵, 🎧, 🎁, 🔥, ✨），避免可能顯示為方框或問號的複雜或罕見emoji。創造情感連接並包含引人注目的行動呼籲。讓每個文案都獨特且令人難忘。
+        prompt = `你是一位專門從事吸引人且注重轉換的內容的創意Facebook廣告文案撰寫者。生成100%繁體中文內容，不使用簡體中文字符。
+
+${enhancedEmojiRules}
+
+創造情感連接並包含引人注目的行動呼籲。讓每個文案都獨特且令人難忘。
 
 為以下內容創建3個吸引人的Facebook廣告文案：
 產品：${translatedProduct.name}
@@ -306,8 +328,6 @@ Yêu cầu:
 要求：
 - 100%繁體中文，不使用簡體中文字符
 - 每個文案120-180個字符
-- 僅使用標準且廣泛支持的emoji
-- 避免複雜或罕見的emoji
 - 使用情感觸發器和引人注目的行動呼籲
 - 使其吸引人、創意且注重轉換
 - 格式：Copy 1: [內容] | Copy 2: [內容] | Copy 3: [內容]`;
@@ -508,13 +528,29 @@ Requirements:
       console.log('🔍 AI原始返回内容:', content);
       console.log('🔍 解析后的文案:', copies);
 
-      // 智能后处理：确保文案完全本土化
-      const processedCopies = copies.map((copy: string) => {
+      // 🎯 智能后处理：确保文案完全本土化 + Emoji增强
+      const processedCopies = copies.map((copy: string, index: number) => {
         console.log('🔍 处理前文案:', copy);
-        const processed = processCopyForLocalization(copy, language, region);
-        console.log('🔍 处理后文案:', processed);
+        
+        // 第一步：语言本土化处理
+        let processed = processCopyForLocalization(copy, language, region);
+        console.log('🔍 本土化后文案:', processed);
+        
+        // 第二步：Emoji密度增强（强制4-6个emoji）
+        processed = emojiEnhancer.enhanceCopy(processed, region, index);
+        console.log('🔍 Emoji增强后文案:', processed);
+        
         return processed;
       }).filter((copy: string) => copy.length > 20); // 再次过滤太短的内容
+
+      // 🔍 验证Emoji合规性
+      const validation = validateEmojiCompliance(processedCopies, region);
+      if (!validation.isCompliant) {
+        console.warn('❌ Emoji合规性检查失败:', validation.violations);
+        // 可以在这里添加进一步的修复逻辑
+      } else {
+        console.log('✅ Emoji合规性检查通过');
+      }
 
       // 如果AI生成失败或处理后没有有效文案，使用备用模板
       if (processedCopies.length === 0) {
@@ -682,21 +718,32 @@ Requirements:
     return processedCopy;
   };
 
-  // 备用文案生成函数
+  // 备用文案生成函数 - 增强版Emoji支持
   const generateFallbackCopies = (productInfo: any, region: string, config: any) => {
     const { language, style, culture } = config;
     const templates = getLocalizedTemplates(region, language);
 
     const translatedProduct = translateProductInfo(productInfo, region);
 
-    return templates.map(template => {
-      return template
+    // 🎯 为备用模板也添加Emoji增强
+    const fallbackEmojiEnhancer = new EmojiEnhancer(SMART_EMOJI_CONFIG);
+    
+    const enhancedTemplates = templates.map((template, index) => {
+      let copy = template
         .replace('{product}', translatedProduct.name)
         .replace('{features}', translatedProduct.features)
         .replace('{audience}', translatedProduct.audience)
         .replace('{style}', style)
         .replace('{culture}', culture);
+
+      // 🚀 增强备用模板的Emoji密度
+      copy = fallbackEmojiEnhancer.enhanceCopy(copy, region, index);
+      
+      console.log(`🎯 备用模板${index + 1}增强完成:`, copy);
+      return copy;
     });
+
+    return enhancedTemplates;
   };
 
   // 翻译产品信息 - 彻底修复版本

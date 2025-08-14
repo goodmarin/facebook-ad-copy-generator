@@ -23,8 +23,7 @@
     </radialGradient>
   </defs>
   
-  <!-- 背景 -->
-  <rect width="120" height="120" fill="#f0f9ff"/>
+  <!-- 透明背景 -->
   
   <!-- 地球主体 -->
   <circle cx="60" cy="60" r="45" fill="url(#earthGradient)" stroke="#1E40AF" stroke-width="1"/>

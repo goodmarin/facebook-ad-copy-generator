@@ -57,8 +57,10 @@ class CopyCache {
     // 如果缓存已满，删除最旧的条目
     if (this.cache.size >= this.config.maxEntries) {
       const oldestKey = this.cache.keys().next().value;
-      this.cache.delete(oldestKey);
-      console.log(`🗑️ 删除最旧缓存: ${oldestKey}`);
+      if (oldestKey) {
+        this.cache.delete(oldestKey);
+        console.log(`🗑️ 删除最旧缓存: ${oldestKey}`);
+      }
     }
     
     const entry: CacheEntry = {

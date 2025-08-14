@@ -1,1 +1,63 @@
- 
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="50%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#DBEAFE" stop-opacity="0.8"/>
+      <stop offset="70%" stop-color="#3B82F6" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#1E40AF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="120" height="120" fill="#ffffff"/>
+  
+  <!-- 背景发光圆 -->
+  <circle cx="60" cy="60" r="55" fill="url(#glowGradient)"/>
+  
+  <!-- 外环 -->
+  <circle cx="60" cy="60" r="45" fill="none" stroke="url(#primaryGradient)" stroke-width="3" opacity="0.6"/>
+  
+  <!-- 中心核心 -->
+  <circle cx="60" cy="60" r="12" fill="url(#primaryGradient)"/>
+  
+  <!-- 六边形结构 -->
+  <polygon 
+    points="60,30 78,42 78,78 60,90 42,78 42,42" 
+    fill="none" 
+    stroke="url(#accentGradient)" 
+    stroke-width="2.5"
+  />
+  
+  <!-- 连接线 -->
+  <line x1="60" y1="48" x2="60" y2="30" stroke="url(#primaryGradient)" stroke-width="2"/>
+  <line x1="72" y1="54" x2="78" y2="42" stroke="url(#primaryGradient)" stroke-width="2"/>
+  <line x1="72" y1="66" x2="78" y2="78" stroke="url(#primaryGradient)" stroke-width="2"/>
+  <line x1="60" y1="72" x2="60" y2="90" stroke="url(#primaryGradient)" stroke-width="2"/>
+  <line x1="48" y1="66" x2="42" y2="78" stroke="url(#primaryGradient)" stroke-width="2"/>
+  <line x1="48" y1="54" x2="42" y2="42" stroke="url(#primaryGradient)" stroke-width="2"/>
+  
+  <!-- 节点 -->
+  <circle cx="60" cy="30" r="3" fill="url(#accentGradient)"/>
+  <circle cx="78" cy="42" r="3" fill="url(#accentGradient)"/>
+  <circle cx="78" cy="78" r="3" fill="url(#accentGradient)"/>
+  <circle cx="60" cy="90" r="3" fill="url(#accentGradient)"/>
+  <circle cx="42" cy="78" r="3" fill="url(#accentGradient)"/>
+  <circle cx="42" cy="42" r="3" fill="url(#accentGradient)"/>
+  
+  <!-- 外围装饰元素 -->
+  <rect x="15" y="58" width="8" height="4" rx="2" fill="url(#primaryGradient)" opacity="0.7"/>
+  <rect x="97" y="58" width="8" height="4" rx="2" fill="url(#primaryGradient)" opacity="0.7"/>
+  <rect x="58" y="15" width="4" height="8" rx="2" fill="url(#accentGradient)" opacity="0.7"/>
+  <rect x="58" y="97" width="4" height="8" rx="2" fill="url(#accentGradient)" opacity="0.7"/>
+</svg>

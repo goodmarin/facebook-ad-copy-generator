@@ -10,6 +10,23 @@ export const AppleFeatures: React.FC<AppleFeaturesProps> = ({ featureImages: _fe
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
+    // 在挂载时，预先将首屏内的卡片标记为可见，避免刷新时出现突兀的进场动画
+    const initiallyVisible = new Set<number>();
+    sectionRefs.current.forEach((ref, idx) => {
+      if (!ref) return;
+      const rect = ref.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      // 只要有 20% 以上在视口内，就认为首屏可见
+      const elementHeight = rect.height || 1;
+      const visibleHeight = Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0);
+      if (visibleHeight / elementHeight >= 0.2) {
+        initiallyVisible.add(idx);
+      }
+    });
+    if (initiallyVisible.size > 0) {
+      setVisibleSections(prev => new Set([...prev, ...Array.from(initiallyVisible)]));
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -112,19 +129,24 @@ export const AppleFeatures: React.FC<AppleFeaturesProps> = ({ featureImages: _fe
 
                   {/* Details List */}
                   <div className="space-y-2">
-                    {feature.details.map((detail, detailIndex) => (
-                      <div
-                        key={detailIndex}
-                        className={`flex items-center space-x-2 transition-all duration-500 delay-${(index * 200) + (detailIndex * 100)} ${
-                          visibleSections.has(index) 
-                            ? 'opacity-100 translate-x-0' 
-                            : 'opacity-0 translate-x-4'
-                        }`}
-                      >
-                        <div className={`w-2 h-2 bg-gradient-to-r ${feature.gradient} rounded-full flex-shrink-0`}></div>
-                        <span className="text-gray-700 font-medium text-xs">{detail}</span>
-                      </div>
-                    ))}
+                    {feature.details.map((detail, detailIndex) => {
+                      // 使用内联 delay，避免动态 class 名被 Tree-shake 导致不生效
+                      const delayMs = (index * 150) + (detailIndex * 120);
+                      return (
+                        <div
+                          key={detailIndex}
+                          style={{ transitionDelay: `${delayMs}ms` }}
+                          className={`flex items-center space-x-2 transition-opacity transform duration-500 ${
+                            visibleSections.has(index)
+                              ? 'opacity-100 translate-x-0'
+                              : 'opacity-0 translate-x-1'
+                          }`}
+                        >
+                          <div className={`w-2 h-2 bg-gradient-to-r ${feature.gradient} rounded-full flex-shrink-0`}></div>
+                          <span className="text-gray-700 font-medium text-xs">{detail}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

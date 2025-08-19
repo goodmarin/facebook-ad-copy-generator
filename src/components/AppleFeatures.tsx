@@ -36,7 +36,7 @@ export const AppleFeatures: React.FC<AppleFeaturesProps> = ({ featureImages: _fe
           }
         });
       },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     );
 
     sectionRefs.current.forEach((ref) => {
@@ -104,11 +104,14 @@ export const AppleFeatures: React.FC<AppleFeaturesProps> = ({ featureImages: _fe
               data-index={index}
               className="relative h-full"
             >
-              <div className={`h-full transition-all duration-1000 delay-${index * 200} ${
-                visibleSections.has(index) 
-                  ? 'opacity-100 translate-y-0' 
-                  : 'opacity-0 translate-y-10'
-              }`}>
+              <div
+                className={`h-full transition-all duration-1000 ${
+                  visibleSections.has(index)
+                    ? 'opacity-100 translate-y-0'
+                    : 'opacity-0 translate-y-10'
+                }`}
+                style={{ transitionDelay: `${index * 150}ms` }}
+              >
                 {/* Feature Card - No Image */}
                 <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 h-full hover:shadow-xl hover:border-gray-200 transition-all duration-300 group flex flex-col">
                   {/* Icon/Title/Description wrapper with fixed min-height on large screens to align details across cards */}
@@ -130,16 +133,16 @@ export const AppleFeatures: React.FC<AppleFeaturesProps> = ({ featureImages: _fe
                   {/* Details List */}
                   <div className="space-y-2">
                     {feature.details.map((detail, detailIndex) => {
-                      // 使用内联 delay，避免动态 class 名被 Tree-shake 导致不生效
+                      // 使用内联 delay，保持与其他模块一致的进场节奏（纵向位移）
                       const delayMs = (index * 150) + (detailIndex * 120);
                       return (
                         <div
                           key={detailIndex}
                           style={{ transitionDelay: `${delayMs}ms` }}
-                          className={`flex items-center space-x-2 transition-opacity transform duration-500 ${
+                          className={`flex items-center space-x-2 transition-all duration-700 ${
                             visibleSections.has(index)
-                              ? 'opacity-100 translate-x-0'
-                              : 'opacity-0 translate-x-1'
+                              ? 'opacity-100 translate-y-0'
+                              : 'opacity-0 translate-y-2'
                           }`}
                         >
                           <div className={`w-2 h-2 bg-gradient-to-r ${feature.gradient} rounded-full flex-shrink-0`}></div>

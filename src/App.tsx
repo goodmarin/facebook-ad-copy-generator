@@ -1924,6 +1924,7 @@ Requirements:
             {/* 左侧Logo */}
             <div className="flex items-center">
               <Logo size="md" />
+              <span className="ml-3 text-white/80 text-xs px-2 py-1 rounded-full border border-white/30 bg-white/10 lg:hidden">v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'}</span>
             </div>
             
             {/* 中间导航菜单 */}

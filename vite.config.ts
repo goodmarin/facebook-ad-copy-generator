@@ -3,11 +3,12 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/facebook-ad-copy-generator/', // GitHub Pages部署路径
+  base: '/facebook-ad-copy-generator/',
   plugins: [react()],
   // 添加HTML元标记配置
   define: {
     __VITE_APP_TITLE__: JSON.stringify('爆款 Facebook 广告文案生成器'),
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '0.0.0'),
   },
   root: '.', // 明确指定根目录
   build: {
@@ -64,4 +65,4 @@ export default defineConfig({
   preview: {
     port: 4173,
   },
-}) 
+})

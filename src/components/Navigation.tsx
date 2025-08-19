@@ -76,6 +76,8 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
     <nav className={`flex items-center justify-end w-full ${className}`}>
       {/* 所有菜单项右对齐 */}
       <div className="flex items-center space-x-8 px-6 py-3">
+        {/* 版本徽标 */}
+        <span className="text-white/80 text-xs px-2 py-1 rounded-full border border-white/30 bg-white/10">v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'}</span>
         {menuItems.map((item) => (
           <div
             key={item.label}

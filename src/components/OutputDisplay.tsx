@@ -7,6 +7,7 @@ import { useEffectPrediction } from '../hooks/useEffectPrediction';
 // import { AdEffectPrediction } from './AdEffectPrediction'; // 暂时注释掉，使用内联版本
 import { EffectPrediction } from '../types';
 import { PolicyCheckResult, PolicyViolation } from '../utils/policyChecker';
+import { sanitizeCopyText } from '../utils/sanitize';
 
 interface OutputDisplayProps {
   copies: Array<{text: string, region: string, regionName: string}>;
@@ -17,15 +18,8 @@ interface OutputDisplayProps {
   policyCheckResult?: PolicyCheckResult | null;
 }
 
-// 清理文案中的Markdown格式
-const cleanCopyText = (text: string): string => {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '$1') // 移除 **粗体**
-    .replace(/\*(.*?)\*/g, '$1')     // 移除 *斜体*
-    .replace(/`(.*?)`/g, '$1')       // 移除 `代码`
-    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 移除链接，保留文字
-    .trim();
-};
+// 清理与过滤无效字符（统一调用）
+const cleanCopyText = (text: string): string => sanitizeCopyText(text);
 
 // 高亮敏感词
 const highlightSensitiveWords = (text: string, sensitiveWords: string[]): React.ReactNode => {

@@ -8,6 +8,7 @@ import { EmojiEnhancer, generateEmojiPromptRules } from '../utils/enhancedEmojiR
 import { checkForbiddenCategory } from '../utils/sensitiveWords';
 import { checkPolicyViolations, PolicyCheckResult } from '../utils/policyChecker';
 import { getLanguageByRegion, getRegionConfig } from '../utils/languages';
+import { sanitizeCopyText } from '../utils/sanitize';
 
 interface ProductInfo {
   name: string;
@@ -40,22 +41,7 @@ export const CopyGeneratorPage: React.FC = () => {
     return cfg?.name || regionCode;
   };
 
-  const cleanCopyText = (text: string): string => {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, '$1')
-      .replace(/\*(.*?)\*/g, '$1')
-      .replace(/`(.*?)`/g, '$1')
-      .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-      // 移除无效或多余的符号，保持纯文本输出
-      .replace(/[\[\]{}<>|【】「」『』]/g, ' ')
-      .replace(/[~^_=\\]/g, ' ')
-      // 移除Unicode替换符与控制字符，并做规范化
-      .replace(/\uFFFD/g, '')
-      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
-      .normalize('NFC')
-      .replace(/\s{2,}/g, ' ')
-      .trim();
-  };
+  const cleanCopyText = (text: string): string => sanitizeCopyText(text);
 
   const isTextInTargetLanguage = (text: string, languageCode: string): boolean => {
     const lang = (languageCode || '').toLowerCase();
@@ -163,8 +149,9 @@ export const CopyGeneratorPage: React.FC = () => {
         const regionEmojiEnhancer = new EmojiEnhancer();
         const newItems: Array<{ text: string; region: string; regionName: string }> = [];
         regionCopies.forEach((copyText, idx) => {
-          let processedCopy = cleanCopyText(copyText);
-          processedCopy = regionEmojiEnhancer.enhanceCopy(processedCopy, region, idx);
+          // 先emoji增强，再统一清理，避免emoji组合引入的变体选择符导致显示为问号
+          let processedCopy = regionEmojiEnhancer.enhanceCopy(copyText, region, idx);
+          processedCopy = cleanCopyText(processedCopy);
           const item = { text: processedCopy, region, regionName: getRegionChineseName(region) };
           newItems.push(item);
           allCopies.push(item);

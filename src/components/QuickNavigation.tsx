@@ -111,28 +111,20 @@ export const QuickNavigation: React.FC<QuickNavigationProps> = ({ className = ''
                 )}
               </div>
               
-              {/* 下拉菜单 - 增强动画效果 */}
+              {/* 下拉菜单（移除非点击的标题行） */}
               {item.children && activeDropdown === item.label && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-3 z-50 animate-in fade-in-0 slide-in-from-top-2 duration-300 ease-out scale-in-95">
-                  <div className="px-4 py-2 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
-                    <h3 className="font-semibold text-gray-900 text-sm flex items-center">
-                      <span className="mr-2">{item.icon}</span>
-                      {item.label}
-                    </h3>
-                  </div>
-                  <div className="py-2">
-                    {item.children.map((child) => (
-                      <a
-                        key={child.label}
-                        href={child.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 ease-in-out transform hover:translate-x-1 rounded mx-2"
-                      >
-                        <span>{child.label}</span>
-                      </a>
-                    ))}
-                  </div>
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 animate-in fade-in-0 slide-in-from-top-2 duration-300 ease-out scale-in-95">
+                  {item.children.map((child) => (
+                    <a
+                      key={child.label}
+                      href={child.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 ease-in-out transform hover:translate-x-1 rounded mx-2"
+                    >
+                      <span>{child.label}</span>
+                    </a>
+                  ))}
                 </div>
               )}
             </div>

@@ -55,7 +55,7 @@ interface NavigationProps {
 
 export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [hoverTimeout, setHoverTimeout] = useState<number | null>(null);
+  const [hoverTimeout, setHoverTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const handleMouseEnter = (label: string) => {
     if (hoverTimeout) {

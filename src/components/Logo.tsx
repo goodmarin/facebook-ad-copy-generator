@@ -400,36 +400,27 @@ export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md' }) => {
     lg: { title: 'text-xl sm:text-2xl', subtitle: 'text-sm sm:text-base' }
   };
 
-  // 刷新页面的函数
-  const handleRefresh = () => {
-    window.location.reload();
-  };
-
   return (
     <div className={`flex items-center group w-full max-w-none ${className}`}>
       {/* 元宇宙风格Logo */}
-      <button 
-        onClick={handleRefresh}
-        className={`${sizeClasses[size]} flex items-center justify-center hover:scale-110 transition-all duration-500 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/40 rounded-xl group-hover:scale-110 shrink-0`}
-        title="点击刷新页面"
+      <div 
+        className={`${sizeClasses[size]} flex items-center justify-center hover:scale-110 transition-all duration-500 rounded-xl group-hover:scale-110 shrink-0`}
       >
         <MetaverseLogo className={`${sizeClasses[size]}`} />
-      </button>
+      </div>
       
       {/* 文字部分 - 自适应宽度 */}
       <div className="ml-3 flex-1 min-w-0 flex flex-col justify-center">
-        <button 
-          onClick={handleRefresh}
-          className="text-left hover:opacity-80 transition-all duration-500 cursor-pointer focus:outline-none group-hover:opacity-80 w-full"
-          title="点击刷新页面"
+        <div 
+          className="text-left hover:opacity-80 transition-all duration-500 group-hover:opacity-80 w-full"
         >
-          <div className={`${textSizeClasses[size].title} font-bold text-white leading-tight tracking-tight truncate`}>
+          <div className={`${textSizeClasses[size].title} font-bold leading-tight tracking-tight truncate`}>
             元文案
           </div>
-          <div className={`${textSizeClasses[size].subtitle} text-white font-medium tracking-wide opacity-90 truncate leading-tight`}>
+          <div className={`${textSizeClasses[size].subtitle} font-medium tracking-wide opacity-90 truncate leading-tight`}>
             MetaCopy AI
           </div>
-        </button>
+        </div>
       </div>
       
       {/* 菜单栏适配样式 */}

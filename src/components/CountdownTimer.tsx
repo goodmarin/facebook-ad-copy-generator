@@ -162,7 +162,7 @@ export const CountdownTimer: React.FC = () => {
   };
 
   return (
-    <div className="relative overflow-hidden py-3 border-b border-blue-200">
+    <div className="relative overflow-hidden py-2 border-b border-blue-200/60 bg-gradient-to-r from-white/60 to-white/30">
       <div className="absolute top-0 left-0 w-full h-full">
         <div className="absolute top-4 left-10 w-2 h-2 bg-blue-300/30 rounded-full animate-pulse"></div>
         <div className="absolute top-8 right-20 w-3 h-3 bg-blue-400/40 rounded-full animate-pulse delay-1000"></div>
@@ -170,19 +170,19 @@ export const CountdownTimer: React.FC = () => {
         <div className="absolute bottom-6 right-1/3 w-2 h-2 bg-blue-300/35 rounded-full animate-pulse delay-1500"></div>
       </div>
       
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="flex items-center justify-between text-sm">
-          <div className="font-semibold text-base text-slate-700 flex-shrink-0">
+      <div className="container mx-auto px-2 sm:px-4 relative z-10">
+        <div className="flex items-center justify-between text-sm whitespace-nowrap">
+          <div className="font-semibold text-[13px] sm:text-sm leading-none text-slate-700 flex-shrink-0">
             {currentTime.getFullYear()}年第{getCurrentWeek()}周
           </div>
-          <div className="flex items-center space-x-4 overflow-x-auto">
+          <div className="flex items-center space-x-2 sm:space-x-4 overflow-x-auto">
             {countdownItems.map((item) => (
-              <div key={item.name} className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-white/80 backdrop-blur-sm border border-blue-200 flex-shrink-0">
-                <span className="text-slate-600 font-medium text-xs">距{item.name}还有</span>
-                <span className="text-blue-600 font-bold text-lg">
+              <div key={item.name} className="flex items-center space-x-1 sm:space-x-2 px-2 py-0.5 rounded-md bg-white/70 backdrop-blur-sm border border-blue-200 flex-shrink-0">
+                <span className="text-slate-600 font-medium text-[10px] sm:text-xs leading-none">距{item.name}还有</span>
+                <span className="text-blue-600 font-bold text-sm sm:text-base leading-none">
                   {calculateDays(item.targetDate)}
                 </span>
-                <span className="text-slate-600 font-medium text-xs">天</span>
+                <span className="text-slate-600 font-medium text-[10px] sm:text-xs leading-none">天</span>
               </div>
             ))}
           </div>

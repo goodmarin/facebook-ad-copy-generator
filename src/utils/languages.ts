@@ -67,6 +67,13 @@ export const REGIONS: RegionConfig[] = [
     direction: 'ltr'
   },
   {
+    code: 'LA',
+    name: '老挝',
+    language: 'lo-LA',
+    flag: '🇱🇦',
+    direction: 'ltr'
+  },
+  {
     code: 'TW',
     name: '台湾',
     language: 'zh-TW',

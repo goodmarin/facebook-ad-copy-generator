@@ -233,6 +233,51 @@ export const getFacebookPolicyLink = (): string => {
 }; 
 
 /**
+ * 根据违规类别返回对应的Facebook广告政策链接（尽量直达具体章节）
+ * 目前已覆盖的直达链接：
+ * - gambling: 博彩与赌博
+ * 其他类别暂时回退到总览页
+ */
+export const getFacebookPolicyLinkByCategory = (category?: string): string => {
+  const mapping: Record<string, string> = {
+    // 博彩与赌博
+    gambling: 'https://www.facebook.com/business/help/345214789920228?id=434838534925385',
+    // 个人属性与隐私
+    personal_attributes: 'https://www.facebook.com/business/help/2557868957763449?id=434838534925385',
+    // 骇人听闻/耸动内容（映射到暴力/血腥等内容政策简介）
+    violence: 'https://www.facebook.com/business/help/304110064285796?id=434838534925385',
+    // 健康与养生
+    health: 'https://www.facebook.com/business/help/2489235377779939?id=434838534925385',
+    // 歧视行为
+    discrimination: 'https://www.facebook.com/business/help/136164207100893',
+    // 住房/就业/金融（HEC）
+    housing_employment_credit: 'https://www.facebook.com/business/help/399587795372584',
+    hec: 'https://www.facebook.com/business/help/399587795372584',
+    financial: 'https://www.facebook.com/business/help/399587795372584',
+    finance: 'https://www.facebook.com/business/help/399587795372584',
+    // 不合理商业行为
+    unfair_business: 'https://www.facebook.com/business/help/2895682587380674?id=434838534925385',
+    // 药物与制药（总览）
+    pharmaceuticals: 'https://www.facebook.com/business/help/432240224665596?id=434838534925385',
+    drugs: 'https://www.facebook.com/business/help/432240224665596?id=434838534925385',
+    // 交友
+    dating: 'https://www.facebook.com/business/help/765622867361201',
+    // 加密货币
+    cryptocurrency: 'https://www.facebook.com/business/help/438252513416690?id=595195347635322',
+    crypto: 'https://www.facebook.com/business/help/438252513416690?id=595195347635322',
+    // 戒毒/酒精成瘾治疗
+    addiction_treatment: 'https://www.facebook.com/business/help/383110896305204?id=434838534925385',
+    rehab: 'https://www.facebook.com/business/help/383110896305204?id=434838534925385',
+    // 处方药
+    prescription_drugs: 'https://www.facebook.com/business/help/263390265553560?id=434838534925385',
+    // 特定网域限制
+    domain_restrictions: 'https://www.facebook.com/business/help/733029810936140?id=434838534925385'
+  };
+  if (!category) return getFacebookPolicyLink();
+  return mapping[category] || getFacebookPolicyLink();
+};
+
+/**
  * 检查是否包含黑五类及高风险品类
  * @param text 待检测文本
  * @returns 是否包含黑五类

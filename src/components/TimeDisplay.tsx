@@ -43,14 +43,14 @@ export const TimeDisplay: React.FC = () => {
   };
 
   return (
-    <div className="py-2">
-      <div className="w-full px-4">
-        <div className="flex items-center justify-center gap-4 md:gap-6 text-sm overflow-x-auto">
+    <div className="relative overflow-hidden py-2 border-b border-blue-200/60 bg-gradient-to-r from-white/60 to-white/30">
+      <div className="container mx-auto px-2 sm:px-4 relative z-10">
+        <div className="flex flex-wrap items-center justify-end gap-2 md:gap-3 text-[13px] sm:text-sm">
           {timeZones.map((tz) => (
-            <div key={tz.name} className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors duration-200 flex-shrink-0">
-              <span className="text-base">{tz.flag}</span>
+            <div key={tz.name} className="flex items-center space-x-1.5 px-2 py-1 rounded-md bg-white/70 hover:bg-white/80 backdrop-blur-sm border border-blue-200 transition-colors duration-200">
+              <span className="text-sm">{tz.flag}</span>
               <span className="font-medium text-slate-700 hidden md:inline">{tz.name}</span>
-              <span className="text-slate-600 font-mono text-sm">
+              <span className="text-slate-600 font-mono text-[11px] sm:text-xs">
                 {formatTime(currentTime, tz.timezone)}
               </span>
             </div>

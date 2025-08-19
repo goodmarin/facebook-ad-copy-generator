@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { CopyButton } from './CopyButton';
-import { detectSensitiveWords, getFacebookPolicyLink } from '../utils/sensitiveWords';
+import { detectSensitiveWords, getFacebookPolicyLink, getFacebookPolicyLinkByCategory } from '../utils/sensitiveWords';
 import { getDirectionByRegion } from '../utils/languages';
-import { AlertTriangle, CheckCircle, Sparkles, ExternalLink, ChevronLeft, ChevronRight, Shield } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Sparkles, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffectPrediction } from '../hooks/useEffectPrediction';
 // import { AdEffectPrediction } from './AdEffectPrediction'; // 暂时注释掉，使用内联版本
 import { EffectPrediction } from '../types';
-import { PolicyCheckResult } from '../utils/policyChecker';
+import { PolicyCheckResult, PolicyViolation } from '../utils/policyChecker';
 
 interface OutputDisplayProps {
   copies: Array<{text: string, region: string, regionName: string}>;
@@ -61,6 +61,38 @@ const highlightSensitiveWords = (text: string, sensitiveWords: string[]): React.
   return parts.length > 0 ? parts : text;
 };
 
+// 违规词横向可滑动列表（手动横滑）
+const Ticker: React.FC<{ violations: PolicyViolation[] }> = ({ violations }) => {
+  if (!violations || violations.length === 0) return null;
+
+  const getBadgeClass = (severity: string) =>
+    severity === 'high'
+      ? 'bg-red-100 text-red-700'
+      : severity === 'medium'
+      ? 'bg-yellow-100 text-yellow-700'
+      : 'bg-blue-100 text-blue-700';
+
+  return (
+    <div className="overflow-x-auto no-scrollbar [-webkit-overflow-scrolling:touch]">
+      <div className="flex items-center gap-1 pr-1">
+        {violations.map((v, idx) => (
+          <div
+            key={`${v.word}-${idx}`}
+            className="shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] leading-[10px] rounded-full border border-gray-200 bg-white text-gray-700"
+          >
+            <span className="whitespace-nowrap">
+              {v.word} → {v.suggestion}
+            </span>
+            <span className={`px-1 py-[1px] rounded ${getBadgeClass(v.severity)}`}>
+              {v.severity === 'high' ? '高' : v.severity === 'medium' ? '中' : '低'}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export const OutputDisplay: React.FC<OutputDisplayProps> = ({
   copies,
   regions,
@@ -74,9 +106,20 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
   const direction = getDirectionByRegion(primaryRegion);
   const [currentIndex, setCurrentIndex] = useState(0);
   
+  // 当风险词较多时，压缩顶部左右轮播按钮占用的垂直空间
+  const violationCount = policyCheckResult?.violations?.length || 0;
+  const compactNav = violationCount >= 8; // 风险词过多时启用极窄模式
+  
   // 效果预测相关状态
   const [predictions, setPredictions] = useState<EffectPrediction[]>([]);
   const { predictEffect, isPredicting, predictionError } = useEffectPrediction();
+
+  // 当开始新一轮生成时，重置当前展示到第一条
+  useEffect(() => {
+    if (isLoading) {
+      setCurrentIndex(0);
+    }
+  }, [isLoading]);
 
   // 当文案生成完成后，自动进行效果预测
   useEffect(() => {
@@ -189,11 +232,13 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
 
   if (copies.length === 0) {
     return (
-      <div className="min-h-0">
-        <div className="text-center text-gray-600 mb-8">
-          <div className="text-4xl mb-4">📝</div>
-          <h3 className="text-lg font-semibold mb-2">等待生成文案</h3>
-          <p className="text-sm">填写左侧表单并点击"生成文案"按钮</p>
+      <div className="flex flex-col h-full">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-600">
+            <div className="text-4xl mb-4">📝</div>
+            <h3 className="text-lg font-semibold mb-2">等待生成文案</h3>
+            <p className="text-sm">填写左侧表单并点击"生成文案"按钮</p>
+          </div>
         </div>
         
         {/* 添加使用指南和示例 */}
@@ -245,117 +290,35 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
   }
 
   return (
-    <div className="relative h-full flex flex-col">
-      {/* 风险检测结果 */}
-      {policyCheckResult && (
-        <div className="mb-4">
-          <div className={`p-4 border rounded-xl ${
-            policyCheckResult.riskLevel === 'high' 
-              ? 'bg-red-50 border-red-200' 
-              : policyCheckResult.riskLevel === 'medium'
-              ? 'bg-yellow-50 border-yellow-200'
-              : policyCheckResult.riskLevel === 'low'
-              ? 'bg-blue-50 border-blue-200'
-              : 'bg-green-50 border-green-200'
-          }`}>
-            <div className="flex items-start">
-              <Shield className={`w-5 h-5 mr-3 mt-0.5 ${
-                policyCheckResult.riskLevel === 'high' 
-                  ? 'text-red-600' 
-                  : policyCheckResult.riskLevel === 'medium'
-                  ? 'text-yellow-600'
-                  : policyCheckResult.riskLevel === 'low'
-                  ? 'text-blue-600'
-                  : 'text-green-600'
-              }`} />
-              <div className="flex-1">
-                <div className="flex items-center mb-2">
-                  <h4 className={`text-sm font-bold ${
-                    policyCheckResult.riskLevel === 'high' 
-                      ? 'text-red-700' 
-                      : policyCheckResult.riskLevel === 'medium'
-                      ? 'text-yellow-700'
-                      : policyCheckResult.riskLevel === 'low'
-                      ? 'text-blue-700'
-                      : 'text-green-700'
-                  }`}>
-                    风险预估检测结果
-                  </h4>
-                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                    policyCheckResult.riskLevel === 'high' 
-                      ? 'bg-red-200 text-red-800' 
-                      : policyCheckResult.riskLevel === 'medium'
-                      ? 'bg-yellow-200 text-yellow-800'
-                      : policyCheckResult.riskLevel === 'low'
-                      ? 'bg-blue-200 text-blue-800'
-                      : 'bg-green-200 text-green-800'
-                  }`}>
-                    {policyCheckResult.riskLevel === 'high' ? '高风险' : 
-                     policyCheckResult.riskLevel === 'medium' ? '中风险' : 
-                     policyCheckResult.riskLevel === 'low' ? '低风险' : '安全'}
-                  </span>
-                </div>
-                
-                <p className={`text-sm mb-3 ${
-                  policyCheckResult.riskLevel === 'high' 
-                    ? 'text-red-700' 
-                    : policyCheckResult.riskLevel === 'medium'
-                    ? 'text-yellow-700'
-                    : policyCheckResult.riskLevel === 'low'
-                    ? 'text-blue-700'
-                    : 'text-green-700'
-                }`}>
-                  {policyCheckResult.summary}
-                </p>
+    <div className="relative h-full flex flex-col min-h-[600px]">
 
-                {policyCheckResult.violations.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-700">检测到的风险词汇：</p>
-                    <div className="flex flex-wrap gap-2">
-                      {policyCheckResult.violations.map((violation, index) => (
-                        <div key={index} className="bg-white/80 border border-gray-200 rounded-lg p-2">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium text-red-600">{violation.word}</span>
-                            <span className={`text-xs px-2 py-1 rounded ${
-                              violation.severity === 'high' 
-                                ? 'bg-red-100 text-red-700' 
-                                : violation.severity === 'medium'
-                                ? 'bg-yellow-100 text-yellow-700'
-                                : 'bg-blue-100 text-blue-700'
-                            }`}>
-                              {violation.severity === 'high' ? '高风险' : 
-                               violation.severity === 'medium' ? '中风险' : '低风险'}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-600 mb-1">{violation.description}</p>
-                          <p className="text-xs text-green-600">
-                            建议替换为：<span className="font-medium">{violation.suggestion}</span>
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+      {/* 违规词横向列表（放在顶部提示条之上） */}
+      {policyCheckResult?.violations?.length ? (
+        <div className={`${compactNav ? 'mb-1 py-1 px-1' : 'mb-2 p-2'} bg-red-50/70 border border-red-200 rounded-lg`}>
+          <Ticker violations={policyCheckResult.violations} />
         </div>
-      )}
+      ) : null}
 
-      {/* 黑五类违规提示 */}
+      {/* 黑五类违规提示（保留一处提示，避免与顶部风险模块重复） */}
       {isForbiddenProduct && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center">
-          <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
-          <div>
-            <span className="text-sm font-bold text-red-700">⚠️ 该产品可能违反Facebook广告发布政策，禁止投放！</span>
-            <a
-              href="https://www.facebook.com/business/help/488043719226449?id=434838534925385"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-2 text-blue-600 underline hover:text-blue-800 text-xs"
-            >
-              查看政策详情
-            </a>
+        <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-lg flex items-center">
+          <AlertTriangle className="w-4 h-4 text-red-600 mr-2" />
+          <div className="text-xs">
+            <span className="font-semibold text-red-700">该产品可能违反Facebook广告发布政策</span>
+            {(() => {
+              const topViolation = policyCheckResult?.violations?.[0];
+              const deepLink = getFacebookPolicyLinkByCategory(topViolation?.category);
+              return (
+                <a
+                  href={deepLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-2 text-blue-600 underline hover:text-blue-800"
+                >
+                  查看政策
+                </a>
+              );
+            })()}
           </div>
         </div>
       )}
@@ -375,23 +338,23 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
         <div className="relative flex-1 min-h-0">
           {/* 轮播控制按钮 */}
           {copies.length > 1 && (
-            <div className="flex justify-between items-center mb-4 px-4">
+            <div className={`flex justify-between items-center ${compactNav ? 'mb-1 px-2 h-7' : 'mb-4 px-4'}`}>
               <button
                 onClick={prevCopy}
-                className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+                className={`flex items-center bg-gray-100 hover:bg-gray-200 transition-colors duration-200 ${compactNav ? 'justify-center w-7 h-7 rounded-md px-0 py-0' : 'px-4 py-2 rounded-lg'}`}
               >
-                <ChevronLeft className="w-4 h-4 text-gray-600 mr-2" />
-                <span className="text-sm font-medium text-gray-700">上一条</span>
+                <ChevronLeft className={`${compactNav ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-gray-600 ${compactNav ? '' : 'mr-2'}`} />
+                <span className={`${compactNav ? 'sr-only' : 'text-sm font-medium text-gray-700'}`}>上一条</span>
               </button>
               
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">文案 {currentIndex + 1} / {copies.length}</span>
-                <div className="flex space-x-1">
+              <div className={`flex items-center ${compactNav ? 'space-x-1' : 'space-x-2'}`}>
+                <span className={`${compactNav ? 'sr-only' : 'text-sm text-gray-600'}`}>文案 {currentIndex + 1} / {copies.length}</span>
+                <div className={`flex ${compactNav ? 'space-x-0.5' : 'space-x-1'}`}>
                   {copies.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentIndex(index)}
-                      className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                      className={`${compactNav ? 'w-1.5 h-1.5' : 'w-2 h-2'} rounded-full transition-all duration-200 ${
                         index === currentIndex ? 'bg-blue-500' : 'bg-gray-300'
                       }`}
                     />
@@ -401,10 +364,10 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
               
               <button
                 onClick={nextCopy}
-                className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+                className={`flex items-center bg-gray-100 hover:bg-gray-200 transition-colors duration-200 ${compactNav ? 'justify-center w-7 h-7 rounded-md px-0 py-0' : 'px-4 py-2 rounded-lg'}`}
               >
-                <span className="text-sm font-medium text-gray-700">下一条</span>
-                <ChevronRight className="w-4 h-4 text-gray-600 ml-2" />
+                <span className={`${compactNav ? 'sr-only' : 'text-sm font-medium text-gray-700'}`}>下一条</span>
+                <ChevronRight className={`${compactNav ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-gray-600 ${compactNav ? '' : 'ml-2'}`} />
               </button>
             </div>
           )}
@@ -434,6 +397,8 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
                     </div>
                     <CopyButton text={cleanCopyText(copies[currentIndex]?.text || '')} className="bg-white hover:bg-gray-50 shadow-sm" />
                   </div>
+
+                  {/* 内嵌风险提示条已删除：保留顶部统一风险提示，避免重复显示 */}
 
                   {/* 文案内容区域 */}
                   <div className="p-6">
@@ -658,29 +623,7 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({
           </div>
         )}
 
-        {/* Facebook政策提示 - 只在生成结果后显示 */}
-        {copies.length > 0 && (
-          <div className="mt-6 mb-4 mx-2 sm:mx-4 lg:mx-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
-              <div className="flex items-center">
-                <ExternalLink className="w-4 h-4 text-blue-600 mr-2" />
-                <span className="text-sm font-medium text-blue-800">Facebook广告发布政策</span>
-              </div>
-              <a 
-                href={getFacebookPolicyLink()} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors bg-white/80 hover:bg-white px-3 py-1 rounded-lg shadow-sm self-start sm:self-center"
-              >
-                查看政策
-                <ExternalLink className="w-3 h-3 ml-1" />
-              </a>
-            </div>
-            <p className="text-xs text-blue-700">
-              💡 提示：请确保您的广告文案符合Facebook广告政策，避免使用夸大宣传、误导性语言或违反社区准则的内容。
-            </p>
-          </div>
-        )}
+        {/* 底部政策提示删除以避免与顶部风险提示重复，并为文案留出更多空间 */}
         </div>
       </div>
     </div>

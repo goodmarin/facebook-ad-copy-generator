@@ -148,7 +148,8 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer sk-674b29e0b86846bca55195b66eb3e3aa'
+                        // 客户端页面不应包含密钥，此示例仅用于回归验证，不发送授权头
+                        // 'Authorization': 'Bearer '
                     },
                     body: JSON.stringify({
                         model: 'deepseek-chat',

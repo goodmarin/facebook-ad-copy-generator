@@ -7,7 +7,7 @@ import { CountdownTimer } from '../components/CountdownTimer';
 import { EmojiEnhancer, generateEmojiPromptRules } from '../utils/enhancedEmojiRules';
 import { checkForbiddenCategory } from '../utils/sensitiveWords';
 import { checkPolicyViolations, PolicyCheckResult } from '../utils/policyChecker';
-import { getLanguageByRegion } from '../utils/languages';
+import { getLanguageByRegion, getRegionConfig } from '../utils/languages';
 
 interface ProductInfo {
   name: string;
@@ -36,14 +36,8 @@ export const CopyGeneratorPage: React.FC = () => {
   const [policyCheckResult, setPolicyCheckResult] = useState<PolicyCheckResult | null>(null);
 
   const getRegionChineseName = (regionCode: string): string => {
-    const regionNames: { [key: string]: string } = {
-      'US': '美国', 'JP': '日本', 'KR': '韩国', 'IN': '印度', 'SG': '新加坡',
-      'MY': '马来西亚', 'TH': '泰国', 'VN': '越南', 'ID': '印度尼西亚', 'PH': '菲律宾',
-      'TW': '台湾', 'HK': '香港', 'CA': '加拿大', 'MX': '墨西哥', 'GB': '英国',
-      'DE': '德国', 'FR': '法国', 'IT': '意大利', 'ES': '西班牙', 'NL': '荷兰',
-      'AU': '澳大利亚', 'NZ': '新西兰', 'BR': '巴西', 'AR': '阿根廷'
-    };
-    return regionNames[regionCode] || regionCode;
+    const cfg = getRegionConfig(regionCode);
+    return cfg?.name || regionCode;
   };
 
   const cleanCopyText = (text: string): string => {

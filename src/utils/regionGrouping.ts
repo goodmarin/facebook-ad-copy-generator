@@ -68,7 +68,7 @@ export function getAutoRegionGroups(regions: RegionConfig[]): UIRegionGroup[] {
     if (!r) return null;
     return {
       value: r.code,
-      label: `${r.flag || ''} ${r.name}`.trim(),
+      label: `${r.name}`.trim(),
       desc: getLanguageDisplay(r.language)
     };
   };

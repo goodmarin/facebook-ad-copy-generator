@@ -18,6 +18,13 @@ function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
+  // Ensure navigating to home always scrolls to top
+  useEffect(() => {
+    if (route === '/') {
+      window.scrollTo(0, 0);
+    }
+  }, [route]);
+
   if (route === '/generate') {
     return <CopyGeneratorPage />;
   }

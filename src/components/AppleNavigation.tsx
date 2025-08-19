@@ -98,7 +98,11 @@ export const AppleNavigation: React.FC<AppleNavigationProps> = () => {
               <a
                 href="#/"
                 aria-label="返回首页"
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  // 强制回到顶部，避免从其它页面返回时保持原滚动位置
+                  window.scrollTo(0, 0);
+                }}
                 className="block"
               >
                 <Logo 

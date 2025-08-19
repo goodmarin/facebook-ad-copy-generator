@@ -1,65 +1,63 @@
 <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- 地球渐变 -->
-    <radialGradient id="earthGradient" cx="40%" cy="30%" r="80%">
-      <stop offset="0%" stop-color="#87CEEB"/>
-      <stop offset="30%" stop-color="#4682B4"/>
-      <stop offset="70%" stop-color="#1E40AF"/>
-      <stop offset="100%" stop-color="#0F172A"/>
-    </radialGradient>
-    
-    <!-- 陆地渐变 -->
-    <linearGradient id="landGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#22C55E"/>
-      <stop offset="50%" stop-color="#16A34A"/>
-      <stop offset="100%" stop-color="#15803D"/>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="50%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
     </linearGradient>
     
-    <!-- 高光渐变 -->
-    <radialGradient id="highlightGradient" cx="35%" cy="25%" r="50%">
-      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.6"/>
-      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.2"/>
-      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#DBEAFE" stop-opacity="0.8"/>
+      <stop offset="70%" stop-color="#3B82F6" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#1E40AF" stop-opacity="0"/>
     </radialGradient>
   </defs>
   
-  <!-- 透明背景 -->
+  <!-- 背景 -->
+  <rect width="120" height="120" fill="#ffffff"/>
   
-  <!-- 地球主体 -->
-  <circle cx="60" cy="60" r="45" fill="url(#earthGradient)" stroke="#1E40AF" stroke-width="1"/>
+  <!-- 背景发光圆 -->
+  <circle cx="60" cy="60" r="55" fill="url(#glowGradient)"/>
   
-  <!-- 陆地区域 -->
-  <!-- 北美洲 -->
-  <path d="M 30 40 Q 35 35 45 38 Q 50 40 48 50 Q 45 55 40 52 Q 32 48 30 40" fill="url(#landGradient)"/>
+  <!-- 外环 -->
+  <circle cx="60" cy="60" r="45" fill="none" stroke="url(#primaryGradient)" stroke-width="3" opacity="0.6"/>
   
-  <!-- 亚洲 -->
-  <path d="M 65 35 Q 80 30 90 40 Q 95 50 88 60 Q 80 55 75 45 Q 70 38 65 35" fill="url(#landGradient)"/>
+  <!-- 中心核心 -->
+  <circle cx="60" cy="60" r="12" fill="url(#primaryGradient)"/>
   
-  <!-- 非洲 -->
-  <path d="M 50 55 Q 60 50 65 65 Q 62 80 55 85 Q 48 82 45 70 Q 47 60 50 55" fill="url(#landGradient)"/>
+  <!-- 六边形结构 -->
+  <polygon 
+    points="60,30 78,42 78,78 60,90 42,78 42,42" 
+    fill="none" 
+    stroke="url(#accentGradient)" 
+    stroke-width="2.5"
+  />
   
-  <!-- 南美洲 -->
-  <path d="M 35 65 Q 40 60 42 75 Q 38 90 32 88 Q 28 80 30 70 Q 32 65 35 65" fill="url(#landGradient)"/>
+  <!-- 连接线 -->
+  <line x1="60" y1="48" x2="60" y2="30" stroke="url(#primaryGradient)" stroke-width="2"/>
+  <line x1="72" y1="54" x2="78" y2="42" stroke="url(#primaryGradient)" stroke-width="2"/>
+  <line x1="72" y1="66" x2="78" y2="78" stroke="url(#primaryGradient)" stroke-width="2"/>
+  <line x1="60" y1="72" x2="60" y2="90" stroke="url(#primaryGradient)" stroke-width="2"/>
+  <line x1="48" y1="66" x2="42" y2="78" stroke="url(#primaryGradient)" stroke-width="2"/>
+  <line x1="48" y1="54" x2="42" y2="42" stroke="url(#primaryGradient)" stroke-width="2"/>
   
-  <!-- 澳洲 -->
-  <ellipse cx="80" cy="75" rx="8" ry="5" fill="url(#landGradient)"/>
+  <!-- 节点 -->
+  <circle cx="60" cy="30" r="3" fill="url(#accentGradient)"/>
+  <circle cx="78" cy="42" r="3" fill="url(#accentGradient)"/>
+  <circle cx="78" cy="78" r="3" fill="url(#accentGradient)"/>
+  <circle cx="60" cy="90" r="3" fill="url(#accentGradient)"/>
+  <circle cx="42" cy="78" r="3" fill="url(#accentGradient)"/>
+  <circle cx="42" cy="42" r="3" fill="url(#accentGradient)"/>
   
-  <!-- 经纬线 -->
-  <!-- 赤道 -->
-  <ellipse cx="60" cy="60" rx="45" ry="15" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.3"/>
-  
-  <!-- 子午线 -->
-  <ellipse cx="60" cy="60" rx="15" ry="45" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.3"/>
-  
-  <!-- 北回归线 -->
-  <ellipse cx="60" cy="45" rx="38" ry="12" fill="none" stroke="#FFFFFF" stroke-width="0.5" opacity="0.2"/>
-  
-  <!-- 南回归线 -->
-  <ellipse cx="60" cy="75" rx="38" ry="12" fill="none" stroke="#FFFFFF" stroke-width="0.5" opacity="0.2"/>
-  
-  <!-- 高光效果 -->
-  <ellipse cx="60" cy="60" rx="45" ry="45" fill="url(#highlightGradient)"/>
-  
-  <!-- 轨道环 -->
-  <ellipse cx="60" cy="60" rx="55" ry="18" fill="none" stroke="#94A3B8" stroke-width="1" opacity="0.4" stroke-dasharray="3,3"/>
+  <!-- 外围装饰元素 -->
+  <rect x="15" y="58" width="8" height="4" rx="2" fill="url(#primaryGradient)" opacity="0.7"/>
+  <rect x="97" y="58" width="8" height="4" rx="2" fill="url(#primaryGradient)" opacity="0.7"/>
+  <rect x="58" y="15" width="4" height="8" rx="2" fill="url(#accentGradient)" opacity="0.7"/>
+  <rect x="58" y="97" width="4" height="8" rx="2" fill="url(#accentGradient)" opacity="0.7"/>
 </svg>

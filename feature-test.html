@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品特性图片测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 产品特性图片样式优化 */
+        .feature-image-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 自适应尺寸容器 */
+        .feature-image-wrapper {
+            aspect-ratio: 4/3;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem;
+        }
+
+        /* 加载状态样式 */
+        .feature-image-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 1.5rem;
+        }
+
+        /* 装饰性元素 */
+        .feature-image-decoration {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .feature-image-decoration:nth-child(1) {
+            top: -1rem;
+            right: -1rem;
+            width: 2rem;
+            height: 2rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            animation-delay: 0s;
+        }
+
+        .feature-image-decoration:nth-child(2) {
+            bottom: -1rem;
+            left: -1rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            animation-delay: 2s;
+        }
+
+        /* 浮动动画 */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .feature-image-wrapper {
+                aspect-ratio: 3/2;
+                max-width: 100%;
+            }
+            
+            .feature-image-container {
+                min-height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .feature-image-wrapper {
+                aspect-ratio: 1/1;
+            }
+            
+            .feature-image-container {
+                min-height: 200px;
+            }
+        }
+
+        /* 图片质量控制 */
+        .feature-image img {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            backface-visibility: hidden;
+        }
+
+        /* 渐变背景优化 */
+        .feature-gradient-bg {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* 图片加载优化 */
+        .feature-image-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* 图片容器阴影效果 */
+        .feature-image-shadow {
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        /* 图片边框效果 */
+        .feature-image-border {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* 图片悬停效果 */
+        .feature-image-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-image-hover:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 
+                0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* 图片加载失败样式 */
+        .feature-image-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #64748b;
+            font-size: 0.875rem;
+            text-align: center;
+            border-radius: 1rem;
+        }
+
+        /* 图片控制按钮样式 */
+        .feature-image-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 0 0 1.5rem 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-image-container:hover .feature-image-controls {
+            opacity: 1;
+        }
+
+        /* 图片质量指示器 */
+        .feature-image-quality {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- 标题 -->
+            <div class="text-center mb-20">
+                <h1 class="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
+                    产品特性图片
+                    <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> 测试页面</span>
+                </h1>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    测试AI生成的产品特性图片效果，验证自适应尺寸和段落对齐
+                </p>
+            </div>
+
+            <!-- 测试特性 -->
+            <div class="space-y-32">
+                <!-- AI 智能生成 -->
+                <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg">
+                                🤖
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-bold text-gray-900">AI 智能生成</h3>
+                                <p class="text-lg text-gray-600">基于DeepSeek大模型</p>
+                            </div>
+                        </div>
+                        <p class="text-xl text-gray-700 leading-relaxed mb-8">
+                            先进的人工智能技术，深度理解产品特性，自动生成高转化率的广告文案，让每一个字都精准触达用户心理。
+                        </p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span class="text-gray-700 font-medium">智能语义分析</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span class="text-gray-700 font-medium">情感识别技术</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span class="text-gray-700 font-medium">转化率优化</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span class="text-gray-700 font-medium">实时学习能力</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <div class="feature-image-wrapper feature-image-shadow feature-image-hover">
+                            <div class="feature-image-decoration"></div>
+                            <div class="feature-image-decoration"></div>
+                            
+                            <div class="feature-image-container">
+                                <div class="relative w-full h-full bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl shadow-2xl overflow-hidden feature-image-border">
+                                    <div class="absolute inset-0 opacity-20">
+                                        <div class="absolute top-0 left-0 w-32 h-32 bg-white rounded-full -translate-x-16 -translate-y-16"></div>
+                                        <div class="absolute bottom-0 right-0 w-24 h-24 bg-white rounded-full translate-x-12 translate-y-12"></div>
+                                    </div>
+                                    
+                                    <div class="relative z-10 w-full h-full flex flex-col">
+                                        <div class="flex-1 p-6 flex items-center justify-center">
+                                            <div class="w-full h-full bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-lg flex items-center justify-center">
+                                                <div class="text-white text-center">
+                                                    <div class="text-6xl mb-4">🤖</div>
+                                                    <div class="text-lg font-medium">AI智能生成</div>
+                                                    <div class="text-sm opacity-80">基于DeepSeek大模型</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="feature-image-controls">
+                                            <div class="flex items-center justify-center space-x-3">
+                                                <button class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors duration-200 text-sm font-medium">
+                                                    🔄 重新生成
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="feature-image-quality">
+                                            AI生成
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 全球本土化 -->
+                <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center lg:grid-flow-col-dense">
+                    <div class="lg:col-start-2 space-y-6">
+                        <div class="flex items-center space-x-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg">
+                                🌍
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-bold text-gray-900">全球本土化</h3>
+                                <p class="text-lg text-gray-600">90+ 国家地区支持</p>
+                            </div>
+                        </div>
+                        <p class="text-xl text-gray-700 leading-relaxed mb-8">
+                            覆盖全球主要市场，精准适配当地语言、文化和消费习惯，让您的产品在任何地区都能获得本土用户的认同。
+                        </p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span class="text-gray-700 font-medium">多语言支持</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span class="text-gray-700 font-medium">文化适配</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span class="text-gray-700 font-medium">本土表达</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span class="text-gray-700 font-medium">地区优化</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="lg:col-start-1 relative">
+                        <div class="feature-image-wrapper feature-image-shadow feature-image-hover">
+                            <div class="feature-image-decoration"></div>
+                            <div class="feature-image-decoration"></div>
+                            
+                            <div class="feature-image-container">
+                                <div class="relative w-full h-full bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl shadow-2xl overflow-hidden feature-image-border">
+                                    <div class="absolute inset-0 opacity-20">
+                                        <div class="absolute top-0 left-0 w-32 h-32 bg-white rounded-full -translate-x-16 -translate-y-16"></div>
+                                        <div class="absolute bottom-0 right-0 w-24 h-24 bg-white rounded-full translate-x-12 translate-y-12"></div>
+                                    </div>
+                                    
+                                    <div class="relative z-10 w-full h-full flex flex-col">
+                                        <div class="flex-1 p-6 flex items-center justify-center">
+                                            <div class="w-full h-full bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-lg flex items-center justify-center">
+                                                <div class="text-white text-center">
+                                                    <div class="text-6xl mb-4">🌍</div>
+                                                    <div class="text-lg font-medium">全球本土化</div>
+                                                    <div class="text-sm opacity-80">90+国家地区支持</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="feature-image-controls">
+                                            <div class="flex items-center justify-center space-x-3">
+                                                <button class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors duration-200 text-sm font-medium">
+                                                    🔄 重新生成
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="feature-image-quality">
+                                            AI生成
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

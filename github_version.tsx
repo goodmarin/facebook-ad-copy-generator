@@ -113,7 +113,10 @@ function App() {
     }
     
     try {
-      const apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY || 'sk-674b29e0b86846bca55195b66eb3e3aa';
+      const apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY;
+      if (!apiKey) {
+        throw new Error('缺少 DeepSeek API Key。请配置环境变量 VITE_DEEPSEEK_API_KEY');
+      }
       
       // 先翻译产品信息
       const translatedProduct = translateProductInfo(productInfo, region);

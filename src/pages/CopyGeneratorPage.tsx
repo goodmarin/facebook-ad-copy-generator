@@ -46,15 +46,49 @@ export const CopyGeneratorPage: React.FC = () => {
       .replace(/\*(.*?)\*/g, '$1')
       .replace(/`(.*?)`/g, '$1')
       .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+      // 移除无效或多余的符号，保持纯文本输出
+      .replace(/[\[\]{}<>|【】「」『』]/g, ' ')
+      .replace(/[~^_=\\]/g, ' ')
+      .replace(/\s{2,}/g, ' ')
       .trim();
   };
 
   const isTextInTargetLanguage = (text: string, languageCode: string): boolean => {
     const lang = (languageCode || '').toLowerCase();
-    if (lang.startsWith('en')) return /[a-z]/i.test(text);
-    if (lang.startsWith('ja')) return /[\u3040-\u30ff\uff66-\uff9f]/.test(text);
-    if (lang.startsWith('ko')) return /[\uac00-\ud7af]/.test(text);
-    if (lang.startsWith('zh')) return /[\u4e00-\u9fff]/.test(text);
+
+    // 非中文语言一律禁止出现中文字符（日本語除外，因含汉字）
+    if (!lang.startsWith('zh') && !lang.startsWith('ja')) {
+      if (/[\u4e00-\u9fff]/.test(text)) return false;
+    }
+
+    // 计算脚本覆盖率：目标脚本字符数 / 所有字母型字符数
+    const count = (re: RegExp) => (text.match(re) || []).length;
+    const letterCount = count(/[A-Za-z\u00C0-\u024F\u0400-\u04FF\u0590-\u05FF\u0600-\u06FF\u0E00-\u0E7F\u3040-\u30FF\u31F0-\u31FF\u4E00-\u9FFF\uAC00-\uD7AF]/g);
+
+    const ensureCoverage = (scriptRe: RegExp, minRatio = 0.8) => {
+      const scriptCnt = count(scriptRe);
+      if (letterCount === 0) return false;
+      return scriptCnt >= 1 && scriptCnt / letterCount >= minRatio;
+    };
+
+    if (lang.startsWith('th')) return ensureCoverage(/[\u0E00-\u0E7F]/g, 0.8);
+    if (lang.startsWith('ko')) return ensureCoverage(/[\uAC00-\uD7AF]/g, 0.8);
+    if (lang.startsWith('ar') || lang.startsWith('fa') || lang.startsWith('ur')) return ensureCoverage(/[\u0600-\u06FF]/g, 0.8);
+    if (lang.startsWith('he')) return ensureCoverage(/[\u0590-\u05FF]/g, 0.8);
+    if (lang.startsWith('bg') || lang.startsWith('ru') || lang.startsWith('uk')) return ensureCoverage(/[\u0400-\u04FF]/g, 0.8);
+    if (lang.startsWith('lo')) return ensureCoverage(/[\u0E80-\u0EFF]/g, 0.8);
+    if (lang.startsWith('ja')) {
+      // 日语需包含平假名/片假名，允许汉字
+      const hasKana = /[\u3040-\u30FF\u31F0-\u31FF]/.test(text);
+      return hasKana;
+    }
+
+    // 拉丁字母系语言：确保不存在其它主要非拉丁脚本
+    const hasNonLatinScript = /[\u0E00-\u0E7F\uAC00-\uD7AF\u0600-\u06FF\u0400-\u04FF\u0590-\u05FF]/.test(text);
+    if (hasNonLatinScript) return false;
+
+    // 进一步通过特征词/变音符判断
+    if (lang.startsWith('vi')) return /[ăâđêôơư]/i.test(text) || /[áàảãạấầẩẫậắằẳẵặéèẻẽẹếềểễệíìỉĩịóòỏõọốồổỗộớờởỡợúùủũụứừửữựýỳỷỹỵ]/i.test(text);
     if (lang.startsWith('es')) return /[áéíóúñ¡¿]/i.test(text) || /\b(el|la|de|que|y|para|con|los|las)\b/i.test(text);
     if (lang.startsWith('pt')) return /[áâãàéêíóôõúç]/i.test(text) || /\b(o|a|de|que|e|para|com|os|as)\b/i.test(text);
     if (lang.startsWith('fr')) return /[àâçéèêëîïôûùüÿœæ]/i.test(text) || /\b(le|la|de|que|et|pour|avec|les|des)\b/i.test(text);
@@ -62,11 +96,6 @@ export const CopyGeneratorPage: React.FC = () => {
     if (lang.startsWith('it')) return /[àèéìíîòóùú]/i.test(text) || /\b(il|lo|la|e|di|che|per|con|gli|le)\b/i.test(text);
     if (lang.startsWith('nl')) return /\b(de|het|een|en|voor|met)\b/i.test(text);
     if (lang.startsWith('tr')) return /[çğıöşü]/i.test(text) || /\b(ve|için|ile|bir)\b/i.test(text);
-    if (lang.startsWith('ar')) return /[\u0600-\u06ff]/.test(text);
-    if (lang.startsWith('th')) return /[\u0e00-\u0e7f]/.test(text);
-    if (lang.startsWith('vi')) return /[ăâđêôơưáàảãạấầẩẫậắằẳẵặéèẻẽẹếềểễệíìỉĩịóòỏõọốồổỗộớờởỡợúùủũụứừửữựýỳỷỹỵ]/i.test(text);
-    if (lang.startsWith('id')) return /\b(dan|yang|untuk|dengan|di|ke|dari)\b/i.test(text);
-    if (lang.startsWith('ms')) return /\b(dan|yang|untuk|dengan|di|ke|dari)\b/i.test(text);
     if (lang.startsWith('sv')) return /[åäö]/i.test(text);
     if (lang.startsWith('no')) return /[æøå]/i.test(text);
     if (lang.startsWith('da')) return /[æøå]/i.test(text);
@@ -75,16 +104,14 @@ export const CopyGeneratorPage: React.FC = () => {
     if (lang.startsWith('cs')) return /[áčďéěíňóřšťúůýž]/i.test(text);
     if (lang.startsWith('hu')) return /[áéíóöőúüű]/i.test(text);
     if (lang.startsWith('ro')) return /[ăâîșț]/i.test(text);
-    if (lang.startsWith('bg')) return /[\u0400-\u04ff]/.test(text);
     if (lang.startsWith('hr')) return /[čćđšž]/i.test(text);
     if (lang.startsWith('sl')) return /[čšž]/i.test(text);
     if (lang.startsWith('sk')) return /[áäčďéíľĺňóôŕšťúýž]/i.test(text);
     if (lang.startsWith('lt')) return /[ąčęėįšųūž]/i.test(text);
     if (lang.startsWith('lv')) return /[āčēģīķļņōŗšūž]/i.test(text);
     if (lang.startsWith('et')) return /[äöõü]/i.test(text);
-    if (lang.startsWith('he')) return /[\u0590-\u05ff]/.test(text);
-    if (lang.startsWith('fa')) return /[\u0600-\u06ff]/.test(text);
-    if (lang.startsWith('ur')) return /[\u0600-\u06ff]/.test(text);
+    if (lang.startsWith('en')) return /[a-z]/i.test(text);
+
     return true;
   };
 
@@ -157,37 +184,31 @@ export const CopyGeneratorPage: React.FC = () => {
   const generateLocalizedCopiesWithAI = async (productInfo: ProductInfo, region: string, diversitySeed?: string): Promise<string[]> => {
     const language = getLanguageByRegion(region);
     const languageMap: { [key: string]: string } = {
-      'en-US': 'English',
-      'en-GB': 'English',
-      'en-CA': 'English',
-      'en-AU': 'English',
-      'en-SG': 'English',
-      'en-PH': 'English',
-      'en-IN': 'English',
-      'ja-JP': 'Japanese',
-      'ko-KR': 'Korean',
-      'zh-TW': 'Chinese (Traditional)',
-      'zh-HK': 'Chinese (Traditional)',
-      'es-ES': 'Spanish',
-      'es-MX': 'Spanish',
-      'pt-BR': 'Portuguese (Brazilian)',
+      // 英语系
+      'en-US': 'English', 'en-GB': 'English', 'en-CA': 'English', 'en-AU': 'English', 'en-SG': 'English', 'en-PH': 'English', 'en-IN': 'English', 'en-IE': 'English', 'en-ZA': 'English', 'en-NG': 'English', 'en-KE': 'English', 'en-GH': 'English', 'en-NZ': 'English',
+      // 东亚/东南亚
+      'ja-JP': 'Japanese', 'ko-KR': 'Korean', 'zh-TW': 'Chinese (Traditional)', 'zh-HK': 'Chinese (Traditional)',
+      'th-TH': 'Thai', 'vi-VN': 'Vietnamese', 'id-ID': 'Indonesian', 'ms-MY': 'Malay', 'lo-LA': 'Lao',
+      // 欧洲主要语种
+      'de-DE': 'German', 'de-CH': 'German', 'de-AT': 'German',
       'fr-FR': 'French',
-      'de-DE': 'German',
       'it-IT': 'Italian',
-      'nl-NL': 'Dutch',
-      'ar-SA': 'Arabic',
-      'ar-AE': 'Arabic',
-      'tr-TR': 'Turkish',
-      'th-TH': 'Thai',
-      'lo-LA': 'Lao',
-      'vi-VN': 'Vietnamese',
-      'id-ID': 'Indonesian',
-      'ms-MY': 'Malay'
+      'es-ES': 'Spanish', 'es-MX': 'Spanish', 'es-AR': 'Spanish', 'es-CL': 'Spanish', 'es-CO': 'Spanish', 'es-PE': 'Spanish', 'es-VE': 'Spanish', 'es-UY': 'Spanish', 'es-PY': 'Spanish', 'es-EC': 'Spanish',
+      'nl-NL': 'Dutch', 'nl-BE': 'Dutch',
+      'sv-SE': 'Swedish', 'no-NO': 'Norwegian', 'da-DK': 'Danish', 'fi-FI': 'Finnish',
+      'pl-PL': 'Polish', 'cs-CZ': 'Czech', 'hu-HU': 'Hungarian', 'ro-RO': 'Romanian', 'bg-BG': 'Bulgarian', 'hr-HR': 'Croatian', 'sl-SI': 'Slovenian', 'sk-SK': 'Slovak', 'lt-LT': 'Lithuanian', 'lv-LV': 'Latvian', 'et-EE': 'Estonian',
+      'el-GR': 'Greek',
+      // 中东/北非
+      'ar-SA': 'Arabic', 'ar-AE': 'Arabic', 'ar-EG': 'Arabic', 'ar-QA': 'Arabic', 'ar-KW': 'Arabic', 'ar-BH': 'Arabic', 'ar-OM': 'Arabic', 'ar-MA': 'Arabic', 'ar-TN': 'Arabic', 'ar-DZ': 'Arabic',
+      'he-IL': 'Hebrew', 'tr-TR': 'Turkish',
+      // 葡语
+      'pt-BR': 'Portuguese (Brazilian)', 'pt-PT': 'Portuguese'
     };
 
-    const targetLanguage = languageMap[language] || 'English';
+    const targetLanguage = languageMap[language] || (language.startsWith('ar-') ? 'Arabic' : language.startsWith('pt-') ? 'Portuguese' : language.startsWith('es-') ? 'Spanish' : language.startsWith('de-') ? 'German' : language.startsWith('nl-') ? 'Dutch' : language.startsWith('en-') ? 'English' : 'English');
     const emojiRules = generateEmojiPromptRules(region);
 
+    const chineseBanLine = targetLanguage === 'Chinese (Traditional)' || targetLanguage === 'Chinese' || targetLanguage === 'Japanese' ? '' : '\n- Absolutely NO Chinese characters (汉字)';
     const prompt = `Create 3 Facebook ad copies for ${region} market in ${targetLanguage}.
 
 Product: ${productInfo.name}
@@ -199,7 +220,7 @@ Promotion: ${productInfo.promotion}
 ${emojiRules}
 
 Requirements:
-- 100% ${targetLanguage}, no Chinese characters if not applicable
+- 100% ${targetLanguage}; do not mix any other languages${chineseBanLine}
 - 120-180 characters each copy
 - Include compelling call-to-action
 - Make it engaging and conversion-focused
@@ -209,7 +230,10 @@ Requirements:
 ${diversitySeed ? `\nRegeneration context: diversity seed = ${diversitySeed}. Ensure this batch is substantially different from previous batches by varying tone, structure, hooks, vocabulary, and emoji sets.` : ''}`;
 
     try {
-      const apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY || 'sk-674b29e0b86846bca55195b66eb3e3aa';
+      const apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY;
+      if (!apiKey) {
+        return generateFallbackCopies(productInfo, region);
+      }
       const requestBody = {
         model: 'deepseek-chat',
         messages: [
@@ -267,7 +291,17 @@ ${diversitySeed ? `\nRegeneration context: diversity seed = ${diversitySeed}. En
   };
 
   const generateFallbackCopies = (productInfo: ProductInfo, region: string): string[] => {
-    const lang = getLanguageByRegion(region);
+    let lang = getLanguageByRegion(region);
+    // 归一化别名，保证语言与国家一致
+    const aliasMap: { [key: string]: string } = {
+      'de-CH': 'de-DE', 'de-AT': 'de-DE',
+      'nl-BE': 'nl-NL',
+      'pt-PT': 'pt-BR',
+      'es-AR': 'es-ES', 'es-CL': 'es-ES', 'es-CO': 'es-ES', 'es-PE': 'es-ES', 'es-VE': 'es-ES', 'es-UY': 'es-ES', 'es-PY': 'es-ES', 'es-EC': 'es-ES',
+      'ar-AE': 'ar-SA', 'ar-EG': 'ar-SA', 'ar-QA': 'ar-SA', 'ar-KW': 'ar-SA', 'ar-BH': 'ar-SA', 'ar-OM': 'ar-SA', 'ar-MA': 'ar-SA', 'ar-TN': 'ar-SA', 'ar-DZ': 'ar-SA',
+      'en-GB': 'en-US', 'en-CA': 'en-US', 'en-AU': 'en-US', 'en-SG': 'en-US', 'en-PH': 'en-US', 'en-IN': 'en-US', 'en-IE': 'en-US', 'en-ZA': 'en-US', 'en-NG': 'en-US', 'en-KE': 'en-US', 'en-GH': 'en-US', 'en-NZ': 'en-US'
+    };
+    if (aliasMap[lang]) lang = aliasMap[lang];
     const languageMap: { [key: string]: { cta: string; bullets: (p: ProductInfo) => string[] } } = {
       'lo-LA': { cta: 'ຊື້ຕອນນີ້', bullets: (p) => [
         `${p.name} - ${p.features} | ເໝາະສໍາລັບ ${p.targetAudience}`,
@@ -339,12 +373,27 @@ ${diversitySeed ? `\nRegeneration context: diversity seed = ${diversitySeed}. En
         `Nur für kurze Zeit`,
         `Garantierte Qualität`
       ]},
+      'de-CH': { cta: 'Jetzt kaufen', bullets: (p) => [
+        `${p.name} - ${p.features} | Perfekt für ${p.targetAudience}`,
+        `Nur für kurze Zeit`,
+        `Garantierte Qualität`
+      ]},
+      'de-AT': { cta: 'Jetzt kaufen', bullets: (p) => [
+        `${p.name} - ${p.features} | Perfekt für ${p.targetAudience}`,
+        `Nur für kurze Zeit`,
+        `Garantierte Qualität`
+      ]},
       'it-IT': { cta: 'Acquista ora', bullets: (p) => [
         `${p.name} - ${p.features} | Perfetto per ${p.targetAudience}`,
         `Offerta a tempo limitato`,
         `Qualità garantita`
       ]},
       'nl-NL': { cta: 'Koop nu', bullets: (p) => [
+        `${p.name} - ${p.features} | Ideaal voor ${p.targetAudience}`,
+        `Aanbieding voor beperkte tijd`,
+        `Gegarandeerde kwaliteit`
+      ]},
+      'nl-BE': { cta: 'Koop nu', bullets: (p) => [
         `${p.name} - ${p.features} | Ideaal voor ${p.targetAudience}`,
         `Aanbieding voor beperkte tijd`,
         `Gegarandeerde kwaliteit`
@@ -360,6 +409,46 @@ ${diversitySeed ? `\nRegeneration context: diversity seed = ${diversitySeed}. En
         `جودة مضمونة`
       ]},
       'ar-AE': { cta: 'اشترِ الآن', bullets: (p) => [
+        `${p.name} - ${p.features} | مثالي لـ ${p.targetAudience}`,
+        `عرض محدود`,
+        `جودة موثوقة`
+      ]},
+      'ar-EG': { cta: 'اشترِ الآن', bullets: (p) => [
+        `${p.name} - ${p.features} | مثالي لـ ${p.targetAudience}`,
+        `عرض محدود`,
+        `جودة موثوقة`
+      ]},
+      'ar-QA': { cta: 'اشترِ الآن', bullets: (p) => [
+        `${p.name} - ${p.features} | مثالي لـ ${p.targetAudience}`,
+        `عرض محدود`,
+        `جودة موثوقة`
+      ]},
+      'ar-KW': { cta: 'اشترِ الآن', bullets: (p) => [
+        `${p.name} - ${p.features} | مثالي لـ ${p.targetAudience}`,
+        `عرض محدود`,
+        `جودة موثوقة`
+      ]},
+      'ar-BH': { cta: 'اشترِ الآن', bullets: (p) => [
+        `${p.name} - ${p.features} | مثالي لـ ${p.targetAudience}`,
+        `عرض محدود`,
+        `جودة موثوقة`
+      ]},
+      'ar-OM': { cta: 'اشترِ الآن', bullets: (p) => [
+        `${p.name} - ${p.features} | مثالي لـ ${p.targetAudience}`,
+        `عرض محدود`,
+        `جودة موثوقة`
+      ]},
+      'ar-MA': { cta: 'اشترِ الآن', bullets: (p) => [
+        `${p.name} - ${p.features} | مثالي لـ ${p.targetAudience}`,
+        `عرض محدود`,
+        `جودة موثوقة`
+      ]},
+      'ar-TN': { cta: 'اشترِ الآن', bullets: (p) => [
+        `${p.name} - ${p.features} | مثالي لـ ${p.targetAudience}`,
+        `عرض محدود`,
+        `جودة موثوقة`
+      ]},
+      'ar-DZ': { cta: 'اشترِ الآن', bullets: (p) => [
         `${p.name} - ${p.features} | مثالي لـ ${p.targetAudience}`,
         `عرض محدود`,
         `جودة موثوقة`

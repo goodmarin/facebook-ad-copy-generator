@@ -30,11 +30,11 @@ export const useEffectPrediction = (): UseEffectPredictionResult => {
     }
 
     try {
-      // 使用环境变量中的 API key，如果没有则使用默认值
-      const apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY || 'sk-674b29e0b86846bca55195b66eb3e3aa';
-      
-      console.log('使用的API Key:', apiKey.substring(0, 10) + '...');
-      console.log('环境变量VITE_DEEPSEEK_API_KEY:', import.meta.env.VITE_DEEPSEEK_API_KEY ? '已设置' : '未设置');
+      // 使用环境变量中的 API key（不再使用任何硬编码默认值）
+      const apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY;
+      if (!apiKey) {
+        throw new Error('缺少 DeepSeek API Key。请配置环境变量 VITE_DEEPSEEK_API_KEY');
+      }
       
       // 构建效果预测的prompt
       const prompt = `请对以下 Facebook 广告文案进行营销效果预测，输出格式如下：
@@ -71,7 +71,7 @@ CTR: [百分比]
         top_p: 0.8 // 降低top_p，提高速度
       };
 
-      console.log('API请求体:', JSON.stringify(requestBody, null, 2));
+      // console.log('API请求体:', JSON.stringify(requestBody, null, 2));
 
       const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',

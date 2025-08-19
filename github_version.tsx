@@ -38,6 +38,7 @@ function App() {
       'MY': { language: 'Bahasa Melayu', style: 'friendly and inclusive', culture: 'emphasize community and tradition' },
       'TH': { language: 'ไทย', style: 'warm and respectful', culture: 'emphasize family and social harmony' },
       'VN': { language: 'Tiếng Việt', style: 'direct and value-conscious', culture: 'emphasize family and education' },
+      'LA': { language: 'Lao', style: 'friendly and authentic', culture: 'emphasize simplicity and everyday use' },
       'ID': { language: 'Bahasa Indonesia', style: 'friendly and community-oriented', culture: 'emphasize social connection' },
       'PH': { language: 'English', style: 'warm and family-oriented', culture: 'emphasize family values and community' },
       'TW': { language: '繁體中文', style: '精緻優雅，注重品質', culture: '注重細節和品質追求' },
@@ -176,7 +177,7 @@ Requirements:
       }
 
       // 快速解析返回的文案
-      const copies = content
+      let copies = content
         .split(/copy\s*\d+[：:]\s*/i)
         .slice(1) // 移除第一个空元素
         .map((copy: string) => copy.trim().replace(/^[|:]\s*/, '').replace(/\s*[|:]\s*.*$/, ''))
@@ -186,6 +187,31 @@ Requirements:
       console.log('🔍 解析后的文案:', copies);
 
       // 智能后处理：确保文案完全本土化
+      // 语言严格校验：针对老挝语、泰语、阿语、希伯来语等需要脚本覆盖率
+      const isTextInTargetLanguage = (text: string, lang: string): boolean => {
+        const lower = (lang || '').toLowerCase();
+        const count = (re: RegExp) => (text.match(re) || []).length;
+        const letterCount = count(/[A-Za-z\u00C0-\u024F\u0400-\u04FF\u0590-\u05FF\u0600-\u06FF\u0E00-\u0E7F\u0E80-\u0EFF\u3040-\u30FF\u31F0-\u31FF\u4E00-\u9FFF\uAC00-\uD7AF]/g);
+        const ensureCoverage = (re: RegExp, min = 0.8) => {
+          const c = count(re);
+          if (letterCount === 0) return false;
+          return c >= 1 && c / letterCount >= min;
+        };
+        if (lower.includes('lao')) return ensureCoverage(/[\u0E80-\u0EFF]/g, 0.8);
+        if (lower.includes('thai')) return ensureCoverage(/[\u0E00-\u0E7F]/g, 0.8);
+        if (lower.includes('arab')) return ensureCoverage(/[\u0600-\u06FF]/g, 0.8);
+        if (lower.includes('hebrew')) return ensureCoverage(/[\u0590-\u05FF]/g, 0.8);
+        if (lower.includes('korean')) return ensureCoverage(/[\uAC00-\uD7AF]/g, 0.8);
+        if (lower.includes('japanese') || lower.includes('日本')) return /[\u3040-\u30FF\u31F0-\u31FF]/.test(text);
+        // 拉丁语系：禁止出现其它主要非拉丁脚本
+        const hasNonLatin = /[\u0E00-\u0E7F\u0E80-\u0EFF\uAC00-\uD7AF\u0600-\u06FF\u0400-\u04FF\u0590-\u05FF\u4E00-\u9FFF]/.test(text);
+        if (hasNonLatin) return false;
+        return true;
+      };
+
+      // 先进行一次粗过滤
+      copies = copies.filter(c => isTextInTargetLanguage(c, language));
+
       const processedCopies = copies.map((copy: string) => {
         console.log('🔍 处理前文案:', copy);
         const processed = processCopyForLocalization(copy, language, region);
@@ -248,6 +274,10 @@ Requirements:
     // 移除所有中文字符和标点符号
     processedCopy = processedCopy.replace(/[\u4e00-\u9fff]/g, '');
     processedCopy = processedCopy.replace(/[，。！？；：""''（）【】]/g, '');
+    // 移除Unicode替换符与控制字符，并规范化
+    processedCopy = processedCopy.replace(/\uFFFD/g, '');
+    processedCopy = processedCopy.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+    try { processedCopy = processedCopy.normalize('NFC'); } catch {}
     
     // 根据语言进行特定的清理
     switch (language) {
@@ -1159,7 +1189,12 @@ Requirements:
       'MX': [
         '🚀 ¡Transforma tu vida con {product}! {features} diseñado para {audience}. ¡Experimenta la fusión perfecta de tecnología y estilo de vida!',
         '💎 ¡Descubre el encanto único de {product}! {features} te ayudan a destacar entre {audience}. ¡Oferta limitada, no te lo pierdas!',
-        '�� ¡Venta caliente! {product} con {features} se convierte en la primera opción para {audience}. ¡Obtén descuentos exclusivos ahora!'
+        '🔥 ¡Venta caliente! {product} con {features} se convierte en la primera opción para {audience}. ¡Obtén descuentos exclusivos ahora!'
+      ],
+      'LA': [
+        '✨ {product}! {features} ອອກແບບສໍາລັບ {audience} ເພື່ອປະສົບການໃໝ່ທີ່ລົງຕົວ',
+        '⭐ ຄົ້ນພົບເສັ້ນສະເໝີຂອງ {product}! {features} ຊ່ວຍໃຫ້ທ່ານໂດດເດ່ນກາງ {audience} ໂປຣໂມຊັນຈໍາກັດ ຢ່າພາດ!',
+        '💪 ຂາຍດີ! {product} ກັບ {features} ເປັນຕົວເລືອກອັນດັບຕົ້ນໆສໍາລັບ {audience} ຮັບສ່ວນຫຼຸດພິເສດດຽວນີ້'
       ],
       'BR': [
         '🚀 Transforme sua vida com {product}! {features} projetado para {audience}. Experimente a fusão perfeita de tecnologia e estilo de vida!',

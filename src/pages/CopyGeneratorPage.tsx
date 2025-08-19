@@ -49,6 +49,10 @@ export const CopyGeneratorPage: React.FC = () => {
       // 移除无效或多余的符号，保持纯文本输出
       .replace(/[\[\]{}<>|【】「」『』]/g, ' ')
       .replace(/[~^_=\\]/g, ' ')
+      // 移除Unicode替换符与控制字符，并做规范化
+      .replace(/\uFFFD/g, '')
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+      .normalize('NFC')
       .replace(/\s{2,}/g, ' ')
       .trim();
   };

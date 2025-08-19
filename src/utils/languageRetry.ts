@@ -200,11 +200,24 @@ const addVietnameseLocalization = (copy: string): string => {
 
 // 🇱🇦 老挝本土化
 const addLaoLocalization = (copy: string): string => {
-  return copy
-    .replace(/amazing/gi, 'ງາມຫຼາຍ')
-    .replace(/great/gi, 'ດີຫຼາຍ')
-    .replace(/check it out/gi, 'ມາເບິ່ງກັນ')
-    + ' 🙏🇱🇦';
+  // 清理中文、替换符和控制字符，避免出现 �
+  let text = copy
+    .replace(/[\u4e00-\u9fff]/g, '')
+    .replace(/\uFFFD/g, '')
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+  try { text = text.normalize('NFC'); } catch {}
+  text = text
+    .replace(/amazing/gi, 'ສຸດຍອດ')
+    .replace(/great/gi, 'ດີເລີດ')
+    .replace(/check it out/gi, 'ລອງເບິ່ງ')
+    + ' 🇱🇦';
+  // 若老挝文字占比不足，附加地道CTA片段
+  const lao = (text.match(/[\u0E80-\u0EFF]/g) || []).length;
+  const letters = (text.match(/[A-Za-z\u0E80-\u0EFF]/g) || []).length || 1;
+  if (lao / letters < 0.6) {
+    text += ' ໂປຣໂມຊັນຈໍາກັດ ຊື້ຕອນນີ້';
+  }
+  return text;
 };
 
 // 🇰🇭 柬埔寨本土化
